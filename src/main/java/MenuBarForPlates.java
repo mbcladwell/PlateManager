@@ -2,7 +2,6 @@ package pm;
 
 import java.awt.*;
 import java.awt.event.*;
-import javax.persistence.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
 import javax.imageio.ImageIO;

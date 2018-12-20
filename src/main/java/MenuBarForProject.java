@@ -1,19 +1,21 @@
 package pm;
 
+import bllm.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import javax.help.*;
-import javax.imageio.ImageIO;
-import javax.persistence.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
 
 public class MenuBarForProject extends JMenuBar {
 
-  private static final long serialVersionUID = 1L;
+  DialogMainFrame mainFrame;
+  JTable project_table;
 
-  public MenuBarForProject() {
+  public MenuBarForProject(DialogMainFrame _dmf, JTable _project_table) {
+
+    mainFrame = _dmf;
+    project_table = _project_table;
 
     // Create the menu bar.
     // JMenuBar menuBar = new JMenuBar();
@@ -27,12 +29,14 @@ public class MenuBarForProject extends JMenuBar {
 
     // a group of JMenuItems
     JMenuItem menuItem = new JMenuItem("Add project", KeyEvent.VK_A);
-    menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
+    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
     menuItem.getAccessibleContext().setAccessibleDescription("Launch the Add Project dialog.");
+    menuItem.putClientProperty("mf", mainFrame);
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            new DialogAddProject();
+            new DialogAddProject(
+                (DialogMainFrame) ((JMenuItem) e.getSource()).getClientProperty("mf"));
           }
         });
     menu.add(menuItem);
@@ -65,50 +69,33 @@ public class MenuBarForProject extends JMenuBar {
 
     JButton downbutton = new JButton();
     try {
-      Image img = ImageIO.read(new File("images/ddown.PNG"));
-      downbutton.setIcon(new ImageIcon(img));
+      ImageIcon down = new ImageIcon(this.getClass().getResource("images/ddown.png"));
+      downbutton.setIcon(down);
     } catch (Exception ex) {
       System.out.println(ex + " ddown.PNG image not found");
     }
     downbutton.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            JPanel target =
-                (JPanel) ((JComponent) e.getSource()).getParent().getParent().getParent();
-            CardLayout cl = (CardLayout) target.getLayout();
-            cl.show(target, DialogMainFrame.PLATESETPANEL);
+
+            try {
+              int i = project_table.getSelectedRow();
+              String project_sys_name = (String) project_table.getValueAt(i, 0);
+              System.out.println("i: " + project_sys_name);
+              mainFrame.showPlateSetTable(project_sys_name);
+            } catch (ArrayIndexOutOfBoundsException s) {
+            }
           }
         });
     this.add(downbutton);
 
-    JButton upbutton = new JButton();
-
-    try {
-      Image img = ImageIO.read(new File("images/dup.PNG"));
-      upbutton.setIcon(new ImageIcon(img));
-    } catch (Exception ex) {
-      System.out.println(ex);
-    }
-    upbutton.addActionListener(
-        new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            JOptionPane.showMessageDialog(
-                ((Component) e.getSource()).getParent().getParent().getParent(),
-                "Project is at the highest level.");
-          }
-        });
-
-    this.add(upbutton);
-    //    menu.setMnemonic(KeyEvent.VK_T);
-    // menu.getAccessibleContext().setAccessibleDescription("This menu does nothing");
-    // this.add(menu);
     this.add(Box.createHorizontalGlue());
 
     menu = new JMenu("Help");
     menu.setMnemonic(KeyEvent.VK_H);
     menu.getAccessibleContext().setAccessibleDescription("Launch help system");
 
-    menuItem = new JMenuItem("Launch Help", KeyEvent.VK_L);
+    menuItem = new JMenuItem("Launch Help System", KeyEvent.VK_L);
     // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
 
     menuItem.addActionListener(
@@ -125,12 +112,13 @@ public class MenuBarForProject extends JMenuBar {
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            new llm.DialogLicenseManager();
+            new bllm.DialogLicenseManager(
+                "My Application", "./license.ser", "nszpx5U5Kt6d91JB3CW31n3SiNjSUzcZ");
           }
         });
     menu.add(menuItem);
 
-    menuItem = new JMenuItem("About PlateManager", KeyEvent.VK_A);
+    menuItem = new JMenuItem("About My 2019 Application", KeyEvent.VK_A);
     // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
 
     menuItem.addActionListener(

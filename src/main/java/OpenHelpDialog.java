@@ -11,7 +11,7 @@ public class OpenHelpDialog {
   public static URL hsURL;
 
   public OpenHelpDialog() {
-    helpHS = "resources/helpset/pmhelp.hs";
+    helpHS = "helpset/pmhelp.hs";
 
     ClassLoader cl = OpenHelpDialog.class.getClassLoader();
 

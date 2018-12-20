@@ -6,7 +6,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
-import javax.persistence.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
 
@@ -119,7 +118,7 @@ public class DialogAddPlateSet extends JDialog {
           public void actionPerformed(ActionEvent e) {
 
             DatabaseManager dm = new DatabaseManager();
-            dm.persistObject(new Project(descriptionField.getText(), ownerField.getText(), nameField.getText()));
+            //dm.persistObject(new Project(descriptionField.getText(), ownerField.getText(), nameField.getText()));
 
             dispose();
           }

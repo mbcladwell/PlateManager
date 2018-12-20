@@ -6,7 +6,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
-import javax.persistence.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
 
@@ -20,16 +19,17 @@ public class DialogAddProject extends JDialog {
   static JButton okButton;
   static JButton cancelButton;
   final Instant instant = Instant.now();
+  static DialogMainFrame mainFrame;
+  private static final Session session = mainFrame.getSession();
   final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
   private static final long serialVersionUID = 1L;
   // final EntityManager em;
-  private DatabaseManager dbm;
-  
-  public DialogAddProject() {
+  private static final DatabaseManager dbm = mainFrame.getDatabaseManager();
 
-    // Create and set up the window.
-    // JFrame frame = new JFrame("Add Project");
-     this.dbm = dbm;
+  public DialogAddProject(DialogMainFrame _dmf) {
+
+    mainFrame = _dmf;
+
     JPanel pane = new JPanel(new GridBagLayout());
     pane.setBorder(BorderFactory.createRaisedBevelBorder());
 
@@ -53,13 +53,13 @@ public class DialogAddProject extends JDialog {
     c.gridy = 0;
     pane.add(label, c);
 
-    label = new JLabel("Name:", SwingConstants.RIGHT);
+    label = new JLabel("Owner:", SwingConstants.RIGHT);
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 0;
     c.gridy = 1;
     pane.add(label, c);
 
-    label = new JLabel("Owner:", SwingConstants.RIGHT);
+    label = new JLabel("Project Name:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 2;
     pane.add(label, c);
@@ -70,17 +70,17 @@ public class DialogAddProject extends JDialog {
     c.gridheight = 2;
     pane.add(label, c);
 
-    nameField = new JTextField(30);
+    label = new JLabel(session.getPmuserName());
     c.gridx = 1;
     c.gridy = 1;
-    c.gridwidth = 2;
     c.gridheight = 1;
-    pane.add(nameField, c);
+    pane.add(label, c);
 
-    ownerField = new JTextField(30);
+    nameField = new JTextField(30);
+    c.gridwidth = 2;
     c.gridx = 1;
     c.gridy = 2;
-    pane.add(ownerField, c);
+    pane.add(nameField, c);
 
     descriptionField = new JTextField(30);
     c.gridx = 1;
@@ -100,11 +100,15 @@ public class DialogAddProject extends JDialog {
     c.gridheight = 1;
     okButton.addActionListener(
         (new ActionListener() {
+          private DatabaseManager innerDBM;
+
           public void actionPerformed(ActionEvent e) {
 
-            //DatabaseManager dm = new DatabaseManager();
-            dbm.persistObject(new Project(descriptionField.getText(), ownerField.getText(), nameField.getText()));
-
+            // DatabaseManager dm = new DatabaseManager();
+            // dbm.persistObject(new Project(descriptionField.getText(), ownerField.getText(),
+            // nameField.getText()));
+            dbm.insertProject(
+                nameField.getText(), descriptionField.getText(), session.getPmuserID());
             dispose();
           }
         }));

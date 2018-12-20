@@ -28,15 +28,14 @@ dependencies {
     testCompile 'junit:junit:4.12'
 	//compile files("objectdb-2.7.5/bin/converter.jar")
 
-	// OBJECTDB:
-	compile 'com.objectdb:objectdb:2.7.5'
-	compile 'org.eclipse.persistence:javax.persistence:2.2.0'
-	compile 'javax.transaction:jta:1.1'
-	
+	// PostgreSQL:
+	compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.5')
+
 	//Help system
 	compile 'javax.help:javahelp:2.0.05'
 
-       compile 'net.stihie:llm:0.1'
+       compile 'net.stihie:bllm:0.1'
+       implementation 'net.stihie:bllm:0.1'
 //JSON parsing
 compile 'com.google.code.gson:gson:2.8.5'
 
@@ -55,9 +54,9 @@ repositories {
     // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
-	maven {
-    url 'http://m2.objectdb.com'
-  }
+//	maven {
+  //  url 'http://m2.objectdb.com'
+ // }
      mavenLocal()
 
 
@@ -68,20 +67,10 @@ task showMeCache << {
   configurations.compile.each { println it }
 }
 
-clean.doFirst {
-    delete "${rootDir}/myDbFile.odb"
-    println "${rootDir}/myDbFile.odb"
-}
 
 
 
 
-task enhance(type: JavaExec) {
-  main = 'com.objectdb.Enhancer'
-  classpath = sourceSets.main.runtimeClasspath
-  args '-cp', 'build/classes/java/main/pm' 
-}
-compileJava.finalizedBy(enhance)
 
 
 
@@ -114,6 +103,10 @@ task printSourceSetOutputDir {
     }
 }
 
+
+// psql -U postgres -h 192.168.1.7 -f ~/syncd/prog/plate-manager/pm/postgres/create_tables.sql
+
+
 jar {
     manifest {
         attributes(
@@ -127,4 +120,18 @@ jar {
 
 
 
+task initializePostgres(type:Exec) {
 
+executable '/usr/bin/psql -U postgres -h 192.168.1.7'
+args '-f ~/syncd/prog/plate-manager/pm/postgres/create_tables.sql'
+outputs.upToDateWhen { false }
+
+
+}
+
+
+task refreshLicense(type: Copy) {
+    from("/home/mbc/LitecoinLicenses/license/DkFzn23a")
+    into(".")
+    include("*.ser")
+}
