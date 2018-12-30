@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
+import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
 
@@ -14,17 +15,23 @@ public class DialogAddPlateSet extends JDialog {
   static JLabel label;
   static JLabel Description;
   static JTextField nameField;
-  static JTextField ownerField;
+  static JLabel ownerLabel;
+  static String owner;
   static JTextField descriptionField;
   static JTextField numberField;
   static JButton okButton;
   static JButton cancelButton;
   final Instant instant = Instant.now();
+  final DialogMainFrame parent;
+  final Session session;
   final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+  private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
 
-  public DialogAddPlateSet() {
-
+  public DialogAddPlateSet(DialogMainFrame _parent) {
+    this.parent = _parent;
+    this.session = parent.getSession();
+    this.owner = session.getPmuserName();
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
     // this.em = em;
@@ -42,6 +49,8 @@ public class DialogAddPlateSet extends JDialog {
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 0;
     c.gridy = 0;
+    c.anchor = GridBagConstraints.LINE_END;
+
     c.insets = new Insets(5, 5, 2, 2);
     pane.add(label, c);
 
@@ -49,12 +58,14 @@ public class DialogAddPlateSet extends JDialog {
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 1;
     c.gridy = 0;
+    c.anchor = GridBagConstraints.LINE_START;
     pane.add(label, c);
 
     label = new JLabel("Name:", SwingConstants.RIGHT);
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 0;
     c.gridy = 1;
+    c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
     label = new JLabel("Owner:", SwingConstants.RIGHT);
@@ -65,7 +76,7 @@ public class DialogAddPlateSet extends JDialog {
     label = new JLabel("Description:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 3;
-    c.gridheight = 2;
+    c.gridheight = 1;
     pane.add(label, c);
 
     label = new JLabel("Number of plates:", SwingConstants.RIGHT);
@@ -79,30 +90,26 @@ public class DialogAddPlateSet extends JDialog {
     c.gridy = 1;
     c.gridwidth = 2;
     c.gridheight = 1;
+    c.anchor = GridBagConstraints.LINE_START;
     pane.add(nameField, c);
 
-    ownerField = new JTextField(30);
+    ownerLabel = new JLabel(owner);
     c.gridx = 1;
     c.gridy = 2;
-    pane.add(ownerField, c);
+    pane.add(ownerLabel, c);
 
     descriptionField = new JTextField(30);
     c.gridx = 1;
     c.gridy = 3;
-    c.gridheight = 2;
+    c.gridheight = 1;
     pane.add(descriptionField, c);
 
-    
     numberField = new JTextField(6);
     c.gridx = 1;
     c.gridy = 4;
     c.gridheight = 1;
-    pane.add(descriptionField, c);
+    pane.add(numberField, c);
 
-
-
-
-    
     okButton = new JButton("OK");
     okButton.setMnemonic(KeyEvent.VK_O);
     okButton.setActionCommand("ok");
@@ -117,8 +124,19 @@ public class DialogAddPlateSet extends JDialog {
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 
-            DatabaseManager dm = new DatabaseManager();
-            //dm.persistObject(new Project(descriptionField.getText(), ownerField.getText(), nameField.getText()));
+            parent
+                .getDatabaseManager()
+                .insertPlateSet(
+                    descriptionField.getText(),
+                    session.getPmuserName(),
+                    "2",
+                    "1",
+                    "1",
+                    "1",
+                    "TRUE");
+
+            // dm.persistObject(new Project(descriptionField.getText(), ownerField.getText(),
+            // nameField.getText()));
 
             dispose();
           }

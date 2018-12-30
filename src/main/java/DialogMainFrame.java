@@ -4,17 +4,19 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.sql.*;
+import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
 
 public class DialogMainFrame extends JFrame {
 
   private static final long serialVersionUID = 1L;
+  private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   private DatabaseManager dbm = new DatabaseManager();
   private JPanel cards; // a panel that uses CardLayout
   private CardLayout card_layout;
 
-  private JPanel project_card;
+  private ProjectPanel project_card;
   private JPanel plate_set_card;
   private JPanel plate_card;
   private JPanel well_card;
@@ -67,9 +69,14 @@ public class DialogMainFrame extends JFrame {
     card_layout.show(cards, DialogMainFrame.PROJECTPANEL);
   }
 
+  public ProjectPanel getProjectPanel() {
+    return project_card;
+  }
+
   public void showPlateSetTable(String _project_sys_name) {
     System.out.println("in dmf.showPlateSet: " + _project_sys_name);
-    plate_set_card = new PlateSetPanel(this, dbm.getPlateSetTableData(_project_sys_name));
+    plate_set_card =
+        new PlateSetPanel(this, dbm.getPlateSetTableData(_project_sys_name), _project_sys_name);
 
     cards.add(plate_set_card, PLATESETPANEL);
     card_layout.show(cards, DialogMainFrame.PLATESETPANEL);
@@ -108,6 +115,8 @@ public class DialogMainFrame extends JFrame {
   }
 
   public Session getSession() {
-    return this.session;
+    return session;
   }
+
+  public void updateProjectPanel() {}
 }

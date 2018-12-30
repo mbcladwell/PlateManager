@@ -2,6 +2,7 @@ package pm;
 
 import java.net.URL;
 import javax.help.*;
+import java.util.logging.*;
 
 public class OpenHelpDialog {
 
@@ -9,6 +10,8 @@ public class OpenHelpDialog {
   public static HelpBroker hb;
   public static String helpHS;
   public static URL hsURL;
+private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
 
   public OpenHelpDialog() {
     helpHS = "helpset/pmhelp.hs";

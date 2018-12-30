@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
+import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
 
@@ -19,16 +20,17 @@ public class DialogAddProject extends JDialog {
   static JButton okButton;
   static JButton cancelButton;
   final Instant instant = Instant.now();
-  static DialogMainFrame mainFrame;
-  private static final Session session = mainFrame.getSession();
+  static DialogMainFrame dmf;
+  private static Session session;
+  private static DatabaseManager dbm;
   final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
   private static final long serialVersionUID = 1L;
-  // final EntityManager em;
-  private static final DatabaseManager dbm = mainFrame.getDatabaseManager();
+  private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public DialogAddProject(DialogMainFrame _dmf) {
-
-    mainFrame = _dmf;
+    dmf = _dmf;
+    session = dmf.getSession();
+    dbm = dmf.getDatabaseManager();
 
     JPanel pane = new JPanel(new GridBagLayout());
     pane.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -100,15 +102,15 @@ public class DialogAddProject extends JDialog {
     c.gridheight = 1;
     okButton.addActionListener(
         (new ActionListener() {
-          private DatabaseManager innerDBM;
-
           public void actionPerformed(ActionEvent e) {
 
             // DatabaseManager dm = new DatabaseManager();
             // dbm.persistObject(new Project(descriptionField.getText(), ownerField.getText(),
             // nameField.getText()));
-            dbm.insertProject(
-                nameField.getText(), descriptionField.getText(), session.getPmuserID());
+            dbm.getDatabaseInserter()
+                .insertProject(
+                    nameField.getText(), descriptionField.getText(), session.getPmuserID());
+            dmf.getProjectPanel().updatePanel();
             dispose();
           }
         }));

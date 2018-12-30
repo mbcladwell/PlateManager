@@ -2,6 +2,7 @@ package pm;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.logging.*;
 import javax.help.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
@@ -10,6 +11,7 @@ public class MenuBarForPlateSet extends JMenuBar {
 
   DialogMainFrame dmf;
   JTable plate_set_table;
+  private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public MenuBarForPlateSet(DialogMainFrame _dmf, JTable _plate_set_table) {
 
@@ -32,7 +34,7 @@ public class MenuBarForPlateSet extends JMenuBar {
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            new DialogAddProject(dmf);
+            new DialogAddPlateSet(dmf);
           }
         });
     menu.add(menuItem);

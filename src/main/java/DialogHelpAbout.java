@@ -25,6 +25,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import java.util.logging.*;
 
 public class DialogHelpAbout extends JDialog {
   static JButton button;
@@ -36,6 +37,7 @@ public class DialogHelpAbout extends JDialog {
   final Instant instant = Instant.now();
   final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
   private static final long serialVersionUID = 1L;
+ private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public DialogHelpAbout() {
 

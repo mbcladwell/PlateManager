@@ -5,11 +5,13 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
 import javax.imageio.ImageIO;
+import java.util.logging.*;
 
 
 public class MenuBarForPlates extends JMenuBar {
 
   private static final long serialVersionUID = 1L;
+private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
  
   public MenuBarForPlates( ) {
 

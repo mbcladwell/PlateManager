@@ -6,11 +6,13 @@ import java.awt.event.*;
 import javax.help.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
+import java.util.logging.*;
 
 public class MenuBarForProject extends JMenuBar {
 
   DialogMainFrame mainFrame;
   JTable project_table;
+private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public MenuBarForProject(DialogMainFrame _dmf, JTable _project_table) {
 
