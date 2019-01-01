@@ -17,14 +17,10 @@ public class MenuBarForPlateSet extends JMenuBar {
 
     dmf = _dmf;
     plate_set_table = _plate_set_table;
-    // Create the menu bar.
-    // JMenuBar menuBar = new JMenuBar();
-    //    this.em = em;
-    // Build the first menu.
+
     JMenu menu = new JMenu("Plate Set");
     menu.setMnemonic(KeyEvent.VK_P);
-    menu.getAccessibleContext()
-        .setAccessibleDescription("The only menu in this program that has menu items");
+    menu.getAccessibleContext().setAccessibleDescription("Menu items related to plate sets");
     this.add(menu);
 
     // a group of JMenuItems
@@ -39,7 +35,17 @@ public class MenuBarForPlateSet extends JMenuBar {
         });
     menu.add(menuItem);
 
-    menuItem = new JMenuItem("Import assay data by plate");
+    menuItem = new JMenuItem("Edit plate set");
+    menuItem.setMnemonic(KeyEvent.VK_E);
+    menuItem.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            // new DialogEditPlateSetData();
+          }
+        });
+    menu.add(menuItem);
+
+    menuItem = new JMenuItem("Import assay data by plate set");
     menuItem.setMnemonic(KeyEvent.VK_I);
     menuItem.addActionListener(
         new ActionListener() {
@@ -48,28 +54,6 @@ public class MenuBarForPlateSet extends JMenuBar {
           }
         });
     menu.add(menuItem);
-
-    menuItem = new JMenuItem(new ImageIcon("images/middle.gif"));
-    menuItem.setMnemonic(KeyEvent.VK_D);
-    menu.add(menuItem);
-
-    // a submenu
-    menu.addSeparator();
-    JMenu submenu = new JMenu("A submenu");
-    submenu.setMnemonic(KeyEvent.VK_S);
-
-    menuItem = new JMenuItem("An item in the submenu");
-    menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, ActionEvent.ALT_MASK));
-    submenu.add(menuItem);
-
-    menuItem = new JMenuItem("Another item");
-    submenu.add(menuItem);
-    menu.add(submenu);
-
-    menu = new JMenu("Another Menu");
-    menu.setMnemonic(KeyEvent.VK_N);
-    menu.getAccessibleContext().setAccessibleDescription("This menu does nothing");
-    this.add(menu);
 
     JButton downbutton = new JButton();
     try {
@@ -107,50 +91,11 @@ public class MenuBarForPlateSet extends JMenuBar {
             dmf.showProjectTable();
           }
         });
-
     this.add(upbutton);
-    //    menu.setMnemonic(KeyEvent.VK_T);
-    // menu.getAccessibleContext().setAccessibleDescription("This menu does nothing");
-    // this.add(menu);
+
     this.add(Box.createHorizontalGlue());
 
-    menu = new JMenu("Help");
-    menu.setMnemonic(KeyEvent.VK_H);
-    menu.getAccessibleContext().setAccessibleDescription("Launch help system");
-
-    menuItem = new JMenuItem("Launch Help", KeyEvent.VK_L);
-    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
-
-    menuItem.addActionListener(
-        new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            new OpenHelpDialog();
-          }
-        });
-    menu.add(menuItem);
-
-    menuItem = new JMenuItem("License", KeyEvent.VK_L);
-    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
-
-    menuItem.addActionListener(
-        new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            //  new llm.DialogLicenseManager("./license.ser");
-          }
-        });
-    menu.add(menuItem);
-
-    menuItem = new JMenuItem("About PlateManager", KeyEvent.VK_A);
-    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
-
-    menuItem.addActionListener(
-        new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            new DialogHelpAbout();
-          }
-        });
-    menu.add(menuItem);
-
+    menu = new HelpMenu();
     this.add(menu);
   }
 }
