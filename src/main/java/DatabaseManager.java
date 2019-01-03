@@ -11,13 +11,16 @@ public class DatabaseManager {
   Connection conn;
   JTable table;
   DatabaseInserter dbInserter;
+  DatabaseRetriever dbRetriever;
+  DialogMainFrame parent;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   /**
    * Use 'pmdb' as the database name. Regular users will connect as pm_user and will have restricted
    * access (no delete etc.). Connect as pm_admin to get administrative priveleges.
    */
-  public DatabaseManager() {
+  public DatabaseManager(DialogMainFrame _parent) {
+    parent = _parent;
     try {
       Class.forName("org.postgresql.Driver");
 
@@ -28,7 +31,8 @@ public class DatabaseManager {
       props.setProperty("password", "welcome");
 
       conn = DriverManager.getConnection(url, props);
-      dbInserter = new DatabaseInserter(conn);
+      dbInserter = new DatabaseInserter(this);
+      dbRetriever = new DatabaseRetriever(this);
     } catch (ClassNotFoundException e) {
 
     } catch (SQLException sqle) {
@@ -96,7 +100,7 @@ public class DatabaseManager {
       Statement st = conn.createStatement();
       ResultSet rs =
           st.executeQuery(
-              "SELECT project_sys_name AS ProjectID, project_name As Name, pmuser_name AS Owner FROM project, pmuser WHERE pmuser_id = pmuser.id ORDER BY project.id DESC;");
+              "SELECT project_sys_name AS ProjectID, project_name As Name, pmuser_name AS Owner, descr AS Description FROM project, pmuser WHERE pmuser_id = pmuser.id ORDER BY project.id DESC;");
 
       table = new JTable(buildTableModel(rs));
       // LOGGER.info(table);
@@ -111,7 +115,7 @@ public class DatabaseManager {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate_set_sys_name AS PlateSetID, plate_set_name As Name FROM plate_set WHERE project_id = (select id from project where project_sys_name like ?);");
+              "SELECT plate_set_sys_name AS PlateSetID, plate_set_name As Name FROM plate_set WHERE project_id = (select id from project where project_sys_name like ?) ORDER BY plate_set.id DESC;");
 
       pstmt.setString(1, _project_sys_name);
       ResultSet rs = pstmt.executeQuery();
@@ -127,11 +131,33 @@ public class DatabaseManager {
     return table;
   }
 
+  public void updateSessionWithProject(String _project_sys_name) {
+    int results = 0;
+    String project_sys_name = _project_sys_name;
+    this.getSession().setProjectSysName(project_sys_name);
+
+    try {
+      String query =
+          new String("SELECT id FROM project WHERE project_sys_name = '" + project_sys_name + "';");
+      Statement st = conn.createStatement();
+      ResultSet rs = st.executeQuery(query);
+      rs.next();
+      results = rs.getInt("id");
+      LOGGER.info("projectID: " + results);
+      this.getSession().setProjectID(results);
+
+      rs.close();
+      st.close();
+    } catch (SQLException sqle) {
+      LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
+    }
+  }
+
   public JTable getPlateTableData(String _plate_set_sys_name) {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate.plate_sys_name AS PlateID, plate_seq_num AS Order,  plate_type.plate_type_name As Type FROM plate_set, plate, plate_type WHERE plate.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate.plate_set_id = plate_set.id;");
+              "SELECT plate.plate_sys_name AS PlateID, plate_seq_num AS Order,  plate_type.plate_type_name As Type, plate_size.format AS Size FROM plate_set, plate, plate_type, plate_size WHERE plate.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate.plate_set_id = plate_set.id AND plate_size.id = plate.plate_size_id;");
 
       pstmt.setString(1, _plate_set_sys_name);
       ResultSet rs = pstmt.executeQuery();
@@ -209,33 +235,65 @@ public class DatabaseManager {
     return result;
   }
 
+  /**
+   * Incoming variables: ( 'plate set name' 'description' '10' '96' 'assay')
+   *
+   * <p>Method signature in Postgres: CREATE OR REPLACE FUNCTION new_plate_set(_descr
+   * VARCHAR(30),_plate_set_name VARCHAR(30), _num_plates INTEGER, _plate_size_id INTEGER,
+   * _plate_type_id INTEGER, _project_id INTEGER, _with_samples boolean)
+   */
   public void insertPlateSet(
-      String _description,
       String _name,
+      String _description,
       String _num_plates,
       String _plate_size_id,
-      String _plate_type_id,
-      String _project_id,
-      String _withSamples) {
+      String _plate_type_id) {
 
     try {
+      int project_id = parent.getSession().getProjectID();
+      int plate_size_id =
+          parent.getDatabaseManager().getDatabaseRetriever().getPlateFormatID(_plate_size_id);
+      int plate_type_id =
+          parent.getDatabaseManager().getDatabaseRetriever().getPlateTypeID(_plate_type_id);
+
       String insertSql = "SELECT new_plate_set ( ?, ?, ?, ?, ?, ?, ?);";
       PreparedStatement insertPs =
           conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
       insertPs.setString(1, _description);
       insertPs.setString(2, _name);
-      insertPs.setString(3, _num_plates);
-      insertPs.setString(4, _plate_size_id);
-      insertPs.setString(5, _plate_type_id);
-      insertPs.setString(6, _project_id);
-      insertPs.setString(7, _withSamples);
+      insertPs.setInt(3, Integer.valueOf(_num_plates));
+      insertPs.setInt(4, plate_size_id);
+      insertPs.setInt(5, plate_type_id);
+      insertPs.setInt(6, project_id);
+      insertPs.setBoolean(7, true);
 
       LOGGER.info(insertPs.toString());
       insertPs.executeUpdate();
+      //  SELECT new_plate_set ( 'descrip', 'myname', '10', '96', 'assay', 0, 't')
+    } catch (SQLException sqle) {
+      LOGGER.severe("Failed to create plate set: " + sqle);
+    }
+  }
+
+  public String[] getPlateTypes() {
+    String[] output = null;
+    Array results = null;
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement("SELECT ARRAY (select plate_type_name from plate_type);");
+
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      results = rs.getArray("array");
+      LOGGER.info("Description: " + results);
+      rs.close();
+      pstmt.close();
+      output = (String[]) results.getArray();
 
     } catch (SQLException sqle) {
-
+      LOGGER.severe("SQL exception getting plate types: " + sqle);
     }
+    return output;
   }
 
   /*
@@ -273,5 +331,17 @@ public class DatabaseManager {
 
   public DatabaseInserter getDatabaseInserter() {
     return this.dbInserter;
+  }
+
+  public DatabaseRetriever getDatabaseRetriever() {
+    return this.dbRetriever;
+  }
+
+  public Connection getConnection() {
+    return this.conn;
+  }
+
+  public Session getSession() {
+    return parent.getSession();
   }
 }

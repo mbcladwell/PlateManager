@@ -11,13 +11,14 @@ import javax.swing.JComponent.*;
 
 public class MenuBarForProject extends JMenuBar {
 
-  DialogMainFrame mainFrame;
+  DialogMainFrame dmf;
   JTable project_table;
+
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public MenuBarForProject(DialogMainFrame _dmf, JTable _project_table) {
 
-    mainFrame = _dmf;
+    dmf = _dmf;
     project_table = _project_table;
 
     JMenu menu = new JMenu("Project");
@@ -30,7 +31,7 @@ public class MenuBarForProject extends JMenuBar {
     JMenuItem menuItem = new JMenuItem("Add project", KeyEvent.VK_A);
     // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
     menuItem.getAccessibleContext().setAccessibleDescription("Launch the Add Project dialog.");
-    menuItem.putClientProperty("mf", mainFrame);
+    menuItem.putClientProperty("mf", dmf);
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
@@ -43,23 +44,28 @@ public class MenuBarForProject extends JMenuBar {
     menuItem = new JMenuItem("Edit project", KeyEvent.VK_E);
     // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
     menuItem.getAccessibleContext().setAccessibleDescription("Launch the Edit Project dialog.");
-    menuItem.putClientProperty("mf", mainFrame);
+    menuItem.putClientProperty("mf", dmf);
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             try {
               int rowIndex = project_table.getSelectedRow();
-              LOGGER.info(project_table.getValueAt(rowIndex, 0).toString());
-              LOGGER.info(project_table.getValueAt(rowIndex, 1).toString());
-              LOGGER.info(project_table.getValueAt(rowIndex, 2).toString());
               String projectid = project_table.getValueAt(rowIndex, 0).toString();
               String name = project_table.getValueAt(rowIndex, 1).toString();
+              String owner = project_table.getValueAt(rowIndex, 2).toString();
               String description = project_table.getValueAt(rowIndex, 3).toString();
-
-              new DialogEditProject(mainFrame, projectid, name, description);
+              if (owner.equals(dmf.getSession().getUserName())) {
+                new DialogEditProject(dmf, projectid, name, description);
+              } else {
+                JOptionPane.showMessageDialog(
+                    dmf,
+                    "Only the owner can modify a project.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+              }
             } catch (ArrayIndexOutOfBoundsException aioob) {
               JOptionPane.showMessageDialog(
-                  mainFrame, "Please select a project!", "Error", JOptionPane.ERROR_MESSAGE);
+                  dmf, "Please select a project!", "Error", JOptionPane.ERROR_MESSAGE);
             }
           }
         });
@@ -79,8 +85,9 @@ public class MenuBarForProject extends JMenuBar {
             try {
               int i = project_table.getSelectedRow();
               String project_sys_name = (String) project_table.getValueAt(i, 0);
+              dmf.getDatabaseManager().updateSessionWithProject(project_sys_name);
               System.out.println("i: " + project_sys_name);
-              mainFrame.showPlateSetTable(project_sys_name);
+              dmf.showPlateSetTable(project_sys_name);
             } catch (ArrayIndexOutOfBoundsException s) {
             }
           }

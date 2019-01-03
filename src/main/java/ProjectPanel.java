@@ -41,7 +41,7 @@ public class ProjectPanel extends JPanel {
     c.gridy = 1;
     textPanel.add(label, c);
 
-    JLabel userLabel = new JLabel(parent.getSession().getPmuserName(), SwingConstants.LEFT);
+    JLabel userLabel = new JLabel(parent.getSession().getUserName(), SwingConstants.LEFT);
     c.gridx = 1;
     c.gridy = 0;
     // c.gridwidth = 3;
@@ -50,8 +50,7 @@ public class ProjectPanel extends JPanel {
     c.anchor = GridBagConstraints.LINE_START;
     textPanel.add(userLabel, c);
 
-    JLabel privilegesLabel =
-        new JLabel(parent.getSession().getPmuserTypeString(), SwingConstants.LEFT);
+    JLabel privilegesLabel = new JLabel(parent.getSession().getUserType(), SwingConstants.LEFT);
     c.gridx = 1;
     c.gridy = 1;
     textPanel.add(privilegesLabel, c);

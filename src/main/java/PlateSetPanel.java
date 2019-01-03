@@ -32,6 +32,7 @@ public class PlateSetPanel extends JPanel {
     c.gridx = 0;
     c.gridy = 0;
     c.anchor = GridBagConstraints.LINE_END;
+    c.weightx = 0.1;
     c.insets = new Insets(5, 5, 2, 2);
     textPanel.add(label, c);
 
@@ -43,7 +44,8 @@ public class PlateSetPanel extends JPanel {
     c.gridx = 1;
     c.gridy = 0;
     c.gridwidth = 3;
-    c.ipadx = 40;
+    c.weightx = 0.9;
+
     c.fill = GridBagConstraints.HORIZONTAL;
     c.anchor = GridBagConstraints.LINE_START;
     textPanel.add(projectLabel, c);

@@ -12,7 +12,7 @@ public class DialogMainFrame extends JFrame {
 
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-  private DatabaseManager dbm = new DatabaseManager();
+  private DatabaseManager dbm;
   private JPanel cards; // a panel that uses CardLayout
   private CardLayout card_layout;
 
@@ -29,10 +29,10 @@ public class DialogMainFrame extends JFrame {
   public static final String PLATEPANEL = "Card with plates";
   public static final String WELLPANEL = "Card with wells";
 
-  public static final JFrame frame = new JFrame("My 2019 Application");
+  public static final JFrame frame = new JFrame("LIMS*Nucleus");
 
   public DialogMainFrame() throws SQLException {
-
+    dbm = new DatabaseManager(this);
     // new DialogLogin();
     // Create and set up the window.
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -40,9 +40,9 @@ public class DialogMainFrame extends JFrame {
       ImageIcon img = new ImageIcon(this.getClass().getResource("images/mwplate.png"));
       frame.setIconImage(img.getImage());
       session.setSessionID(dbm.initializeSession("admin1", "welcome"));
-      session.setPmuserName("admin1");
-      session.setPmuserID(1);
-      session.setPmuserType(1);
+      session.setUserName("admin1");
+      session.setUserID(1);
+      session.setUserTypeID(1);
 
     } catch (SQLException sqle) {
       System.out.println("Invalid password");

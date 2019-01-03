@@ -45,7 +45,19 @@ public class MenuBarForPlateSet extends JMenuBar {
         });
     menu.add(menuItem);
 
-    menuItem = new JMenuItem("Import assay data by plate set");
+    JMenu utilitiesMenu = new JMenu("Utilities");
+    menu.setMnemonic(KeyEvent.VK_U);
+    this.add(utilitiesMenu);
+
+    menuItem = new JMenuItem("Group");
+    menuItem.setMnemonic(KeyEvent.VK_G);
+    menuItem.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {}
+        });
+    utilitiesMenu.add(menuItem);
+
+    menuItem = new JMenuItem("Import assay data");
     menuItem.setMnemonic(KeyEvent.VK_I);
     menuItem.addActionListener(
         new ActionListener() {
@@ -53,7 +65,7 @@ public class MenuBarForPlateSet extends JMenuBar {
             new DialogAddPlateSetData();
           }
         });
-    menu.add(menuItem);
+    utilitiesMenu.add(menuItem);
 
     JButton downbutton = new JButton();
     try {

@@ -4,12 +4,17 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.logging.*;
 
-/** Upon insert session gains a timestamp */
+/**
+ * Upon insert session gains a timestamp
+ *
+ * <p>Session provides user name and ID and project sys name and id
+ */
 public class Session {
 
-  private int pmUserID;
-  private String pmUserName;
-  private int pmUserType; // admin, superuser, user
+  private int userID;
+  private String userName;
+  private int userTypeID;
+  private String userType; // admin, superuser, user
   private int projectID;
   private String projectSysName;
   private Long sessionID;
@@ -19,44 +24,36 @@ public class Session {
 
   public Session() {}
 
-  public void setPmuserID(int _id) {
-    pmUserID = _id;
+  public void setUserID(int _id) {
+    userID = _id;
   }
 
-  public int getPmuserID() {
-    return pmUserID;
+  public int getUserID() {
+    return userID;
   }
 
-  public void setPmuserName(String _n) {
-    pmUserName = _n;
+  public void setUserName(String _n) {
+    userName = _n;
   }
 
-  public String getPmuserName() {
-    return pmUserName;
+  public String getUserName() {
+    return userName;
   }
 
-  public void setPmuserType(int _i) {
-    pmUserType = _i;
+  public void setUserType(String _s) {
+    userType = _s;
   }
 
-  public int getPmuserType() {
-    return pmUserType;
+  public String getUserType() {
+    return userType;
   }
 
-  public String getPmuserTypeString() {
-    String usertype = new String();
-    switch (pmUserType) {
-      case 1:
-        usertype = "admin";
-        break;
-      case 2:
-        usertype = "superuser";
-        break;
-      case 3:
-        usertype = "user";
-        break;
-    }
-    return usertype;
+  public int getUserTypeID() {
+    return userTypeID;
+  }
+
+  public void setUserTypeID(int _i) {
+    userTypeID = _i;
   }
 
   public void setProjectID(int _id) {

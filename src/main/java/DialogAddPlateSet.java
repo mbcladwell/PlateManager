@@ -19,6 +19,8 @@ public class DialogAddPlateSet extends JDialog {
   static String owner;
   static JTextField descriptionField;
   static JTextField numberField;
+  static JComboBox<Integer> formatList;
+  static JComboBox<String> typeList;
   static JButton okButton;
   static JButton cancelButton;
   final Instant instant = Instant.now();
@@ -31,7 +33,7 @@ public class DialogAddPlateSet extends JDialog {
   public DialogAddPlateSet(DialogMainFrame _parent) {
     this.parent = _parent;
     this.session = parent.getSession();
-    this.owner = session.getPmuserName();
+    owner = session.getUserName();
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
     // this.em = em;
@@ -61,14 +63,14 @@ public class DialogAddPlateSet extends JDialog {
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(label, c);
 
-    label = new JLabel("Name:", SwingConstants.RIGHT);
-    // c.fill = GridBagConstraints.HORIZONTAL;
+    label = new JLabel("Owner:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 1;
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    label = new JLabel("Owner:", SwingConstants.RIGHT);
+    label = new JLabel("Plate Set Name:", SwingConstants.RIGHT);
+    // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 0;
     c.gridy = 2;
     pane.add(label, c);
@@ -85,18 +87,18 @@ public class DialogAddPlateSet extends JDialog {
     c.gridheight = 1;
     pane.add(label, c);
 
-    nameField = new JTextField(30);
-    c.gridx = 1;
-    c.gridy = 1;
-    c.gridwidth = 2;
-    c.gridheight = 1;
-    c.anchor = GridBagConstraints.LINE_START;
-    pane.add(nameField, c);
-
     ownerLabel = new JLabel(owner);
     c.gridx = 1;
-    c.gridy = 2;
+    c.gridy = 1;
+    c.gridwidth = 5;
+    c.anchor = GridBagConstraints.LINE_START;
     pane.add(ownerLabel, c);
+
+    nameField = new JTextField(30);
+    c.gridx = 1;
+    c.gridy = 2;
+    c.gridheight = 1;
+    pane.add(nameField, c);
 
     descriptionField = new JTextField(30);
     c.gridx = 1;
@@ -104,11 +106,47 @@ public class DialogAddPlateSet extends JDialog {
     c.gridheight = 1;
     pane.add(descriptionField, c);
 
-    numberField = new JTextField(6);
+    numberField = new JTextField(4);
     c.gridx = 1;
     c.gridy = 4;
     c.gridheight = 1;
+    c.gridwidth = 1;
     pane.add(numberField, c);
+
+    label = new JLabel("Format:", SwingConstants.RIGHT);
+    c.gridx = 2;
+    c.gridy = 4;
+    c.gridheight = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane.add(label, c);
+
+    Integer[] formats = {96, 384, 1536};
+
+    formatList = new JComboBox<Integer>(formats);
+    formatList.setSelectedIndex(0);
+    c.gridx = 3;
+    c.gridy = 4;
+    c.gridheight = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane.add(formatList, c);
+    // formatList.addActionListener(this);
+
+    label = new JLabel("Type:", SwingConstants.RIGHT);
+    c.gridx = 4;
+    c.gridy = 4;
+    c.gridheight = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane.add(label, c);
+
+    String[] plateTypes = parent.getDatabaseManager().getPlateTypes();
+
+    typeList = new JComboBox<String>(plateTypes);
+    formatList.setSelectedIndex(0);
+    c.gridx = 5;
+    c.gridy = 4;
+    c.gridheight = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane.add(typeList, c);
 
     okButton = new JButton("OK");
     okButton.setMnemonic(KeyEvent.VK_O);
@@ -118,7 +156,7 @@ public class DialogAddPlateSet extends JDialog {
     c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 2;
     c.gridy = 5;
-    c.gridwidth = 1;
+    c.gridwidth = 2;
     c.gridheight = 1;
     okButton.addActionListener(
         (new ActionListener() {
@@ -127,17 +165,11 @@ public class DialogAddPlateSet extends JDialog {
             parent
                 .getDatabaseManager()
                 .insertPlateSet(
+                    nameField.getText(),
                     descriptionField.getText(),
-                    session.getPmuserName(),
-                    "2",
-                    "1",
-                    "1",
-                    "1",
-                    "TRUE");
-
-            // dm.persistObject(new Project(descriptionField.getText(), ownerField.getText(),
-            // nameField.getText()));
-
+                    numberField.getText(),
+                    formatList.getSelectedItem().toString(),
+                    typeList.getSelectedItem().toString());
             dispose();
           }
         }));
@@ -151,6 +183,7 @@ public class DialogAddPlateSet extends JDialog {
     cancelButton.setForeground(Color.RED);
     c.gridx = 1;
     c.gridy = 5;
+    c.gridwidth = 1;
     pane.add(cancelButton, c);
     cancelButton.addActionListener(
         (new ActionListener() {

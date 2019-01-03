@@ -76,7 +76,7 @@ public class DialogEditProject extends JDialog {
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(label, c);
 
-    label = new JLabel(session.getPmuserName());
+    label = new JLabel(session.getUserName());
     c.gridx = 1;
     c.gridy = 1;
     c.gridheight = 1;

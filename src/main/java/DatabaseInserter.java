@@ -8,13 +8,16 @@ import javax.swing.table.DefaultTableModel;
 
 /** */
 public class DatabaseInserter {
+  DatabaseManager dbm;
   Connection conn;
   JTable table;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   /** */
-  public DatabaseInserter(Connection _conn) {
-    this.conn = _conn;
+  public DatabaseInserter(DatabaseManager _dbm) {
+    this.dbm = _dbm;
+    this.conn = dbm.getConnection();
+    ;
   }
 
   public void insertProject(String _name, String _description, int _pmuser_id) {

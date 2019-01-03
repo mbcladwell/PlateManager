@@ -47,12 +47,7 @@ public class DialogAddProject extends JDialog {
     c.gridx = 0;
     c.gridy = 0;
     c.insets = new Insets(5, 5, 2, 2);
-    pane.add(label, c);
-
-    label = new JLabel(df.format(Date.from(instant)));
-    // c.fill = GridBagConstraints.HORIZONTAL;
-    c.gridx = 1;
-    c.gridy = 0;
+    c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
     label = new JLabel("Owner:", SwingConstants.RIGHT);
@@ -69,10 +64,16 @@ public class DialogAddProject extends JDialog {
     label = new JLabel("Description:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 3;
-    c.gridheight = 2;
     pane.add(label, c);
 
-    label = new JLabel(session.getPmuserName());
+    label = new JLabel(df.format(Date.from(instant)));
+    // c.fill = GridBagConstraints.HORIZONTAL;
+    c.gridx = 1;
+    c.gridy = 0;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane.add(label, c);
+
+    label = new JLabel(session.getUserName());
     c.gridx = 1;
     c.gridy = 1;
     c.gridheight = 1;
@@ -109,7 +110,7 @@ public class DialogAddProject extends JDialog {
             // nameField.getText()));
             dbm.getDatabaseInserter()
                 .insertProject(
-                    nameField.getText(), descriptionField.getText(), session.getPmuserID());
+                    nameField.getText(), descriptionField.getText(), session.getUserID());
             dmf.getProjectPanel().updatePanel();
             dispose();
           }

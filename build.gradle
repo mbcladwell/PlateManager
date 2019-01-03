@@ -85,10 +85,11 @@ task runAddProject(type: JavaExec) {
 
 task runMain(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
+  //main = 'pm.DialogMainFrame'
   //classpath = src.test.java
-
+  
   main = 'pm.Main'
-
+    
   // arguments to pass to the application
   //args 'appArg1'
 }
