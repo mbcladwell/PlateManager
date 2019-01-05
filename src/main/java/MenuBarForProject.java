@@ -23,8 +23,7 @@ public class MenuBarForProject extends JMenuBar {
 
     JMenu menu = new JMenu("Project");
     menu.setMnemonic(KeyEvent.VK_P);
-    menu.getAccessibleContext()
-        .setAccessibleDescription("The only menu in this program that has menu items");
+    menu.getAccessibleContext().setAccessibleDescription("Project");
     this.add(menu);
 
     // a group of JMenuItems
@@ -67,6 +66,23 @@ public class MenuBarForProject extends JMenuBar {
               JOptionPane.showMessageDialog(
                   dmf, "Please select a project!", "Error", JOptionPane.ERROR_MESSAGE);
             }
+          }
+        });
+    menu.add(menuItem);
+
+    menu = new JMenu("Utilities");
+    menu.setMnemonic(KeyEvent.VK_U);
+    menu.getAccessibleContext().setAccessibleDescription("Project utilities");
+    this.add(menu);
+
+    menuItem = new JMenuItem("Export", KeyEvent.VK_E);
+    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
+    menuItem.getAccessibleContext().setAccessibleDescription("Export as .csv.");
+    menuItem.putClientProperty("mf", dmf);
+    menuItem.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            dmf.getUtilities().toExcel(project_table);
           }
         });
     menu.add(menuItem);

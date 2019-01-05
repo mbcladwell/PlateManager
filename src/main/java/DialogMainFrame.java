@@ -22,6 +22,8 @@ public class DialogMainFrame extends JFrame {
   private JPanel well_card;
 
   private static final Session session = new Session();
+  private static Utilities utils;
+
   private Long sessionID;
 
   public static final String PROJECTPANEL = "Card with projects";
@@ -33,6 +35,7 @@ public class DialogMainFrame extends JFrame {
 
   public DialogMainFrame() throws SQLException {
     dbm = new DatabaseManager(this);
+    utils = new Utilities(this);
     // new DialogLogin();
     // Create and set up the window.
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -43,6 +46,7 @@ public class DialogMainFrame extends JFrame {
       session.setUserName("admin1");
       session.setUserID(1);
       session.setUserTypeID(1);
+      session.setUserType("pm_admin");
 
     } catch (SQLException sqle) {
       System.out.println("Invalid password");
@@ -117,6 +121,10 @@ public class DialogMainFrame extends JFrame {
 
   public Session getSession() {
     return session;
+  }
+
+  public Utilities getUtilities() {
+    return utils;
   }
 
   public void updateProjectPanel() {}
