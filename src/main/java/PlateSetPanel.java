@@ -36,7 +36,7 @@ public class PlateSetPanel extends JPanel {
     c.insets = new Insets(5, 5, 2, 2);
     textPanel.add(label, c);
 
-    label = new JLabel("Desciption:", SwingConstants.RIGHT);
+    label = new JLabel("Description:", SwingConstants.RIGHT);
     c.gridy = 1;
     textPanel.add(label, c);
 

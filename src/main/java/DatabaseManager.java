@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 /** */
 public class DatabaseManager {
@@ -100,10 +101,9 @@ public class DatabaseManager {
       Statement st = conn.createStatement();
       ResultSet rs =
           st.executeQuery(
-              "SELECT project_sys_name AS ProjectID, project_name As Name, pmuser_name AS Owner, descr AS Description FROM project, pmuser WHERE pmuser_id = pmuser.id ORDER BY project.id DESC;");
+              "SELECT project_sys_name AS \"ProjectID\", project_name As \"Name\", pmuser_name AS \"Owner\", descr AS \"Description\" FROM project, pmuser WHERE pmuser_id = pmuser.id ORDER BY project.id DESC;");
 
       table = new JTable(buildTableModel(rs));
-      // LOGGER.info(table);
       rs.close();
       st.close();
     } catch (SQLException sqle) {
@@ -115,13 +115,12 @@ public class DatabaseManager {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate_set_sys_name AS PlateSetID, plate_set_name As Name FROM plate_set WHERE project_id = (select id from project where project_sys_name like ?) ORDER BY plate_set.id DESC;");
+              "SELECT plate_set_sys_name AS \"PlateSetID\", plate_set_name As \"Name\", descr AS \"Description\", format AS \"Format\" FROM plate_set, plate_size WHERE plate_size.id = plate_set.plate_size_id AND project_id = (select id from project where project_sys_name like ?) ORDER BY plate_set.id DESC;");
 
       pstmt.setString(1, _project_sys_name);
       ResultSet rs = pstmt.executeQuery();
 
       table = new JTable(buildTableModel(rs));
-      LOGGER.info("PlateSet table: " + table);
       rs.close();
       pstmt.close();
 
@@ -157,7 +156,7 @@ public class DatabaseManager {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate.plate_sys_name AS PlateID, plate_seq_num AS Order,  plate_type.plate_type_name As Type, plate_size.format AS Size FROM plate_set, plate, plate_type, plate_size WHERE plate.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate.plate_set_id = plate_set.id AND plate_size.id = plate.plate_size_id;");
+              "SELECT plate.plate_sys_name AS \"PlateID\", plate_seq_num AS \"Order\",  plate_type.plate_type_name As \"Type\", plate_size.format AS \"Format\" FROM plate_set, plate, plate_type, plate_size WHERE plate.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate.plate_set_id = plate_set.id AND plate_size.id = plate.plate_size_id;");
 
       pstmt.setString(1, _plate_set_sys_name);
       ResultSet rs = pstmt.executeQuery();
@@ -177,7 +176,7 @@ public class DatabaseManager {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate.plate_sys_name AS PlateID, well.well_name AS Well, sample.sample_sys_name AS Sample FROM  plate, well, sample WHERE plate.id = well.plate_id AND sample.id = well.sample_id AND well.plate_id = (SELECT plate.id FROM plate WHERE plate.plate_sys_name = ?);");
+              "SELECT plate.plate_sys_name AS \"PlateID\", well.well_name AS \"Well\", sample.sample_sys_name AS \"Sample\" FROM  plate, well, sample WHERE plate.id = well.plate_id AND sample.id = well.sample_id AND well.plate_id = (SELECT plate.id FROM plate WHERE plate.plate_sys_name = ?);");
 
       pstmt.setString(1, _plate_sys_name);
       ResultSet rs = pstmt.executeQuery();
@@ -192,22 +191,65 @@ public class DatabaseManager {
     return table;
   }
 
-  public static DefaultTableModel buildTableModel(ResultSet _rs) throws SQLException {
+  public static CustomTableModel buildTableModel(ResultSet _rs) throws SQLException {
 
     ResultSet rs = _rs;
     ResultSetMetaData metaData = rs.getMetaData();
     int columnCount = metaData.getColumnCount();
-    Vector<String> columnNames = new Vector<String>();
+
+    String[] columnNames = new String[columnCount + 1];
+    columnNames[0] = "Select";
     for (int column = 1; column <= columnCount; column++) {
-      columnNames.add(metaData.getColumnName(column));
+      columnNames[column] = metaData.getColumnName(column);
+    }
+    // data of the table
+    Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+    while (rs.next()) {
+      Vector<Object> vector = new Vector<Object>();
+      vector.add(new Boolean(false));
+
+      for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+        vector.add(rs.getObject(columnIndex));
+        // LOGGER.info("Index: " + columnIndex + "Object: " + rs.getObject(columnIndex));
+      }
+      data.add(vector);
+    }
+
+    /*
+    javax.swing.table.TableColumn column = null;
+    for (int i = 0; i < 5; i++) {
+      column = data.getColumnModel().getColumn(i);
+      if (i == 2) {
+        column.setPreferredWidth(100); // third column is bigger
+      } else {
+        column.setPreferredWidth(50);
+      }
+    }
+    */
+    return new CustomTableModel(
+        data.stream().map(List::toArray).toArray(Object[][]::new), columnNames);
+  }
+
+  public static DefaultTableModel oldBuildTableModel(ResultSet _rs) throws SQLException {
+
+    ResultSet rs = _rs;
+    ResultSetMetaData metaData = rs.getMetaData();
+    int columnCount = metaData.getColumnCount() + 1;
+    Vector<String> columnNames = new Vector<String>();
+    columnNames.add("Select");
+    for (int column = 2; column <= columnCount; column++) {
+      columnNames.add(metaData.getColumnName(column - 1));
     }
 
     // data of the table
     Vector<Vector<Object>> data = new Vector<Vector<Object>>();
     while (rs.next()) {
       Vector<Object> vector = new Vector<Object>();
-      for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
-        vector.add(rs.getObject(columnIndex));
+      vector.add(new Boolean(false));
+
+      for (int columnIndex = 2; columnIndex <= columnCount; columnIndex++) {
+        vector.add(rs.getObject(columnIndex - 1));
+        LOGGER.info("Index: " + columnIndex + "Object: " + rs.getObject(columnIndex - 1));
       }
       data.add(vector);
     }
@@ -328,6 +370,25 @@ public class DatabaseManager {
      return assay_types;
    }
    */
+
+  public void groupPlateSets(JTable _table) {
+    // 5 columns in the plate set table
+    JTable plate_set_table = _table;
+    TableModel tableModel = plate_set_table.getModel();
+    int[] selection = plate_set_table.getSelectedRows();
+    String[][] results = new String[selection.length][5];
+
+    LOGGER.info("selection: " + selection.toString());
+
+    for (int i = 0; i < selection.length; i++) {
+      for (int j = 0; j < 5; j++) {
+        results[i][j] = tableModel.getValueAt(i, j).toString();
+        LOGGER.info("i: " + i + " j: " + j + " results[i][j]: " + results[i][j]);
+      }
+    }
+
+    //    new DialogGroupPlateSet(dmf);
+  }
 
   public DatabaseInserter getDatabaseInserter() {
     return this.dbInserter;

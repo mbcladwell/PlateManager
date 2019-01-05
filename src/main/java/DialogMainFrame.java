@@ -88,7 +88,8 @@ public class DialogMainFrame extends JFrame {
 
   public void showPlateTable(String _plate_set_sys_name) {
     System.out.println("in dmf.showPlate: " + _plate_set_sys_name);
-    plate_card = new PlatePanel(this, dbm.getPlateTableData(_plate_set_sys_name));
+    plate_card =
+        new PlatePanel(this, dbm.getPlateTableData(_plate_set_sys_name), _plate_set_sys_name);
 
     cards.add(plate_card, PLATEPANEL);
     card_layout.show(cards, DialogMainFrame.PLATEPANEL);

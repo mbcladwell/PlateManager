@@ -76,7 +76,7 @@ public class MenuBarForPlate extends JMenuBar {
           public void actionPerformed(ActionEvent e) {
             try {
               int i = plate_table.getSelectedRow();
-              String plate_sys_name = (String) plate_table.getValueAt(i, 0);
+              String plate_sys_name = (String) plate_table.getValueAt(i, 1);
               System.out.println("i: " + plate_sys_name);
               dmf.showWellTable(plate_sys_name);
             } catch (ArrayIndexOutOfBoundsException s) {

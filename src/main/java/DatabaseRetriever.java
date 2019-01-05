@@ -91,4 +91,24 @@ public class DatabaseRetriever {
 
     return new DefaultTableModel(data, columnNames);
   }
+
+  public String getDescriptionForPlateSet(String _plateset_sys_name) {
+    String result = new String();
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement("SELECT descr  FROM  plate_set WHERE plate_set_sys_name =  ?;");
+
+      pstmt.setString(1, _plateset_sys_name);
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      result = rs.getString("descr");
+      LOGGER.info("Description: " + result);
+      rs.close();
+      pstmt.close();
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting description: " + sqle);
+    }
+    return result;
+  }
 }

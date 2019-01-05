@@ -84,7 +84,7 @@ public class MenuBarForProject extends JMenuBar {
 
             try {
               int i = project_table.getSelectedRow();
-              String project_sys_name = (String) project_table.getValueAt(i, 0);
+              String project_sys_name = (String) project_table.getValueAt(i, 1);
               dmf.getDatabaseManager().updateSessionWithProject(project_sys_name);
               System.out.println("i: " + project_sys_name);
               dmf.showPlateSetTable(project_sys_name);

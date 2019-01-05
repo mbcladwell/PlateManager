@@ -53,7 +53,9 @@ public class MenuBarForPlateSet extends JMenuBar {
     menuItem.setMnemonic(KeyEvent.VK_G);
     menuItem.addActionListener(
         new ActionListener() {
-          public void actionPerformed(ActionEvent e) {}
+          public void actionPerformed(ActionEvent e) {
+            dmf.getDatabaseManager().groupPlateSets(plate_set_table);
+          }
         });
     utilitiesMenu.add(menuItem);
 
@@ -62,7 +64,7 @@ public class MenuBarForPlateSet extends JMenuBar {
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            new DialogAddPlateSetData();
+            // new DialogAddPlateSetData();
           }
         });
     utilitiesMenu.add(menuItem);
@@ -80,7 +82,7 @@ public class MenuBarForPlateSet extends JMenuBar {
 
             try {
               int i = plate_set_table.getSelectedRow();
-              String plate_sys_name = (String) plate_set_table.getValueAt(i, 0);
+              String plate_sys_name = (String) plate_set_table.getValueAt(i, 1);
               System.out.println("plate_sys_name: " + plate_sys_name);
               dmf.showPlateTable(plate_sys_name);
             } catch (ArrayIndexOutOfBoundsException s) {
