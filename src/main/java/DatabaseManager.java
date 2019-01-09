@@ -35,9 +35,9 @@ public class DatabaseManager {
       dbInserter = new DatabaseInserter(this);
       dbRetriever = new DatabaseRetriever(this);
     } catch (ClassNotFoundException e) {
-
+      LOGGER.severe("Class not found: " + e);
     } catch (SQLException sqle) {
-
+      LOGGER.severe("SQL exception: " + sqle);
     }
   }
 

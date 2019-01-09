@@ -47,6 +47,10 @@ public class DialogMainFrame extends JFrame {
       session.setUserID(1);
       session.setUserTypeID(1);
       session.setUserType("pm_admin");
+      session.setTempDir((new File(System.getProperty("java.io.tmpdir")).toString()));
+      LOGGER.info("Temporary directory set to: " + session.getTempDir());
+      session.setWorkingDir((new File(System.getProperty("user.dir")).toString()));
+      LOGGER.info("Working directory set to: " + session.getWorkingDir());
 
     } catch (SQLException sqle) {
       System.out.println("Invalid password");

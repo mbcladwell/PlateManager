@@ -4,6 +4,7 @@ import bllm.*;
 import java.awt.*;
 import java.awt.Dialog.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.logging.*;
 import javax.help.*;
 import javax.swing.*;
@@ -82,14 +83,27 @@ public class MenuBarForProject extends JMenuBar {
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            dmf.getUtilities().toExcel(project_table);
+
+            Object[][] results = dmf.getUtilities().getTableDataWithHeader(project_table);
+            POIUtilities poi = new POIUtilities(dmf);
+            poi.writeJTableToSpreadsheet("Projects", results);
+            try {
+              Desktop d = Desktop.getDesktop();
+              d.open(new File("./Writesheet.xlsx"));
+            } catch (IOException ioe) {
+            }
+            // JWSFileChooserDemo jwsfcd = new JWSFileChooserDemo();
+            // jwsfcd.createAndShowGUI();
+
           }
         });
     menu.add(menuItem);
 
     JButton downbutton = new JButton();
     try {
-      ImageIcon down = new ImageIcon(this.getClass().getResource("images/ddown.png"));
+      ImageIcon down =
+          new ImageIcon(
+              this.getClass().getResource("/toolbarButtonGraphics/navigation/Down16.gif"));
       downbutton.setIcon(down);
     } catch (Exception ex) {
       System.out.println(ex + " ddown.PNG image not found");

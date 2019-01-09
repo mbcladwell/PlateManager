@@ -18,6 +18,9 @@ public class Session {
   private int projectID;
   private String projectSysName;
   private Long sessionID;
+  private String workingDir;
+  private String tempDir;
+
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   private static final long serialVersionUID = 1L;
@@ -78,5 +81,21 @@ public class Session {
 
   public void setSessionID(Long _l) {
     sessionID = _l;
+  }
+
+  public void setTempDir(String _s) {
+    tempDir = _s;
+  }
+
+  public String getTempDir() {
+    return tempDir;
+  }
+
+  public void setWorkingDir(String _s) {
+    workingDir = _s;
+  }
+
+  public String getWorkingDir() {
+    return workingDir;
   }
 }

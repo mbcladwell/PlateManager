@@ -31,6 +31,12 @@ public class ProjectPanel extends JPanel implements TableModelListener {
     listSelectionModel.addListSelectionListener(new SharedListSelectionHandler());
     table.setSelectionModel(listSelectionModel);
 
+    // table.getColumnModel().getColumn(0).setMinWidth(60);
+    table.getColumnModel().getColumn(0).setMaxWidth(60);
+    table.getColumnModel().getColumn(1).setMaxWidth(75);
+    table.getColumnModel().getColumn(3).setMaxWidth(100);
+    table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+
     scrollPane = new JScrollPane(table);
     this.add(scrollPane, BorderLayout.SOUTH);
     table.setFillsViewportHeight(true);

@@ -34,9 +34,32 @@ dependencies {
 	//Help system
 	compile 'javax.help:javahelp:2.0.05'
 	implementation 'javax.help:javahelp:2.0.05'
+compile 'javax.swing:jlfgr:1.0'
+implementation 'javax.swing:jlfgr:1.0'
 
+    // https://mvnrepository.com/artifact/org.apache.poi/poi
+    //Apache project to access Office files
+compile 'org.apache:poi:4.0.1'
+implementation 'org.apache:poi:4.0.1'
+compile 'org.apache:poi-ooxml:4.0.1'
+    implementation 'org.apache:poi-ooxml:4.0.1'
+compile 'org.apache.xmlbeans:xmlbeans:2.6.0'
+    implementation 'org.apache.xmlbeans:xmlbeans:2.6.0'
+compile  'org.apache.commons:commons-collections4:4.2'
+implementation 'org.apache.commons:commons-collections4:4.2'
+compile  'org.apache.commons:commons-compress:1.18'
+implementation  'org.apache.commons:commons-compress:1.18'
+// https://mvnrepository.com/artifact/org.apache.poi/ooxml-schemas
+compile  'org.apache.poi:ooxml-schemas:1.4'
+implementation   'org.apache.poi:ooxml-schemas:1.4'
+
+
+    
        compile 'net.stihie:bllm:0.1'
-       implementation 'net.stihie:bllm:0.1'
+    implementation 'net.stihie:bllm:0.1'
+    compile 'javax.swing:jnlp:1.0'
+    implementation 'javax.swing:jnlp:1.0'
+    
 //JSON parsing
 compile 'com.google.code.gson:gson:2.8.5'
 
@@ -58,7 +81,8 @@ repositories {
 //	maven {
   //  url 'http://m2.objectdb.com'
  // }
-     mavenLocal()
+    mavenLocal()
+    mavenCentral()
 
 
 }
@@ -150,3 +174,13 @@ task copyJavaDocsToWeb(type: Copy, dependsOn: [myJavadocs]) {
 }
 
 
+//update the local Maven repository
+task updateMaven(type: Exec)  {
+
+        executable "mvn"
+	args "install:install-file", "-Dfile=/home/mbc/Downloads/poi-bin-4.0.1-20181203/poi-4.0.1/poi-ooxml-4.0.1.jar", "-DgroupId=org.apache", "-DartifactId=poi-ooxml", "-Dversion=4.0.1", "-Dpackaging=jar"
+
+//	args "install:install-file", "-Dfile=build/libs/pm-0.1.jar", "-DgroupId=net.stihie", "-DartifactId=pm", "-Dversion=0.1", "-Dpackaging=jar"
+
+    
+}
