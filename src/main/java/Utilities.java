@@ -21,7 +21,7 @@ public class Utilities {
   public Utilities(DialogMainFrame _dmf) {
     dmf = _dmf;
   }
-
+  /** Returns selected rows only */
   public Object[][] getTableDataWithHeader(JTable _table) {
     JTable table = _table;
 
@@ -37,6 +37,39 @@ public class Utilities {
       for (int j = 0; j < nCol; j++) tableData[i][j] = ctm.getValueAt(i - 1, j);
     return tableData;
   }
+
+  /*
+    public JTable filterTable(JTable _table, String _query) {
+
+      JTable table = _table;
+      String query = _query;
+
+      CustomTableModel ctm = (CustomTableModel) table.getModel();
+      int nRow = ctm.getRowCount(), nCol = ctm.getColumnCount();
+      String[] concatenatedData = new String[nRow];
+      String holder = new String();
+
+      for (int i = 0; i < nRow; i++) {
+        for (int j = 1; j < nCol; j++) {
+          holder = holder + " " + ctm.getValueAt(i, j);
+        }
+        concatenatedData[i] = holder;
+        holder = "";
+      }
+      for (int i = 0; i < nRow; i++) {
+        LOGGER.info(concatenatedData[i]);
+      }
+
+      List indicesOfInterest = new List();
+
+      for (int i = 0; i < nCol; i++) {
+        tableData[0][i] = table.getColumnName(i);
+      }
+
+      return null;
+    }
+  */
+
   /**
    * Expot selected rows only to TSV (TAB; extension .XLS) or CSV (COMMA; extension .CSV) First
    * column Select is ignored.

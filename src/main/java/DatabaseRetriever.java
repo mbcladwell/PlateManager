@@ -111,4 +111,35 @@ public class DatabaseRetriever {
     }
     return result;
   }
+
+  /**
+   * Return a key/value HashMap with the number of plates in each plate set. Used to inform user
+   * when grouping plate sets. @Set projectSet a set that contains plate_set IDs to be iterated
+   * over.
+   */
+  public HashMap<String, String> getNumberOfPlatesInPlateSets(Set<String> _plate_setSet) {
+    Set<String> plate_setSet = _plate_setSet;
+    HashMap<String, String> plate_setPlateCount = new HashMap<String, String>();
+    String result;
+    for (String s : plate_setSet) {
+      try {
+        PreparedStatement pstmt =
+            conn.prepareStatement(
+                "SELECT count(*) AS exact_count FROM (SELECT plate.plate_sys_name  FROM  plate, plate_set WHERE plate.plate_set_id = plate_set.id AND plate_set_sys_name = ?) AS count;");
+
+        pstmt.setString(1, s);
+        ResultSet rs = pstmt.executeQuery();
+        rs.next();
+        result = rs.getString("exact_count");
+        plate_setPlateCount.put(s, result);
+        LOGGER.info("s:: " + s + " result: " + result);
+        rs.close();
+        pstmt.close();
+
+      } catch (SQLException sqle) {
+        LOGGER.severe("SQL exception getting plate count: " + sqle);
+      }
+    }
+    return plate_setPlateCount;
+  }
 }

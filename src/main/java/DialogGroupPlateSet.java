@@ -5,7 +5,7 @@ import java.awt.event.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Date;
+import java.util.*;
 import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
@@ -30,10 +30,14 @@ public class DialogGroupPlateSet extends JDialog {
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
 
-  public DialogGroupPlateSet(DialogMainFrame _parent) {
+  public DialogGroupPlateSet(
+      DialogMainFrame _parent, HashMap<String, String> _plate_set_num_plates, String _format) {
     this.parent = _parent;
     this.session = parent.getSession();
     owner = session.getUserName();
+    HashMap<String, String> plate_set_num_plates = _plate_set_num_plates;
+    String format = _format;
+    String plateSetsAndNumbers = new String("Needs work");
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
     // this.em = em;
@@ -44,7 +48,7 @@ public class DialogGroupPlateSet extends JDialog {
     // Image img = new
     // ImageIcon(DialogAddProject.class.getResource("../resources/mwplate.png")).getImage();
     // this.setIconImage(img);
-    this.setTitle("Add a Plate Set");
+    this.setTitle("Group Plate Sets");
     // c.gridwidth = 2;
 
     label = new JLabel("Date:", SwingConstants.RIGHT);
@@ -69,24 +73,6 @@ public class DialogGroupPlateSet extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    label = new JLabel("Plate Set Name:", SwingConstants.RIGHT);
-    // c.fill = GridBagConstraints.HORIZONTAL;
-    c.gridx = 0;
-    c.gridy = 2;
-    pane.add(label, c);
-
-    label = new JLabel("Description:", SwingConstants.RIGHT);
-    c.gridx = 0;
-    c.gridy = 3;
-    c.gridheight = 1;
-    pane.add(label, c);
-
-    label = new JLabel("Number of plates:", SwingConstants.RIGHT);
-    c.gridx = 0;
-    c.gridy = 4;
-    c.gridheight = 1;
-    pane.add(label, c);
-
     ownerLabel = new JLabel(owner);
     c.gridx = 1;
     c.gridy = 1;
@@ -94,46 +80,72 @@ public class DialogGroupPlateSet extends JDialog {
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(ownerLabel, c);
 
+    label = new JLabel("New Plate Set Name:", SwingConstants.RIGHT);
+    // c.fill = GridBagConstraints.HORIZONTAL;
+    c.gridx = 0;
+    c.gridy = 2;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane.add(label, c);
+
     nameField = new JTextField(30);
     c.gridx = 1;
     c.gridy = 2;
     c.gridheight = 1;
+    c.gridwidth = 5;
+    c.anchor = GridBagConstraints.LINE_START;
     pane.add(nameField, c);
+
+    label = new JLabel("New Plate Set Description:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 3;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    pane.add(label, c);
 
     descriptionField = new JTextField(30);
     c.gridx = 1;
     c.gridy = 3;
     c.gridheight = 1;
+    c.gridwidth = 5;
+    c.anchor = GridBagConstraints.LINE_START;
     pane.add(descriptionField, c);
 
-    numberField = new JTextField(4);
-    c.gridx = 1;
-    c.gridy = 4;
-    c.gridheight = 1;
-    c.gridwidth = 1;
-    pane.add(numberField, c);
-
-    label = new JLabel("Format:", SwingConstants.RIGHT);
-    c.gridx = 2;
+    label = new JLabel("Plate Set ID (# plates):", SwingConstants.RIGHT);
+    c.gridx = 0;
     c.gridy = 4;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    Integer[] formats = {96, 384, 1536};
-
-    formatList = new JComboBox<Integer>(formats);
-    formatList.setSelectedIndex(0);
-    c.gridx = 3;
+    label = new JLabel(plateSetsAndNumbers);
+    c.gridx = 1;
     c.gridy = 4;
     c.gridheight = 1;
+    c.gridwidth = 5;
+    pane.add(label, c);
+
+    label = new JLabel("Format:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 5;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane.add(label, c);
+
+    label = new JLabel(format);
+
+    c.gridx = 1;
+    c.gridy = 5;
+    c.gridheight = 1;
+    c.gridwidth = 5;
     c.anchor = GridBagConstraints.LINE_START;
-    pane.add(formatList, c);
+    pane.add(label, c);
     // formatList.addActionListener(this);
 
-    label = new JLabel("Type:", SwingConstants.RIGHT);
-    c.gridx = 4;
-    c.gridy = 4;
+    label = new JLabel("New Plate Set Type:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 6;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
@@ -141,9 +153,9 @@ public class DialogGroupPlateSet extends JDialog {
     String[] plateTypes = parent.getDatabaseManager().getPlateTypes();
 
     typeList = new JComboBox<String>(plateTypes);
-    formatList.setSelectedIndex(0);
-    c.gridx = 5;
-    c.gridy = 4;
+    typeList.setSelectedIndex(0);
+    c.gridx = 1;
+    c.gridy = 6;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(typeList, c);
@@ -155,7 +167,7 @@ public class DialogGroupPlateSet extends JDialog {
     okButton.setForeground(Color.GREEN);
     c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 2;
-    c.gridy = 5;
+    c.gridy = 7;
     c.gridwidth = 2;
     c.gridheight = 1;
     okButton.addActionListener(
@@ -182,7 +194,7 @@ public class DialogGroupPlateSet extends JDialog {
     cancelButton.setEnabled(true);
     cancelButton.setForeground(Color.RED);
     c.gridx = 1;
-    c.gridy = 5;
+    c.gridy = 7;
     c.gridwidth = 1;
     pane.add(cancelButton, c);
     cancelButton.addActionListener(

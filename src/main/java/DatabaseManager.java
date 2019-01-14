@@ -4,7 +4,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.logging.*;
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 /** */
@@ -95,20 +94,20 @@ public class DatabaseManager {
     return insertKey;
   }
 
-  public JTable getProjectTableData() {
-
+  public CustomTable getProjectTableData() {
+    LOGGER.info("in getProject");
     try {
       Statement st = conn.createStatement();
       ResultSet rs =
           st.executeQuery(
               "SELECT project_sys_name AS \"ProjectID\", project_name As \"Name\", pmuser_name AS \"Owner\", descr AS \"Description\" FROM project, pmuser WHERE pmuser_id = pmuser.id ORDER BY project.id DESC;");
 
-      table = new JTable(buildTableModel(rs));
+      table = new CustomTable(parent, buildTableModel(rs));
       rs.close();
       st.close();
     } catch (SQLException sqle) {
     }
-    return table;
+    return (CustomTable) table;
   }
 
   public JTable getPlateSetTableData(String _project_sys_name) {
@@ -191,70 +190,38 @@ public class DatabaseManager {
     return table;
   }
 
-  public static CustomTableModel buildTableModel(ResultSet _rs) throws SQLException {
+  public static CustomTableModel buildTableModel(ResultSet _rs) {
 
-    ResultSet rs = _rs;
-    ResultSetMetaData metaData = rs.getMetaData();
-    int columnCount = metaData.getColumnCount();
+    try {
+      ResultSet rs = _rs;
+      ResultSetMetaData metaData = rs.getMetaData();
+      int columnCount = metaData.getColumnCount();
 
-    String[] columnNames = new String[columnCount + 1];
-    columnNames[0] = "Select";
-    for (int column = 1; column <= columnCount; column++) {
-      columnNames[column] = metaData.getColumnName(column);
-    }
-    // data of the table
-    Vector<Vector<Object>> data = new Vector<Vector<Object>>();
-    while (rs.next()) {
-      Vector<Object> vector = new Vector<Object>();
-      vector.add(new Boolean(false));
+      Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+      String[] columnNames = new String[columnCount];
 
-      for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
-        vector.add(rs.getObject(columnIndex));
-        // LOGGER.info("Index: " + columnIndex + "Object: " + rs.getObject(columnIndex));
+      for (int column = 0; column < columnCount; column++) {
+        columnNames[column] = metaData.getColumnName(column + 1);
       }
-      data.add(vector);
-    }
 
-    /*
-    javax.swing.table.TableColumn column = null;
-    for (int i = 0; i < 5; i++) {
-      column = data.getColumnModel().getColumn(i);
-      if (i == 2) {
-        column.setPreferredWidth(100); // third column is bigger
-      } else {
-        column.setPreferredWidth(50);
+      // data of the table
+      while (rs.next()) {
+        Vector<Object> vector = new Vector<Object>();
+
+        for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+          vector.add(rs.getObject(columnIndex + 1));
+        }
+        data.add(vector);
       }
-    }
-    */
-    return new CustomTableModel(
-        data.stream().map(List::toArray).toArray(Object[][]::new), columnNames);
-  }
+      // LOGGER.info("results: " + data.stream().map(List::toArray).toArray(Object[][]::new));
+      return new CustomTableModel(
+          data.stream().map(List::toArray).toArray(Object[][]::new), columnNames);
 
-  public static DefaultTableModel oldBuildTableModel(ResultSet _rs) throws SQLException {
-
-    ResultSet rs = _rs;
-    ResultSetMetaData metaData = rs.getMetaData();
-    int columnCount = metaData.getColumnCount() + 1;
-    Vector<String> columnNames = new Vector<String>();
-    columnNames.add("Select");
-    for (int column = 2; column <= columnCount; column++) {
-      columnNames.add(metaData.getColumnName(column - 1));
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQLException: " + sqle);
     }
 
-    // data of the table
-    Vector<Vector<Object>> data = new Vector<Vector<Object>>();
-    while (rs.next()) {
-      Vector<Object> vector = new Vector<Object>();
-      vector.add(new Boolean(false));
-
-      for (int columnIndex = 2; columnIndex <= columnCount; columnIndex++) {
-        vector.add(rs.getObject(columnIndex - 1));
-        LOGGER.info("Index: " + columnIndex + "Object: " + rs.getObject(columnIndex - 1));
-      }
-      data.add(vector);
-    }
-
-    return new DefaultTableModel(data, columnNames);
+    return null;
   }
 
   public String getDescriptionForProject(String _project_sys_name) {
@@ -371,23 +338,43 @@ public class DatabaseManager {
    }
    */
 
+  /** TableModel Columns: PSID Name Descr Format */
   public void groupPlateSets(JTable _table) {
-    // 5 columns in the plate set table
+    // 4 columns in the plate set table
     JTable plate_set_table = _table;
     TableModel tableModel = plate_set_table.getModel();
     int[] selection = plate_set_table.getSelectedRows();
-    String[][] results = new String[selection.length][5];
+    String[][] results = new String[selection.length][4];
 
     LOGGER.info("selection: " + selection.toString());
+    Set<String> projectSet = new HashSet<String>();
+    Set<String> plateFormatSet = new HashSet<String>();
 
     for (int i = 0; i < selection.length; i++) {
-      for (int j = 0; j < 5; j++) {
-        results[i][j] = tableModel.getValueAt(i, j).toString();
-        LOGGER.info("i: " + i + " j: " + j + " results[i][j]: " + results[i][j]);
+      for (int j = 0; j < 4; j++) {
+        results[i][j] = tableModel.getValueAt(selection[i], j).toString();
+        // LOGGER.info("i: " + i + " j: " + j + " results[i][j]: " + results[i][j]);
       }
     }
+    for (int k = 0; k < selection.length; k++) {
+      projectSet.add(results[k][0]);
+      LOGGER.info("prjID: " + results[k][0]);
 
-    //    new DialogGroupPlateSet(dmf);
+      plateFormatSet.add(results[k][3]);
+      LOGGER.info("pltformat: " + results[k][3]);
+    }
+    LOGGER.info("Size of plateFormatSet: " + plateFormatSet.size());
+    if (plateFormatSet.size() == 1) {
+      HashMap<String, String> numberOfPlatesInPlateSets =
+          dbRetriever.getNumberOfPlatesInPlateSets(projectSet);
+      new DialogGroupPlateSet(parent, numberOfPlatesInPlateSets, "96");
+    } else {
+      JOptionPane.showMessageDialog(
+          parent,
+          "Plate set must be of the same formats\ne.g. all 96 well plates!",
+          "Error!",
+          JOptionPane.ERROR_MESSAGE);
+    }
   }
 
   public DatabaseInserter getDatabaseInserter() {

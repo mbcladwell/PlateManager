@@ -82,7 +82,6 @@ public class DialogMainFrame extends JFrame {
   }
 
   public void showPlateSetTable(String _project_sys_name) {
-    System.out.println("in dmf.showPlateSet: " + _project_sys_name);
     plate_set_card =
         new PlateSetPanel(this, dbm.getPlateSetTableData(_project_sys_name), _project_sys_name);
 
@@ -95,7 +94,6 @@ public class DialogMainFrame extends JFrame {
   }
 
   public void showPlateTable(String _plate_set_sys_name) {
-    System.out.println("in dmf.showPlate: " + _plate_set_sys_name);
     plate_card =
         new PlatePanel(this, dbm.getPlateTableData(_plate_set_sys_name), _plate_set_sys_name);
 
@@ -108,9 +106,7 @@ public class DialogMainFrame extends JFrame {
   }
 
   public void showWellTable(String _plate_sys_name) {
-    System.out.println("in dmf.showWell: " + _plate_sys_name);
     well_card = new WellPanel(this, dbm.getWellTableData(_plate_sys_name));
-    System.out.println("in show well table");
     cards.add(well_card, WELLPANEL);
     card_layout.show(cards, DialogMainFrame.WELLPANEL);
   }

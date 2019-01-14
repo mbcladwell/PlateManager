@@ -43,8 +43,8 @@ public class POIUtilities {
 
       if (rowid == 0) { // the headers
         row = spreadsheet.createRow(rowcounter);
-        for (int colid = 1; colid < colsize; colid++) {
-          Cell cell = row.createCell(colid - 1);
+        for (int colid = 0; colid < colsize; colid++) {
+          Cell cell = row.createCell(colid);
           cell.setCellValue((String) tableData[rowid][colid]);
         }
         rowcounter++;

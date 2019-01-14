@@ -5,42 +5,54 @@ import java.awt.event.*;
 import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
-import javax.swing.ListSelectionModel;
 import javax.swing.event.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.*;
-import javax.swing.table.TableModel;
 
-public class ProjectPanel extends JPanel implements TableModelListener {
+public class ProjectPanel extends JPanel {
 
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-  private JTable table;
+  private CustomTable table;
   private JScrollPane scrollPane;
   private DialogMainFrame parent;
   private JPanel textPanel;
   private ListSelectionModel listSelectionModel;
-
-  public ProjectPanel(DialogMainFrame _parent, JTable _table) {
+  // private SharedListSelectionHandler sharedListSelectionHandler;
+  /**
+   * To accomodate all components place panels within panels.
+   *
+   * <p>HeaderPanel<br>
+   * NORTH: menubar<br>
+   * CENTER: textPanel<br>
+   *
+   * <p>FooterPanel<br>
+   * NORTH: table<br>
+   * SOUTH: filter<br>
+   */
+  public ProjectPanel(DialogMainFrame _parent, CustomTable _table) {
     this.setLayout(new BorderLayout());
     parent = _parent;
     table = _table;
+
+    /*
     listSelectionModel = table.getSelectionModel();
-    listSelectionModel.addListSelectionListener(new SharedListSelectionHandler());
+    sharedListSelectionHandler = new SharedListSelectionHandler();
+    listSelectionModel.addListSelectionListener(sharedListSelectionHandler);
     table.setSelectionModel(listSelectionModel);
+    table.setRowSelectionAllowed(true);
+    */
 
     // table.getColumnModel().getColumn(0).setMinWidth(60);
-    table.getColumnModel().getColumn(0).setMaxWidth(60);
-    table.getColumnModel().getColumn(1).setMaxWidth(75);
-    table.getColumnModel().getColumn(3).setMaxWidth(100);
+    table.getColumnModel().getColumn(0).setMaxWidth(75);
+    table.getColumnModel().getColumn(1).setMaxWidth(150);
+    table.getColumnModel().getColumn(2).setMaxWidth(100);
+
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 
-    scrollPane = new JScrollPane(table);
-    this.add(scrollPane, BorderLayout.SOUTH);
-    table.setFillsViewportHeight(true);
-    this.add(new MenuBarForProject(parent, table), BorderLayout.NORTH);
+    JPanel headerPanel = new JPanel();
+    headerPanel.setLayout(new BorderLayout());
+    headerPanel.add(new MenuBarForProject(parent, table), BorderLayout.NORTH);
 
     textPanel = new JPanel();
     textPanel.setLayout(new GridBagLayout());
@@ -70,8 +82,15 @@ public class ProjectPanel extends JPanel implements TableModelListener {
     c.gridx = 1;
     c.gridy = 1;
     textPanel.add(privilegesLabel, c);
+    headerPanel.add(textPanel, BorderLayout.CENTER);
 
-    this.add(textPanel, BorderLayout.CENTER);
+    this.add(headerPanel, BorderLayout.NORTH);
+
+    scrollPane = new JScrollPane(table);
+    this.add(scrollPane, BorderLayout.CENTER);
+    table.setFillsViewportHeight(true);
+    FilterPanel fp = new FilterPanel(parent, table);
+    this.add(fp, BorderLayout.SOUTH);
   }
 
   public JTable getTable() {
@@ -79,57 +98,36 @@ public class ProjectPanel extends JPanel implements TableModelListener {
   }
 
   public void updatePanel() {
-    JTable table = parent.getDatabaseManager().getProjectTableData();
-    TableModel model = table.getModel();
+    CustomTable table = parent.getDatabaseManager().getProjectTableData();
+    CustomTableModel model = (CustomTableModel) table.getModel();
     this.table.setModel(model);
   }
 
-  public void tableChanged(TableModelEvent e) {
-    int row = e.getFirstRow();
-    int column = e.getColumn();
-    TableModel model = (TableModel) e.getSource();
-    String columnName = model.getColumnName(column);
-    Object data = model.getValueAt(row, column);
-
-    model.setValueAt(false, row, 0);
-
-    // Do something with the data...
-  }
-
+  /*
   class SharedListSelectionHandler implements ListSelectionListener {
     public void valueChanged(ListSelectionEvent e) {
-      ListSelectionModel lsm = (ListSelectionModel) e.getSource();
 
-      int firstIndex = e.getFirstIndex();
-      int lastIndex = e.getLastIndex();
       boolean isAdjusting = e.getValueIsAdjusting();
-      /*  LOGGER.info(
-      //   "Event for indexes "
-              + firstIndex
-              + " - "
-              + lastIndex
-              + "; isAdjusting is "
-              + isAdjusting
-              + "; selected indexes:");
-      */
-      if (lsm.isSelectionEmpty()) {
-        LOGGER.info(" <none>");
-      } else {
-        if (!isAdjusting) {
-          // Find out which indexes are selected.
-          int minIndex = lsm.getMinSelectionIndex();
-          int maxIndex = lsm.getMaxSelectionIndex();
-          for (int i = minIndex; i <= maxIndex; i++) {
-            if (lsm.isSelectedIndex(i)) {
-              LOGGER.info(" " + i);
-              javax.swing.table.TableModel tm = ProjectPanel.this.getTable().getModel();
-              if ((boolean) tm.getValueAt(i, 0)) tm.setValueAt(false, i, 0);
-              else tm.setValueAt(true, i, 0);
-              ProjectPanel.this.table.setModel(tm);
-            }
-          }
+      if (!isAdjusting) {
+        listSelectionModel.removeListSelectionListener(sharedListSelectionHandler);
+        // ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+
+        CustomTableModel tm = (CustomTableModel) ProjectPanel.this.getTable().getModel();
+
+        // Find out which indexes are selected.
+        int minIndex = listSelectionModel.getMinSelectionIndex();
+        int maxIndex = listSelectionModel.getMaxSelectionIndex();
+        for (int i = minIndex; i <= maxIndex; i++) {
+          if (listSelectionModel.isSelectedIndex(i)) {}
+          // ProjectPanel.this.table.setModel(tm);
         }
       }
+      listSelectionModel.addListSelectionListener(sharedListSelectionHandler);
     }
   }
+  */
 }
+
+// https://stackoverflow.com/questions/2668547/stackoverflowerror-being-caused-by-a-tablemodellistener
+
+// https://stackoverflow.com/questions/10679425/multiple-row-selection-with-checkbox-in-jtable
