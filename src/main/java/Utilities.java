@@ -22,11 +22,12 @@ public class Utilities {
     dmf = _dmf;
   }
   /** Returns selected rows only */
-  public Object[][] getTableDataWithHeader(JTable _table) {
-    JTable table = _table;
+  public Object[][] getTableDataWithHeader(CustomTable _table) {
+    CustomTable table = _table;
 
-    CustomTableModel ctm = (CustomTableModel) table.getModel();
-    int nRow = ctm.getRowCount() + 1, nCol = ctm.getColumnCount();
+    DefaultTableModel tm = table.getTableModel();
+
+    int nRow = tm.getRowCount() + 1, nCol = tm.getColumnCount();
     Object[][] tableData = new Object[nRow][nCol];
 
     for (int i = 0; i < nCol; i++) {
@@ -34,7 +35,7 @@ public class Utilities {
     }
 
     for (int i = 1; i < nRow; i++)
-      for (int j = 0; j < nCol; j++) tableData[i][j] = ctm.getValueAt(i - 1, j);
+      for (int j = 0; j < nCol; j++) tableData[i][j] = tm.getValueAt(i - 1, j);
     return tableData;
   }
 

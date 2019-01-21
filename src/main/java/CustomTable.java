@@ -15,42 +15,47 @@ public class CustomTable extends JTable {
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   private DialogMainFrame dmf;
-  private CustomTableModel customTableModel;
+  private DefaultTableModel tableModel;
   private ListSelectionModel listSelectionModel;
   private SharedListSelectionHandler sharedListSelectionHandler;
   private Vector<Integer> selectedRows = new Vector<>();
+  private TableColumnModel tableColumnModel;
 
-  public CustomTable(DialogMainFrame _dmf, CustomTableModel _ctm) {
-    super(_ctm);
+  public CustomTable(DialogMainFrame _dmf, DefaultTableModel _tm) {
+    super(_tm);
 
     dmf = _dmf;
-    customTableModel = _ctm;
-
+    tableModel = _tm;
+    tableColumnModel = this.getColumnModel();
     listSelectionModel = this.getSelectionModel();
     sharedListSelectionHandler = new SharedListSelectionHandler();
     listSelectionModel.addListSelectionListener(sharedListSelectionHandler);
     this.setSelectionModel(listSelectionModel);
     this.setRowSelectionAllowed(true);
 
-    /*
-    table.getColumnModel().getColumn(0).setMaxWidth(75);
-    table.getColumnModel().getColumn(1).setMaxWidth(150);
-    table.getColumnModel().getColumn(2).setMaxWidth(100);
-    */
+    this.getColumnModel().getColumn(0).setMaxWidth(75);
+    this.getColumnModel().getColumn(1).setMaxWidth(150);
+    this.getColumnModel().getColumn(2).setMaxWidth(100);
+
     this.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
   }
 
-  public CustomTableModel getCustomTableModel() {
-    return this.customTableModel;
+  public DefaultTableModel getTableModel() {
+    return this.tableModel;
   }
 
-  public String[][] getSelectedRowsAsStringArray() {
-    int colCount = customTableModel.getColumnCount();
-    int rowCount = getSelectedRows().length;
-    String[][] results = new String[colCount][rowCount];
-    for (int i = 0; i <= rowCount; i++) {
+  public String[][] getSelectedRowsAndHeaderAsStringArray() {
+
+    int colCount = tableModel.getColumnCount();
+    int rowCount = selectedRows.size();
+    String[][] results = new String[rowCount + 1][colCount];
+    for (int i = 0; i < colCount; i++) {
+      results[0][i] = this.getColumnName(i);
+    }
+
+    for (int i = 1; i <= rowCount; i++) {
       for (int j = 0; j < colCount; j++) {
-        results[j][i] = (String) customTableModel.getValueAt(i, j);
+        results[i][j] = tableModel.getValueAt(selectedRows.get(i - 1), j).toString();
       }
     }
     return results;
@@ -58,8 +63,8 @@ public class CustomTable extends JTable {
 
   class SharedListSelectionHandler implements ListSelectionListener {
     public void valueChanged(ListSelectionEvent e) {
-      // listSelectionModel.removeListSelectionListener(sharedListSelectionHandler);
-      /*
+      listSelectionModel.removeListSelectionListener(sharedListSelectionHandler);
+
       boolean isAdjusting = e.getValueIsAdjusting();
       if (!isAdjusting) {
         selectedRows.clear();
@@ -73,8 +78,8 @@ public class CustomTable extends JTable {
           }
         }
       }
-      */
-      // listSelectionModel.addListSelectionListener(sharedListSelectionHandler);
+
+      listSelectionModel.addListSelectionListener(sharedListSelectionHandler);
     }
   }
 }

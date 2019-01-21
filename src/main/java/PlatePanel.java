@@ -12,18 +12,20 @@ public class PlatePanel extends JPanel {
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-  private JTable table;
+  private CustomTable table;
   private JScrollPane scrollPane;
-  private DialogMainFrame parent;
+  private DialogMainFrame dmf;
   private JPanel textPanel;
   private String plateset_sys_name;
 
-  public PlatePanel(DialogMainFrame _parent, JTable _table, String _plateset_sys_name) {
+  public PlatePanel(DialogMainFrame _dmf, CustomTable _table) {
     this.setLayout(new BorderLayout());
-    parent = _parent;
+    dmf = _dmf;
     table = _table;
-    plateset_sys_name = _plateset_sys_name;
-    this.add(new MenuBarForPlate(parent, table), BorderLayout.NORTH);
+
+    JPanel headerPanel = new JPanel();
+    headerPanel.setLayout(new BorderLayout());
+    headerPanel.add(new MenuBarForPlate(dmf, table), BorderLayout.NORTH);
 
     textPanel = new JPanel();
     textPanel.setLayout(new GridBagLayout());
@@ -36,14 +38,33 @@ public class PlatePanel extends JPanel {
     c.insets = new Insets(5, 5, 2, 2);
     textPanel.add(label, c);
 
-    label = new JLabel("Desciption:", SwingConstants.RIGHT);
-    c.gridy = 1;
+    label = new JLabel("Project: ", SwingConstants.RIGHT);
+    c.gridx = 2;
+    c.gridy = 0;
+    c.anchor = GridBagConstraints.LINE_END;
     textPanel.add(label, c);
 
+    JLabel projectLabel = new JLabel(dmf.getSession().getProjectSysName(), SwingConstants.LEFT);
+    c.gridx = 3;
+    c.gridy = 0;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    textPanel.add(projectLabel, c);
+
+    label = new JLabel("Description:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    textPanel.add(label, c);
+
+    plateset_sys_name =
+        dmf.getDatabaseManager()
+            .getDatabaseRetriever()
+            .getPlateSetSysNameForPlateSysName((String) table.getValueAt(1, 0));
     JLabel platesetLabel = new JLabel(plateset_sys_name, SwingConstants.LEFT);
     c.gridx = 1;
     c.gridy = 0;
-    c.gridwidth = 3;
+    c.gridwidth = 1;
     c.weightx = 0.9;
 
     c.fill = GridBagConstraints.HORIZONTAL;
@@ -52,8 +73,7 @@ public class PlatePanel extends JPanel {
 
     JLabel descriptionLabel =
         new JLabel(
-            parent
-                .getDatabaseManager()
+            dmf.getDatabaseManager()
                 .getDatabaseRetriever()
                 .getDescriptionForPlateSet(plateset_sys_name),
             SwingConstants.LEFT);
@@ -61,11 +81,14 @@ public class PlatePanel extends JPanel {
     c.gridy = 1;
     textPanel.add(descriptionLabel, c);
 
-    this.add(textPanel, BorderLayout.CENTER);
+    headerPanel.add(textPanel, BorderLayout.CENTER);
+    this.add(headerPanel, BorderLayout.NORTH);
 
     scrollPane = new JScrollPane(table);
-    this.add(scrollPane, BorderLayout.SOUTH);
+    this.add(scrollPane, BorderLayout.CENTER);
     table.setFillsViewportHeight(true);
+    FilterPanel fp = new FilterPanel(dmf, table);
+    this.add(fp, BorderLayout.SOUTH);
   }
 
   public JTable getTable() {
@@ -74,7 +97,7 @@ public class PlatePanel extends JPanel {
 
   public void updatePanel(String _plate_set_sys_name) {
     String plate_set_sys_name = _plate_set_sys_name;
-    JTable table = parent.getDatabaseManager().getPlateTableData(plate_set_sys_name);
+    JTable table = dmf.getDatabaseManager().getPlateTableData(plate_set_sys_name);
     TableModel model = table.getModel();
     this.table.setModel(model);
   }

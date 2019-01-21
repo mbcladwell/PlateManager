@@ -2,6 +2,7 @@ package pm;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.logging.*;
 import javax.help.*;
 import javax.swing.*;
@@ -10,10 +11,10 @@ import javax.swing.JComponent.*;
 public class MenuBarForPlateSet extends JMenuBar {
 
   DialogMainFrame dmf;
-  JTable plate_set_table;
+  CustomTable plate_set_table;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-  public MenuBarForPlateSet(DialogMainFrame _dmf, JTable _plate_set_table) {
+  public MenuBarForPlateSet(DialogMainFrame _dmf, CustomTable _plate_set_table) {
 
     dmf = _dmf;
     plate_set_table = _plate_set_table;
@@ -69,9 +70,31 @@ public class MenuBarForPlateSet extends JMenuBar {
         });
     utilitiesMenu.add(menuItem);
 
+    menuItem = new JMenuItem("Export", KeyEvent.VK_E);
+    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
+    menuItem.getAccessibleContext().setAccessibleDescription("Export as .csv.");
+    menuItem.putClientProperty("mf", dmf);
+    menuItem.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+
+            Object[][] results = plate_set_table.getSelectedRowsAndHeaderAsStringArray();
+            POIUtilities poi = new POIUtilities(dmf);
+            poi.writeJTableToSpreadsheet("Plate Sets", results);
+            try {
+              Desktop d = Desktop.getDesktop();
+              d.open(new File("./Writesheet.xlsx"));
+            } catch (IOException ioe) {
+            }
+          }
+        });
+    utilitiesMenu.add(menuItem);
+
     JButton downbutton = new JButton();
     try {
-      ImageIcon down = new ImageIcon(this.getClass().getResource("images/ddown.png"));
+      ImageIcon down =
+          new ImageIcon(
+              this.getClass().getResource("/toolbarButtonGraphics/navigation/Down16.gif"));
       downbutton.setIcon(down);
     } catch (Exception ex) {
       System.out.println(ex + " ddown.PNG image not found");
@@ -81,8 +104,9 @@ public class MenuBarForPlateSet extends JMenuBar {
           public void actionPerformed(ActionEvent e) {
 
             try {
+              dmf.getSession().setPlateSetSysName("plateset_sys_name");
               int i = plate_set_table.getSelectedRow();
-              String plate_sys_name = (String) plate_set_table.getValueAt(i, 1);
+              String plate_sys_name = (String) plate_set_table.getValueAt(i, 0);
               System.out.println("plate_sys_name: " + plate_sys_name);
               dmf.showPlateTable(plate_sys_name);
             } catch (ArrayIndexOutOfBoundsException s) {
@@ -94,7 +118,8 @@ public class MenuBarForPlateSet extends JMenuBar {
     JButton upbutton = new JButton();
 
     try {
-      ImageIcon up = new ImageIcon(this.getClass().getResource("images/dup.png"));
+      ImageIcon up =
+          new ImageIcon(this.getClass().getResource("/toolbarButtonGraphics/navigation/Up16.gif"));
       upbutton.setIcon(up);
     } catch (Exception ex) {
       System.out.println(ex);

@@ -2,31 +2,90 @@ package pm;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
-import java.util.logging.*;
 
 public class WellPanel extends JPanel {
 
   private static final long serialVersionUID = 1L;
+  private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-  private JTable table;
+  private CustomTable table;
   private JScrollPane scrollPane;
-  private DialogMainFrame parent;
-private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+  private DialogMainFrame dmf;
+  private JPanel textPanel;
 
-  public WellPanel(DialogMainFrame _parent, JTable _table) {
+  public WellPanel(DialogMainFrame _dmf, CustomTable _table) {
     this.setLayout(new BorderLayout());
-    parent = _parent;
+    dmf = _dmf;
     table = _table;
+
+    JPanel headerPanel = new JPanel();
+    headerPanel.setLayout(new BorderLayout());
+    headerPanel.add(new MenuBarForWell(dmf, table), BorderLayout.NORTH);
+
+    textPanel = new JPanel();
+    textPanel.setLayout(new GridBagLayout());
+    GridBagConstraints c = new GridBagConstraints();
+    JLabel label = new JLabel("Plate Set:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 0;
+    c.anchor = GridBagConstraints.LINE_END;
+    c.weightx = 0.1;
+    c.insets = new Insets(5, 5, 2, 2);
+    textPanel.add(label, c);
+
+    label = new JLabel("Project: ", SwingConstants.RIGHT);
+    c.gridx = 2;
+    c.gridy = 0;
+    c.anchor = GridBagConstraints.LINE_END;
+    textPanel.add(label, c);
+
+    JLabel projectLabel = new JLabel(dmf.getSession().getProjectSysName(), SwingConstants.LEFT);
+    c.gridx = 3;
+    c.gridy = 0;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    textPanel.add(projectLabel, c);
+
+    label = new JLabel("Description:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    textPanel.add(label, c);
+
+    JLabel platesetLabel = new JLabel(dmf.getSession().getPlateSetSysName(), SwingConstants.LEFT);
+    c.gridx = 1;
+    c.gridy = 0;
+    c.gridwidth = 1;
+    c.weightx = 0.9;
+
+    c.fill = GridBagConstraints.HORIZONTAL;
+    c.anchor = GridBagConstraints.LINE_START;
+    textPanel.add(platesetLabel, c);
+
+    JLabel descriptionLabel =
+        new JLabel(
+            dmf.getDatabaseManager()
+                .getDatabaseRetriever()
+                .getDescriptionForPlateSet(dmf.getSession().getPlateSetSysName()),
+            SwingConstants.LEFT);
+    c.gridx = 1;
+    c.gridy = 1;
+    textPanel.add(descriptionLabel, c);
+
+    headerPanel.add(textPanel, BorderLayout.CENTER);
+    this.add(headerPanel, BorderLayout.NORTH);
+
     scrollPane = new JScrollPane(table);
-    this.add(scrollPane, BorderLayout.CENTER);
+    this.add(scrollPane, BorderLayout.SOUTH);
     table.setFillsViewportHeight(true);
-    this.add(new MenuBarForWell(parent, table), BorderLayout.NORTH);
-    System.out.println("finished well panel");
+    FilterPanel fp = new FilterPanel(dmf, table);
+    this.add(fp, BorderLayout.SOUTH);
   }
 
-  public JTable getTable() {
+  public CustomTable getTable() {
     return table;
   }
 }

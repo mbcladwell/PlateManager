@@ -15,7 +15,7 @@ public class ProjectPanel extends JPanel {
 
   private CustomTable table;
   private JScrollPane scrollPane;
-  private DialogMainFrame parent;
+  private DialogMainFrame dmf;
   private JPanel textPanel;
   private ListSelectionModel listSelectionModel;
   // private SharedListSelectionHandler sharedListSelectionHandler;
@@ -30,29 +30,32 @@ public class ProjectPanel extends JPanel {
    * NORTH: table<br>
    * SOUTH: filter<br>
    */
-  public ProjectPanel(DialogMainFrame _parent, CustomTable _table) {
+  public ProjectPanel(DialogMainFrame _dmf, CustomTable _table) {
     this.setLayout(new BorderLayout());
-    parent = _parent;
+    dmf = _dmf;
     table = _table;
 
     /*
-    listSelectionModel = table.getSelectionModel();
-    sharedListSelectionHandler = new SharedListSelectionHandler();
-    listSelectionModel.addListSelectionListener(sharedListSelectionHandler);
-    table.setSelectionModel(listSelectionModel);
-    table.setRowSelectionAllowed(true);
-    */
+        listSelectionModel = table.getSelectionModel();
+        sharedListSelectionHandler = new SharedListSelectionHandler();
+        listSelectionModel.addListSelectionListener(sharedListSelectionHandler);
+        table.setSelectionModel(listSelectionModel);
+        table.setRowSelectionAllowed(true);
 
-    // table.getColumnModel().getColumn(0).setMinWidth(60);
-    table.getColumnModel().getColumn(0).setMaxWidth(75);
-    table.getColumnModel().getColumn(1).setMaxWidth(150);
-    table.getColumnModel().getColumn(2).setMaxWidth(100);
+
+        // table.getColumnModel().getColumn(0).setMinWidth(60);
+        table.getColumnModel().getColumn(0).setMaxWidth(75);
+        table.getColumnModel().getColumn(1).setMaxWidth(150);
+        table.getColumnModel().getColumn(2).setMaxWidth(100);
+    */
+    LOGGER.info("table: " + table);
+    LOGGER.info("class: " + table.getClass());
 
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 
     JPanel headerPanel = new JPanel();
     headerPanel.setLayout(new BorderLayout());
-    headerPanel.add(new MenuBarForProject(parent, table), BorderLayout.NORTH);
+    headerPanel.add(new MenuBarForProject(dmf, table), BorderLayout.NORTH);
 
     textPanel = new JPanel();
     textPanel.setLayout(new GridBagLayout());
@@ -69,7 +72,7 @@ public class ProjectPanel extends JPanel {
     c.gridy = 1;
     textPanel.add(label, c);
 
-    JLabel userLabel = new JLabel(parent.getSession().getUserName(), SwingConstants.LEFT);
+    JLabel userLabel = new JLabel(dmf.getSession().getUserName(), SwingConstants.LEFT);
     c.gridx = 1;
     c.gridy = 0;
     // c.gridwidth = 3;
@@ -78,7 +81,7 @@ public class ProjectPanel extends JPanel {
     c.anchor = GridBagConstraints.LINE_START;
     textPanel.add(userLabel, c);
 
-    JLabel privilegesLabel = new JLabel(parent.getSession().getUserType(), SwingConstants.LEFT);
+    JLabel privilegesLabel = new JLabel(dmf.getSession().getUserType(), SwingConstants.LEFT);
     c.gridx = 1;
     c.gridy = 1;
     textPanel.add(privilegesLabel, c);
@@ -89,7 +92,7 @@ public class ProjectPanel extends JPanel {
     scrollPane = new JScrollPane(table);
     this.add(scrollPane, BorderLayout.CENTER);
     table.setFillsViewportHeight(true);
-    FilterPanel fp = new FilterPanel(parent, table);
+    FilterPanel fp = new FilterPanel(dmf, table);
     this.add(fp, BorderLayout.SOUTH);
   }
 
@@ -98,7 +101,7 @@ public class ProjectPanel extends JPanel {
   }
 
   public void updatePanel() {
-    CustomTable table = parent.getDatabaseManager().getProjectTableData();
+    CustomTable table = dmf.getDatabaseManager().getProjectTableData();
     CustomTableModel model = (CustomTableModel) table.getModel();
     this.table.setModel(model);
   }

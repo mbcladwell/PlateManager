@@ -30,6 +30,12 @@ public class DialogGroupPlateSet extends JDialog {
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
 
+  /**
+   * Called from DatabaseManager.groupPlateSets()
+   *
+   * @param _plate_set_num_plates plate set id and the number of plates in the plate set
+   * @param _format number of wells per plate
+   */
   public DialogGroupPlateSet(
       DialogMainFrame _parent, HashMap<String, String> _plate_set_num_plates, String _format) {
     this.parent = _parent;
@@ -37,7 +43,12 @@ public class DialogGroupPlateSet extends JDialog {
     owner = session.getUserName();
     HashMap<String, String> plate_set_num_plates = _plate_set_num_plates;
     String format = _format;
-    String plateSetsAndNumbers = new String("Needs work");
+    String plateSetsAndNumbers = new String("");
+
+    for (HashMap.Entry<String, String> entry : plate_set_num_plates.entrySet()) {
+      plateSetsAndNumbers = plateSetsAndNumbers + entry.getKey() + " (" + entry.getValue() + "); ";
+    }
+
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
     // this.em = em;
@@ -115,6 +126,7 @@ public class DialogGroupPlateSet extends JDialog {
     c.gridx = 0;
     c.gridy = 4;
     c.gridheight = 1;
+    c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
@@ -123,20 +135,21 @@ public class DialogGroupPlateSet extends JDialog {
     c.gridy = 4;
     c.gridheight = 1;
     c.gridwidth = 5;
+    c.anchor = GridBagConstraints.LINE_START;
     pane.add(label, c);
 
     label = new JLabel("Format:", SwingConstants.RIGHT);
-    c.gridx = 0;
-    c.gridy = 5;
+    c.gridx = 4;
+    c.gridy = 6;
     c.gridheight = 1;
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    label = new JLabel(format);
+    label = new JLabel(format + " well");
 
-    c.gridx = 1;
-    c.gridy = 5;
+    c.gridx = 5;
+    c.gridy = 6;
     c.gridheight = 1;
     c.gridwidth = 5;
     c.anchor = GridBagConstraints.LINE_START;
@@ -147,6 +160,7 @@ public class DialogGroupPlateSet extends JDialog {
     c.gridx = 0;
     c.gridy = 6;
     c.gridheight = 1;
+    c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
@@ -157,6 +171,7 @@ public class DialogGroupPlateSet extends JDialog {
     c.gridx = 1;
     c.gridy = 6;
     c.gridheight = 1;
+    c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(typeList, c);
 

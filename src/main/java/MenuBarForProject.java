@@ -13,11 +13,11 @@ import javax.swing.JComponent.*;
 public class MenuBarForProject extends JMenuBar {
 
   DialogMainFrame dmf;
-  JTable project_table;
+  CustomTable project_table;
 
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-  public MenuBarForProject(DialogMainFrame _dmf, JTable _project_table) {
+  public MenuBarForProject(DialogMainFrame _dmf, CustomTable _project_table) {
 
     dmf = _dmf;
     project_table = _project_table;
@@ -84,7 +84,7 @@ public class MenuBarForProject extends JMenuBar {
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 
-            Object[][] results = dmf.getUtilities().getTableDataWithHeader(project_table);
+            String[][] results = project_table.getSelectedRowsAndHeaderAsStringArray();
             POIUtilities poi = new POIUtilities(dmf);
             poi.writeJTableToSpreadsheet("Projects", results);
             try {
@@ -106,7 +106,7 @@ public class MenuBarForProject extends JMenuBar {
               this.getClass().getResource("/toolbarButtonGraphics/navigation/Down16.gif"));
       downbutton.setIcon(down);
     } catch (Exception ex) {
-      System.out.println(ex + " ddown.PNG image not found");
+      System.out.println(ex + " down image not found");
     }
     downbutton.addActionListener(
         new ActionListener() {
@@ -116,7 +116,7 @@ public class MenuBarForProject extends JMenuBar {
               int i = project_table.getSelectedRow();
               String project_sys_name = (String) project_table.getValueAt(i, 0);
               dmf.getDatabaseManager().updateSessionWithProject(project_sys_name);
-              System.out.println("i: " + project_sys_name);
+
               dmf.showPlateSetTable(project_sys_name);
             } catch (ArrayIndexOutOfBoundsException s) {
             }

@@ -49,16 +49,14 @@ public class POIUtilities {
         }
         rowcounter++;
       } else {
-        // only include of the first column is true
-        if ((boolean) tableData[rowid][0] == true) {
-          row = spreadsheet.createRow(rowcounter);
 
-          for (int colid = 1; colid < colsize; colid++) {
-            Cell cell = row.createCell(colid - 1);
-            cell.setCellValue((String) tableData[rowid][colid]);
-          }
-          rowcounter++;
+        row = spreadsheet.createRow(rowcounter);
+
+        for (int colid = 0; colid < colsize; colid++) {
+          Cell cell = row.createCell(colid);
+          cell.setCellValue((String) tableData[rowid][colid]);
         }
+        rowcounter++;
       }
     }
 

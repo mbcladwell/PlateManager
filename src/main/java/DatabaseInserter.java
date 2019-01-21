@@ -114,4 +114,13 @@ public class DatabaseInserter {
 
     }
   }
+
+  /** called from ; Performs the creation of a new plate set from existing plates */
+  public void groupPlateSet(
+      String _description,
+      String _name,
+      String _num_plates,
+      String _plate_size_id,
+      String _plate_type_id,
+      String _project_id) {}
 }

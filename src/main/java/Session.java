@@ -17,6 +17,7 @@ public class Session {
   private String userType; // admin, superuser, user
   private int projectID;
   private String projectSysName;
+  private String plateSetSysName;
   private Long sessionID;
   private String workingDir;
   private String tempDir;
@@ -73,6 +74,14 @@ public class Session {
 
   public String getProjectSysName() {
     return projectSysName;
+  }
+
+  public void setPlateSetSysName(String _s) {
+    plateSetSysName = _s;
+  }
+
+  public String getPlateSetSysName() {
+    return plateSetSysName;
   }
 
   public Long getSessionID() {

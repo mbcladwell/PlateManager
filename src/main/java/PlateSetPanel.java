@@ -12,18 +12,21 @@ public class PlateSetPanel extends JPanel {
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-  private JTable table;
+  private CustomTable table;
   private JScrollPane scrollPane;
-  private DialogMainFrame parent;
+  private DialogMainFrame dmf;
   private JPanel textPanel;
   private String project_sys_name;
 
-  public PlateSetPanel(DialogMainFrame _parent, JTable _table, String _project_sys_name) {
+  public PlateSetPanel(DialogMainFrame _dmf, CustomTable _table, String _project_sys_name) {
     this.setLayout(new BorderLayout());
-    parent = _parent;
+    dmf = _dmf;
     table = _table;
     project_sys_name = _project_sys_name;
-    this.add(new MenuBarForPlateSet(parent, table), BorderLayout.NORTH);
+
+    JPanel headerPanel = new JPanel();
+    headerPanel.setLayout(new BorderLayout());
+    headerPanel.add(new MenuBarForPlateSet(dmf, table), BorderLayout.NORTH);
 
     textPanel = new JPanel();
     textPanel.setLayout(new GridBagLayout());
@@ -52,17 +55,20 @@ public class PlateSetPanel extends JPanel {
 
     JLabel descriptionLabel =
         new JLabel(
-            parent.getDatabaseManager().getDescriptionForProject(project_sys_name),
+            dmf.getDatabaseManager().getDescriptionForProject(project_sys_name),
             SwingConstants.LEFT);
     c.gridx = 1;
     c.gridy = 1;
     textPanel.add(descriptionLabel, c);
 
-    this.add(textPanel, BorderLayout.CENTER);
+    headerPanel.add(textPanel, BorderLayout.CENTER);
+    this.add(headerPanel, BorderLayout.NORTH);
 
     scrollPane = new JScrollPane(table);
     table.setFillsViewportHeight(true);
-    this.add(scrollPane, BorderLayout.SOUTH);
+    this.add(scrollPane, BorderLayout.CENTER);
+    FilterPanel fp = new FilterPanel(dmf, table);
+    this.add(fp, BorderLayout.SOUTH);
   }
 
   public JTable getTable() {
@@ -71,7 +77,7 @@ public class PlateSetPanel extends JPanel {
 
   public void updatePanel(String _project_sys_name) {
     String project_sys_name = _project_sys_name;
-    JTable table = parent.getDatabaseManager().getPlateSetTableData(project_sys_name);
+    JTable table = dmf.getDatabaseManager().getPlateSetTableData(project_sys_name);
     TableModel model = table.getModel();
     this.table.setModel(model);
   }

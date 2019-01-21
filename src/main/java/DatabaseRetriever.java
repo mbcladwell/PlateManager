@@ -92,6 +92,26 @@ public class DatabaseRetriever {
     return new DefaultTableModel(data, columnNames);
   }
 
+  public String getPlateSetSysNameForPlateSysName(String _plate_sys_name) {
+    String result = new String();
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+              "SELECT plate_set.plate_set_sys_name  FROM  plate_set, plate, plate_plate_set WHERE plate_plate_set.plate_set_id = plate_set.id AND plate_plate_set.plate_id = plate.id AND plate_sys_name =  ?;");
+
+      pstmt.setString(1, _plate_sys_name);
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      result = rs.getString("plate_set_sys_name");
+      rs.close();
+      pstmt.close();
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting plateset_sys_name from plate_sys_name: " + sqle);
+    }
+    return result;
+  }
+
   public String getDescriptionForPlateSet(String _plateset_sys_name) {
     String result = new String();
     try {
@@ -125,7 +145,7 @@ public class DatabaseRetriever {
       try {
         PreparedStatement pstmt =
             conn.prepareStatement(
-                "SELECT count(*) AS exact_count FROM (SELECT plate.plate_sys_name  FROM  plate, plate_set WHERE plate.plate_set_id = plate_set.id AND plate_set_sys_name = ?) AS count;");
+                "SELECT count(*) AS exact_count FROM (SELECT plate.plate_sys_name  FROM  plate, plate_set, plate_plate_set WHERE plate_plate_set.plate_set_id = plate_set.id AND plate_plate_set.plate_id = plate.id AND plate_set_sys_name = ?) AS count;");
 
         pstmt.setString(1, s);
         ResultSet rs = pstmt.executeQuery();

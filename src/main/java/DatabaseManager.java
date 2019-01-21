@@ -4,12 +4,13 @@ import java.sql.*;
 import java.util.*;
 import java.util.logging.*;
 import javax.swing.*;
+import javax.swing.table.*;
 import javax.swing.table.TableModel;
 
 /** */
 public class DatabaseManager {
   Connection conn;
-  JTable table;
+  // CustomTable table;
   DatabaseInserter dbInserter;
   DatabaseRetriever dbRetriever;
   DialogMainFrame parent;
@@ -102,31 +103,33 @@ public class DatabaseManager {
           st.executeQuery(
               "SELECT project_sys_name AS \"ProjectID\", project_name As \"Name\", pmuser_name AS \"Owner\", descr AS \"Description\" FROM project, pmuser WHERE pmuser_id = pmuser.id ORDER BY project.id DESC;");
 
-      table = new CustomTable(parent, buildTableModel(rs));
+      CustomTable table = new CustomTable(parent, buildTableModel(rs));
+
       rs.close();
       st.close();
+      return table;
     } catch (SQLException sqle) {
     }
-    return (CustomTable) table;
+    return null;
   }
 
-  public JTable getPlateSetTableData(String _project_sys_name) {
+  public CustomTable getPlateSetTableData(String _project_sys_name) {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate_set_sys_name AS \"PlateSetID\", plate_set_name As \"Name\", descr AS \"Description\", format AS \"Format\" FROM plate_set, plate_size WHERE plate_size.id = plate_set.plate_size_id AND project_id = (select id from project where project_sys_name like ?) ORDER BY plate_set.id DESC;");
+              "SELECT plate_set_sys_name AS \"PlateSetID\", plate_set_name As \"Name\", format AS \"Format\", descr AS \"Description\" FROM plate_set, plate_size WHERE plate_size.id = plate_set.plate_size_id AND project_id = (select id from project where project_sys_name like ?) ORDER BY plate_set.id DESC;");
 
       pstmt.setString(1, _project_sys_name);
       ResultSet rs = pstmt.executeQuery();
 
-      table = new JTable(buildTableModel(rs));
+      CustomTable table = new CustomTable(parent, buildTableModel(rs));
       rs.close();
       pstmt.close();
-
+      return table;
     } catch (SQLException sqle) {
 
     }
-    return table;
+    return null;
   }
 
   public void updateSessionWithProject(String _project_sys_name) {
@@ -151,46 +154,47 @@ public class DatabaseManager {
     }
   }
 
-  public JTable getPlateTableData(String _plate_set_sys_name) {
+  public CustomTable getPlateTableData(String _plate_set_sys_name) {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate.plate_sys_name AS \"PlateID\", plate_seq_num AS \"Order\",  plate_type.plate_type_name As \"Type\", plate_size.format AS \"Format\" FROM plate_set, plate, plate_type, plate_size WHERE plate.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate.plate_set_id = plate_set.id AND plate_size.id = plate.plate_size_id;");
+              "SELECT plate.plate_sys_name AS \"PlateID\", plate_seq_num AS \"Order\",  plate_type.plate_type_name As \"Type\", plate_size.format AS \"Format\" FROM plate_set, plate, plate_type, plate_size, plate_plate_set WHERE plate_plate_set.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate_plate_set.plate_id = plate.id AND plate_plate_set.plate_set_id = plate_set.id  AND plate_size.id = plate.plate_size_id;");
 
       pstmt.setString(1, _plate_set_sys_name);
       ResultSet rs = pstmt.executeQuery();
 
-      table = new JTable(buildTableModel(rs));
+      CustomTable table = new CustomTable(parent, buildTableModel(rs));
       LOGGER.info("Got plate table ");
       rs.close();
       pstmt.close();
+      return table;
 
     } catch (SQLException sqle) {
 
     }
-    return table;
+    return null;
   }
 
-  public JTable getWellTableData(String _plate_sys_name) {
+  public CustomTable getWellTableData(String _plate_sys_name) {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate.plate_sys_name AS \"PlateID\", well.well_name AS \"Well\", sample.sample_sys_name AS \"Sample\" FROM  plate, well, sample WHERE plate.id = well.plate_id AND sample.id = well.sample_id AND well.plate_id = (SELECT plate.id FROM plate WHERE plate.plate_sys_name = ?);");
+              "SELECT plate.plate_sys_name AS \"PlateID\", well.well_name AS \"Well\", sample.sample_sys_name AS \"Sample\" FROM  plate, well, sample, well_sample WHERE plate.id = well.plate_id AND well_sample.well_id=well.id AND well_sample.sample_id=sample.id AND well.plate_id = (SELECT plate.id FROM plate WHERE plate.plate_sys_name = ?);");
 
       pstmt.setString(1, _plate_sys_name);
       ResultSet rs = pstmt.executeQuery();
 
-      table = new JTable(buildTableModel(rs));
+      CustomTable table = new CustomTable(parent, buildTableModel(rs));
       rs.close();
       pstmt.close();
-
+      return table;
     } catch (SQLException sqle) {
 
     }
-    return table;
+    return null;
   }
 
-  public static CustomTableModel buildTableModel(ResultSet _rs) {
+  public static DefaultTableModel buildTableModel(ResultSet _rs) {
 
     try {
       ResultSet rs = _rs;
@@ -198,10 +202,15 @@ public class DatabaseManager {
       int columnCount = metaData.getColumnCount();
 
       Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+      Vector<String> columnNames = new Vector<String>();
+      /*
       String[] columnNames = new String[columnCount];
-
       for (int column = 0; column < columnCount; column++) {
         columnNames[column] = metaData.getColumnName(column + 1);
+      }
+      */
+      for (int column = 0; column < columnCount; column++) {
+        columnNames.addElement(metaData.getColumnName(column + 1));
       }
 
       // data of the table
@@ -213,12 +222,13 @@ public class DatabaseManager {
         }
         data.add(vector);
       }
-      // LOGGER.info("results: " + data.stream().map(List::toArray).toArray(Object[][]::new));
-      return new CustomTableModel(
-          data.stream().map(List::toArray).toArray(Object[][]::new), columnNames);
+      //      LOGGER.info("data: " + data);
+      return new DefaultTableModel(data, columnNames);
+
+      //          data.stream().map(List::toArray).toArray(Object[][]::new), columnNames);
 
     } catch (SQLException sqle) {
-      LOGGER.severe("SQLException: " + sqle);
+      LOGGER.severe("SQLException in buildTableModel: " + sqle);
     }
 
     return null;
@@ -347,7 +357,7 @@ public class DatabaseManager {
     String[][] results = new String[selection.length][4];
 
     LOGGER.info("selection: " + selection.toString());
-    Set<String> projectSet = new HashSet<String>();
+    Set<String> plateSet = new HashSet<String>();
     Set<String> plateFormatSet = new HashSet<String>();
 
     for (int i = 0; i < selection.length; i++) {
@@ -357,7 +367,7 @@ public class DatabaseManager {
       }
     }
     for (int k = 0; k < selection.length; k++) {
-      projectSet.add(results[k][0]);
+      plateSet.add(results[k][0]);
       LOGGER.info("prjID: " + results[k][0]);
 
       plateFormatSet.add(results[k][3]);
@@ -366,8 +376,12 @@ public class DatabaseManager {
     LOGGER.info("Size of plateFormatSet: " + plateFormatSet.size());
     if (plateFormatSet.size() == 1) {
       HashMap<String, String> numberOfPlatesInPlateSets =
-          dbRetriever.getNumberOfPlatesInPlateSets(projectSet);
-      new DialogGroupPlateSet(parent, numberOfPlatesInPlateSets, "96");
+          dbRetriever.getNumberOfPlatesInPlateSets(plateSet);
+      String format = new String();
+      for (Iterator<String> it = plateFormatSet.iterator(); it.hasNext(); ) {
+        format = it.next();
+      }
+      new DialogGroupPlateSet(parent, numberOfPlatesInPlateSets, format);
     } else {
       JOptionPane.showMessageDialog(
           parent,

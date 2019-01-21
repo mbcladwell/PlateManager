@@ -2,6 +2,7 @@ package pm;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
@@ -10,10 +11,10 @@ public class MenuBarForWell extends JMenuBar {
 
   private static final long serialVersionUID = 1L;
   DialogMainFrame dmf;
-  JTable well_table;
+  CustomTable well_table;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-  public MenuBarForWell(DialogMainFrame _dmf, JTable _table) {
+  public MenuBarForWell(DialogMainFrame _dmf, CustomTable _table) {
     dmf = _dmf;
     well_table = _table;
     // Create the menu bar.
@@ -38,54 +39,39 @@ public class MenuBarForWell extends JMenuBar {
         });
     menu.add(menuItem);
 
-    menuItem = new JMenuItem("Both text and icon");
-    menuItem.setMnemonic(KeyEvent.VK_B);
-    menu.add(menuItem);
-
-    menuItem = new JMenuItem();
-    menuItem.setMnemonic(KeyEvent.VK_D);
-    menu.add(menuItem);
-
-    // a submenu
-    menu.addSeparator();
-    JMenu submenu = new JMenu("A submenu");
-    submenu.setMnemonic(KeyEvent.VK_S);
-
-    menuItem = new JMenuItem("An item in the submenu");
-    menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, ActionEvent.ALT_MASK));
-    submenu.add(menuItem);
-
-    menuItem = new JMenuItem("Another item");
-    submenu.add(menuItem);
-    menu.add(submenu);
-
-    menu = new JMenu("Another Menu");
-    menu.setMnemonic(KeyEvent.VK_N);
-    menu.getAccessibleContext().setAccessibleDescription("This menu does nothing");
+    menu = new JMenu("Utilities");
+    menu.setMnemonic(KeyEvent.VK_U);
+    menu.getAccessibleContext().setAccessibleDescription("Project utilities");
     this.add(menu);
 
-    /*
-        JButton downbutton = new JButton();
-        try {
-          ImageIcon img = new ImageIcon(this.getClass().getResource("images/ddown.png"));
-          downbutton.setIcon(img);
-        } catch (Exception ex) {
-          System.out.println(ex);
-        }
-        downbutton.addActionListener(
-            new ActionListener() {
-              public void actionPerformed(ActionEvent e) {
+    menuItem = new JMenuItem("Export", KeyEvent.VK_E);
+    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
+    menuItem.getAccessibleContext().setAccessibleDescription("Export as .csv.");
+    menuItem.putClientProperty("mf", dmf);
+    menuItem.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
 
+            String[][] results = well_table.getSelectedRowsAndHeaderAsStringArray();
+            POIUtilities poi = new POIUtilities(dmf);
+            poi.writeJTableToSpreadsheet("Projects", results);
+            try {
+              Desktop d = Desktop.getDesktop();
+              d.open(new File("./Writesheet.xlsx"));
+            } catch (IOException ioe) {
+            }
+            // JWSFileChooserDemo jwsfcd = new JWSFileChooserDemo();
+            // jwsfcd.createAndShowGUI();
 
-    	  }
-            });
-        this.add(downbutton);
-    */
+          }
+        });
+    menu.add(menuItem);
 
     JButton upbutton = new JButton();
 
     try {
-      ImageIcon img = new ImageIcon(this.getClass().getResource("images/dup.png"));
+      ImageIcon img =
+          new ImageIcon(this.getClass().getResource("/toolbarButtonGraphics/navigation/Up16.gif"));
       upbutton.setIcon(img);
     } catch (Exception ex) {
       System.out.println(ex);
