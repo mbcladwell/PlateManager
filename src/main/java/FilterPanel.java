@@ -22,6 +22,7 @@ public class FilterPanel extends JPanel {
   private JScrollPane scrollPane;
   private DialogMainFrame parent;
   private JPanel textPanel;
+  private JButton clearButton;
 
   /** */
   public FilterPanel(DialogMainFrame _parent, JTable _table) {
@@ -33,6 +34,7 @@ public class FilterPanel extends JPanel {
     table.setRowSorter(rowSorter);
 
     GridBagConstraints c = new GridBagConstraints();
+    /*
     JLabel label = new JLabel("Filter:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 0;
@@ -40,6 +42,7 @@ public class FilterPanel extends JPanel {
     c.anchor = GridBagConstraints.LINE_END;
     c.insets = new Insets(5, 5, 2, 2);
     this.add(label, c);
+    */
 
     JTextField textField = new JTextField(60);
     c.gridx = 1;
@@ -53,8 +56,10 @@ public class FilterPanel extends JPanel {
         .getDocument()
         .addDocumentListener(
             new DocumentListener() {
+
               public void changedUpdate(DocumentEvent e) {
                 String text = textField.getText();
+                clearButton.setText("Clear:");
 
                 if (text.trim().length() == 0) {
                   rowSorter.setRowFilter(null);
@@ -65,6 +70,7 @@ public class FilterPanel extends JPanel {
 
               public void removeUpdate(DocumentEvent e) {
                 String text = textField.getText();
+                clearButton.setText("Clear:");
 
                 if (text.trim().length() == 0) {
                   rowSorter.setRowFilter(null);
@@ -75,6 +81,7 @@ public class FilterPanel extends JPanel {
 
               public void insertUpdate(DocumentEvent e) {
                 String text = textField.getText();
+                clearButton.setText("Clear:");
 
                 if (text.trim().length() == 0) {
                   rowSorter.setRowFilter(null);
@@ -83,6 +90,20 @@ public class FilterPanel extends JPanel {
                 }
               }
             });
+    clearButton = new JButton("Filter:");
+    c.gridx = 0;
+    c.gridy = 0;
+    c.weightx = 0.1;
+    c.anchor = GridBagConstraints.LINE_END;
+    c.insets = new Insets(5, 5, 2, 2);
+    clearButton.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            textField.setText("");
+            clearButton.setText("Filter:");
+          }
+        });
+    this.add(clearButton, c);
   }
 
   /*

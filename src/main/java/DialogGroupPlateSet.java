@@ -24,9 +24,9 @@ public class DialogGroupPlateSet extends JDialog {
   static JButton okButton;
   static JButton cancelButton;
   final Instant instant = Instant.now();
-  final DialogMainFrame parent;
+  final DialogMainFrame dmf;
   final Session session;
-  final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+  final DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
 
@@ -37,9 +37,9 @@ public class DialogGroupPlateSet extends JDialog {
    * @param _format number of wells per plate
    */
   public DialogGroupPlateSet(
-      DialogMainFrame _parent, HashMap<String, String> _plate_set_num_plates, String _format) {
-    this.parent = _parent;
-    this.session = parent.getSession();
+      DialogMainFrame _dmf, HashMap<String, String> _plate_set_num_plates, String _format) {
+    this.dmf = _dmf;
+    this.session = dmf.getSession();
     owner = session.getUserName();
     HashMap<String, String> plate_set_num_plates = _plate_set_num_plates;
     String format = _format;
@@ -164,7 +164,7 @@ public class DialogGroupPlateSet extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    String[] plateTypes = parent.getDatabaseManager().getPlateTypes();
+    String[] plateTypes = dmf.getDatabaseManager().getPlateTypes();
 
     typeList = new JComboBox<String>(plateTypes);
     typeList.setSelectedIndex(0);
@@ -189,14 +189,15 @@ public class DialogGroupPlateSet extends JDialog {
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 
-            parent
-                .getDatabaseManager()
-                .insertPlateSet(
-                    nameField.getText(),
+            dmf.getDatabaseManager()
+                .getDatabaseInserter()
+                .makePlateSetFromGroup(
                     descriptionField.getText(),
-                    numberField.getText(),
-                    formatList.getSelectedItem().toString(),
-                    typeList.getSelectedItem().toString());
+                    nameField.getText(),
+                    plate_set_num_plates,
+                    format,
+                    typeList.getSelectedItem().toString(),
+                    dmf.getSession().getProjectID());
             dispose();
           }
         }));

@@ -115,12 +115,44 @@ public class DatabaseInserter {
     }
   }
 
-  /** called from ; Performs the creation of a new plate set from existing plates */
-  public void groupPlateSet(
+  /**
+   * called from DialogGroupPlates; Performs the creation of a new plate set from existing plates.
+   * The HashMap contains the pair plateset_sys_name:number of plates. A dedicated function
+   * "new_plate_set_from_group" will create the plateset and return the id without making any
+   * plates.
+   */
+  public void makePlateSetFromGroup(
       String _description,
       String _name,
-      String _num_plates,
-      String _plate_size_id,
-      String _plate_type_id,
-      String _project_id) {}
+      HashMap<String, String> _plate_set_num_plates,
+      String _plate_format,
+      String _plate_type,
+      int _project_id) {
+
+    String description = _description;
+    String name = _name;
+    HashMap<String, String> plate_set_num_plates = _plate_set_num_plates;
+    String plate_format = _plate_format;
+    String plate_type = _plate_type;
+    int project_id = _project_id;
+
+    // determine total number of plates in new plate set
+    int total_num_plates = 0;
+
+    Iterator it = plate_set_num_plates.entrySet().iterator();
+    while (it.hasNext()) {
+      HashMap.Entry pair = (HashMap.Entry) it.next();
+      total_num_plates = total_num_plates + Integer.parseInt((String) pair.getValue());
+      it.remove(); // avoids a ConcurrentModificationException
+    }
+    LOGGER.info("total: " + total_num_plates);
+
+    // determine format id
+
+    // determine type id
+
+    // insert new plate set
+
+    // associate old plates with new plates]
+  }
 }

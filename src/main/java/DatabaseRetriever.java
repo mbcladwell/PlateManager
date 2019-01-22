@@ -132,6 +132,32 @@ public class DatabaseRetriever {
     return result;
   }
 
+  public int getPlateSetIDForPlateSetSysName(String _plateset_sys_name) {
+    String plateset_sys_name = _plateset_sys_name;
+    // int plate_set_id;
+
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+              "SELECT plate_set.id FROM   plate_set WHERE plate_set_sys_name = ?;");
+
+      pstmt.setString(1, plateset_sys_name);
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      int plate_set_id = Integer.valueOf(rs.getString("id"));
+
+      LOGGER.info("result: " + plate_set_id);
+      rs.close();
+      pstmt.close();
+      return plate_set_id;
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting plateset_id: " + sqle);
+    }
+    int dummy = -1;
+    return dummy;
+  }
+
   /**
    * Return a key/value HashMap with the number of plates in each plate set. Used to inform user
    * when grouping plate sets. @Set projectSet a set that contains plate_set IDs to be iterated
@@ -152,7 +178,7 @@ public class DatabaseRetriever {
         rs.next();
         result = rs.getString("exact_count");
         plate_setPlateCount.put(s, result);
-        LOGGER.info("s:: " + s + " result: " + result);
+        LOGGER.info("s: " + s + " result: " + result);
         rs.close();
         pstmt.close();
 

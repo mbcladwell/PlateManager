@@ -189,7 +189,7 @@ public class DatabaseManager {
       pstmt.close();
       return table;
     } catch (SQLException sqle) {
-
+      LOGGER.severe("Failed to retrieve well data: " + sqle);
     }
     return null;
   }
@@ -222,7 +222,7 @@ public class DatabaseManager {
         }
         data.add(vector);
       }
-      //      LOGGER.info("data: " + data);
+      // LOGGER.info("data: " + data);
       return new DefaultTableModel(data, columnNames);
 
       //          data.stream().map(List::toArray).toArray(Object[][]::new), columnNames);
@@ -370,8 +370,8 @@ public class DatabaseManager {
       plateSet.add(results[k][0]);
       LOGGER.info("prjID: " + results[k][0]);
 
-      plateFormatSet.add(results[k][3]);
-      LOGGER.info("pltformat: " + results[k][3]);
+      plateFormatSet.add(results[k][2]);
+      LOGGER.info("pltformat: " + results[k][2]);
     }
     LOGGER.info("Size of plateFormatSet: " + plateFormatSet.size());
     if (plateFormatSet.size() == 1) {
