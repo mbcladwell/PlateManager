@@ -44,6 +44,16 @@ public class MenuBarForPlate extends JMenuBar {
     menu.getAccessibleContext().setAccessibleDescription("Plate utilities");
     this.add(menu);
 
+    menuItem = new JMenuItem("Group");
+    menuItem.setMnemonic(KeyEvent.VK_G);
+    menuItem.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            dmf.getDatabaseManager().groupPlates(plate_table);
+          }
+        });
+    menu.add(menuItem);
+
     menuItem = new JMenuItem("Export", KeyEvent.VK_E);
     // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
     menuItem.getAccessibleContext().setAccessibleDescription("Export as .csv.");

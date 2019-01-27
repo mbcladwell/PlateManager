@@ -13,15 +13,15 @@ public class DatabaseManager {
   // CustomTable table;
   DatabaseInserter dbInserter;
   DatabaseRetriever dbRetriever;
-  DialogMainFrame parent;
+  DialogMainFrame dmf;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   /**
    * Use 'pmdb' as the database name. Regular users will connect as pm_user and will have restricted
    * access (no delete etc.). Connect as pm_admin to get administrative priveleges.
    */
-  public DatabaseManager(DialogMainFrame _parent) {
-    parent = _parent;
+  public DatabaseManager(DialogMainFrame _dmf) {
+    dmf = _dmf;
     try {
       Class.forName("org.postgresql.Driver");
 
@@ -52,7 +52,7 @@ public class DatabaseManager {
     // return session ID
     Long insertKey = 0L;
     try {
-      LOGGER.info("in init : ");
+      // LOGGER.info("in init : ");
 
       PreparedStatement pstmt =
           conn.prepareStatement(
@@ -70,7 +70,7 @@ public class DatabaseManager {
       pstmt.close();
 
       if (pass) {
-        LOGGER.info("pass is true; user: " + _user);
+        // LOGGER.info("pass is true; user: " + _user);
         String insertSql =
             "INSERT INTO pmsession (pmuser_id) SELECT id FROM pmuser WHERE pmuser_name = ?;";
         PreparedStatement insertPs =
@@ -82,7 +82,7 @@ public class DatabaseManager {
 
         if (rsKey.next()) {
           insertKey = rsKey.getLong(1);
-          LOGGER.info("rsKey: " + insertKey);
+          // LOGGER.info("rsKey: " + insertKey);
         }
 
       } else {
@@ -103,7 +103,7 @@ public class DatabaseManager {
           st.executeQuery(
               "SELECT project_sys_name AS \"ProjectID\", project_name As \"Name\", pmuser_name AS \"Owner\", descr AS \"Description\" FROM project, pmuser WHERE pmuser_id = pmuser.id ORDER BY project.id DESC;");
 
-      CustomTable table = new CustomTable(parent, buildTableModel(rs));
+      CustomTable table = new CustomTable(dmf, buildTableModel(rs));
 
       rs.close();
       st.close();
@@ -117,12 +117,12 @@ public class DatabaseManager {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate_set_sys_name AS \"PlateSetID\", plate_set_name As \"Name\", format AS \"Format\", descr AS \"Description\" FROM plate_set, plate_size WHERE plate_size.id = plate_set.plate_size_id AND project_id = (select id from project where project_sys_name like ?) ORDER BY plate_set.id DESC;");
+              "SELECT plate_set_sys_name AS \"PlateSetID\",plate_set.id As \"ID\", plate_set_name As \"Name\", format AS \"Format\", descr AS \"Description\" FROM plate_set, plate_size WHERE plate_size.id = plate_set.plate_size_id AND project_id = (select id from project where project_sys_name like ?) ORDER BY plate_set.id DESC;");
 
       pstmt.setString(1, _project_sys_name);
       ResultSet rs = pstmt.executeQuery();
 
-      CustomTable table = new CustomTable(parent, buildTableModel(rs));
+      CustomTable table = new CustomTable(dmf, buildTableModel(rs));
       rs.close();
       pstmt.close();
       return table;
@@ -144,7 +144,7 @@ public class DatabaseManager {
       ResultSet rs = st.executeQuery(query);
       rs.next();
       results = rs.getInt("id");
-      LOGGER.info("projectID: " + results);
+      // LOGGER.info("projectID: " + results);
       this.getSession().setProjectID(results);
 
       rs.close();
@@ -158,13 +158,13 @@ public class DatabaseManager {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate.plate_sys_name AS \"PlateID\", plate_seq_num AS \"Order\",  plate_type.plate_type_name As \"Type\", plate_size.format AS \"Format\" FROM plate_set, plate, plate_type, plate_size, plate_plate_set WHERE plate_plate_set.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate_plate_set.plate_id = plate.id AND plate_plate_set.plate_set_id = plate_set.id  AND plate_size.id = plate.plate_size_id;");
+              "SELECT plate.plate_sys_name AS \"PlateID\", plate.id AS \"ID\",  plate_type.plate_type_name As \"Type\", plate_size.format AS \"Format\" FROM plate_set, plate, plate_type, plate_size, plate_plate_set WHERE plate_plate_set.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate_plate_set.plate_id = plate.id AND plate_plate_set.plate_set_id = plate_set.id  AND plate_size.id = plate.plate_size_id ORDER BY plate.id DESC;");
 
       pstmt.setString(1, _plate_set_sys_name);
       ResultSet rs = pstmt.executeQuery();
 
-      CustomTable table = new CustomTable(parent, buildTableModel(rs));
-      LOGGER.info("Got plate table ");
+      CustomTable table = new CustomTable(dmf, buildTableModel(rs));
+      // LOGGER.info("Got plate table ");
       rs.close();
       pstmt.close();
       return table;
@@ -184,7 +184,7 @@ public class DatabaseManager {
       pstmt.setString(1, _plate_sys_name);
       ResultSet rs = pstmt.executeQuery();
 
-      CustomTable table = new CustomTable(parent, buildTableModel(rs));
+      CustomTable table = new CustomTable(dmf, buildTableModel(rs));
       rs.close();
       pstmt.close();
       return table;
@@ -234,26 +234,6 @@ public class DatabaseManager {
     return null;
   }
 
-  public String getDescriptionForProject(String _project_sys_name) {
-    String result = new String();
-    try {
-      PreparedStatement pstmt =
-          conn.prepareStatement("SELECT descr  FROM  project WHERE project_sys_name =  ?;");
-
-      pstmt.setString(1, _project_sys_name);
-      ResultSet rs = pstmt.executeQuery();
-      rs.next();
-      result = rs.getString("descr");
-      LOGGER.info("Description: " + result);
-      rs.close();
-      pstmt.close();
-
-    } catch (SQLException sqle) {
-      LOGGER.severe("SQL exception getting description: " + sqle);
-    }
-    return result;
-  }
-
   /**
    * Incoming variables: ( 'plate set name' 'description' '10' '96' 'assay')
    *
@@ -269,11 +249,11 @@ public class DatabaseManager {
       String _plate_type_id) {
 
     try {
-      int project_id = parent.getSession().getProjectID();
+      int project_id = dmf.getSession().getProjectID();
       int plate_size_id =
-          parent.getDatabaseManager().getDatabaseRetriever().getPlateFormatID(_plate_size_id);
+          dmf.getDatabaseManager().getDatabaseRetriever().getPlateFormatID(_plate_size_id);
       int plate_type_id =
-          parent.getDatabaseManager().getDatabaseRetriever().getPlateTypeID(_plate_type_id);
+          dmf.getDatabaseManager().getDatabaseRetriever().getPlateTypeID(_plate_type_id);
 
       String insertSql = "SELECT new_plate_set ( ?, ?, ?, ?, ?, ?, ?);";
       PreparedStatement insertPs =
@@ -286,67 +266,32 @@ public class DatabaseManager {
       insertPs.setInt(6, project_id);
       insertPs.setBoolean(7, true);
 
-      LOGGER.info(insertPs.toString());
+      // LOGGER.info(insertPs.toString());
       insertPs.executeUpdate();
       //  SELECT new_plate_set ( 'descrip', 'myname', '10', '96', 'assay', 0, 't')
     } catch (SQLException sqle) {
       LOGGER.severe("Failed to create plate set: " + sqle);
     }
   }
+  /**
+   * ******************************************************************
+   *
+   * <p>Generic DB activities
+   *
+   * <p>****************************************************************
+   */
+  public void insertPreparedStatement(PreparedStatement _preparedStatement) {
+    PreparedStatement preparedStatement = _preparedStatement;
+    //  LOGGER.info(preparedStatement.toString());
 
-  public String[] getPlateTypes() {
-    String[] output = null;
-    Array results = null;
     try {
-      PreparedStatement pstmt =
-          conn.prepareStatement("SELECT ARRAY (select plate_type_name from plate_type);");
-
-      ResultSet rs = pstmt.executeQuery();
-      rs.next();
-      results = rs.getArray("array");
-      LOGGER.info("Description: " + results);
-      rs.close();
-      pstmt.close();
-      output = (String[]) results.getArray();
+      preparedStatement.executeUpdate();
 
     } catch (SQLException sqle) {
-      LOGGER.severe("SQL exception getting plate types: " + sqle);
+      LOGGER.warning("Failed to execute prepared statement: " + preparedStatement.toString());
+      LOGGER.warning("Exception: " + sqle);
     }
-    return output;
   }
-
-  /*
-   public HashMap<Integer, String> getAssayTypes(){
-
-  try {
-       PreparedStatement pstmt =
-           conn.prepareStatement("SELECT * FROM assay_type;");
-
-       ResultSet rs = pstmt.executeQuery();
-       HashMap<Integer, String> assay_types = new HashMap<Integer, String>(50);
-
-       while (rs.next()){
-
-  for(int i=0; i<=50; ++i){
-        row.put(md.getColumnName(i),rs.getObject(i));
-      }
-       list.add(row);
-   }
-
-
-     rs.close();
-       pstmt.close();
-
-     } catch (SQLException sqle) {
-
-     }
-
-
-  return assay_types;
-
-     return assay_types;
-   }
-   */
 
   /** TableModel Columns: PSID Name Descr Format */
   public void groupPlateSets(JTable _table) {
@@ -356,7 +301,7 @@ public class DatabaseManager {
     int[] selection = plate_set_table.getSelectedRows();
     String[][] results = new String[selection.length][4];
 
-    LOGGER.info("selection: " + selection.toString());
+    //  LOGGER.info("selection: " + selection.toString());
     Set<String> plateSet = new HashSet<String>();
     Set<String> plateFormatSet = new HashSet<String>();
 
@@ -368,10 +313,10 @@ public class DatabaseManager {
     }
     for (int k = 0; k < selection.length; k++) {
       plateSet.add(results[k][0]);
-      LOGGER.info("prjID: " + results[k][0]);
+      // LOGGER.info("prjID: " + results[k][0]);
 
       plateFormatSet.add(results[k][2]);
-      LOGGER.info("pltformat: " + results[k][2]);
+      // LOGGER.info("pltformat: " + results[k][2]);
     }
     LOGGER.info("Size of plateFormatSet: " + plateFormatSet.size());
     if (plateFormatSet.size() == 1) {
@@ -381,14 +326,50 @@ public class DatabaseManager {
       for (Iterator<String> it = plateFormatSet.iterator(); it.hasNext(); ) {
         format = it.next();
       }
-      new DialogGroupPlateSet(parent, numberOfPlatesInPlateSets, format);
+      new DialogGroupPlateSet(dmf, numberOfPlatesInPlateSets, format);
     } else {
       JOptionPane.showMessageDialog(
-          parent,
+          dmf,
           "Plate set must be of the same formats\ne.g. all 96 well plates!",
           "Error!",
           JOptionPane.ERROR_MESSAGE);
     }
+  }
+
+  /**
+   * Launched by the menu item "group". Since by definition a plate set can only have one format of
+   * plate, no need to check that there is only one format
+   */
+  public void groupPlates(CustomTable _table) {
+    // 4 columns in the plate  table
+    // plate_sys_name plate_id type format
+    CustomTable plate_table = _table;
+    TableModel tableModel = plate_table.getModel();
+    int[] selection = plate_table.getSelectedRows();
+    String[][] results = new String[selection.length][4];
+    String numberOfPlates = Integer.valueOf(selection.length).toString();
+
+    //  LOGGER.info("selection: " + selection.toString());
+    Set<String> plateSet = new HashSet<String>();
+
+    for (int i = 0; i < selection.length; i++) {
+      for (int j = 0; j < 4; j++) {
+        results[i][j] = tableModel.getValueAt(selection[i], j).toString();
+        // LOGGER.info("i: " + i + " j: " + j + " results[i][j]: " + results[i][j]);
+      }
+    }
+    for (int k = 0; k < selection.length; k++) {
+      plateSet.add(results[k][0]);
+      // LOGGER.info("prjID: " + results[k][0]);
+
+    }
+    String format = new String();
+    format = results[1][3];
+    new DialogGroupPlates(dmf, plateSet, format);
+  }
+
+  public DialogMainFrame getDmf() {
+    return this.dmf;
   }
 
   public DatabaseInserter getDatabaseInserter() {
@@ -404,6 +385,6 @@ public class DatabaseManager {
   }
 
   public Session getSession() {
-    return parent.getSession();
+    return dmf.getSession();
   }
 }

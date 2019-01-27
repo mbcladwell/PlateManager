@@ -106,7 +106,7 @@ public class MenuBarForProject extends JMenuBar {
               this.getClass().getResource("/toolbarButtonGraphics/navigation/Down16.gif"));
       downbutton.setIcon(down);
     } catch (Exception ex) {
-      System.out.println(ex + " down image not found");
+      LOGGER.severe(ex + " down image not found");
     }
     downbutton.addActionListener(
         new ActionListener() {
@@ -116,8 +116,8 @@ public class MenuBarForProject extends JMenuBar {
               // int i = project_table.convertRowIndexToModel(project_table.getSelectedRow());
               // String project_sys_name = (String) project_table.getValueAt(i, 0);
               String results[][] = project_table.getSelectedRowsAndHeaderAsStringArray();
-              LOGGER.info("down button results: " + results);
-              LOGGER.info("down button results: " + results[1][0]);
+              // LOGGER.info("down button results: " + results);
+              // LOGGER.info("down button results: " + results[1][0]);
 
               dmf.getDatabaseManager().updateSessionWithProject(results[1][0]);
 

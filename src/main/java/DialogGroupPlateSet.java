@@ -164,7 +164,7 @@ public class DialogGroupPlateSet extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    String[] plateTypes = dmf.getDatabaseManager().getPlateTypes();
+    String[] plateTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateTypes();
 
     typeList = new JComboBox<String>(plateTypes);
     typeList.setSelectedIndex(0);

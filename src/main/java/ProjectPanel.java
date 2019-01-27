@@ -102,7 +102,7 @@ public class ProjectPanel extends JPanel {
 
   public void updatePanel() {
     CustomTable table = dmf.getDatabaseManager().getProjectTableData();
-    CustomTableModel model = (CustomTableModel) table.getModel();
+    DefaultTableModel model = (DefaultTableModel) table.getModel();
     this.table.setModel(model);
   }
 

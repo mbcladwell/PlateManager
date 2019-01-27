@@ -65,7 +65,7 @@ public class MenuBarForPlateSet extends JMenuBar {
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            // new DialogAddPlateSetData();
+            new DialogAddPlateSetData();
           }
         });
     utilitiesMenu.add(menuItem);

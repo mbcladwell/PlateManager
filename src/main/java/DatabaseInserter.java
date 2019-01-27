@@ -9,6 +9,7 @@ import javax.swing.table.DefaultTableModel;
 /** */
 public class DatabaseInserter {
   DatabaseManager dbm;
+  DatabaseRetriever dbr;
   Connection conn;
   JTable table;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -17,7 +18,7 @@ public class DatabaseInserter {
   public DatabaseInserter(DatabaseManager _dbm) {
     this.dbm = _dbm;
     this.conn = dbm.getConnection();
-    ;
+    this.dbr = this.dbm.getDatabaseRetriever();
   }
 
   public void insertProject(String _name, String _description, int _pmuser_id) {
@@ -135,6 +136,10 @@ public class DatabaseInserter {
     String plate_format = _plate_format;
     String plate_type = _plate_type;
     int project_id = _project_id;
+    int format_id = 0;
+    int new_plate_set_id = 0;
+    // ResultSet resultSet;
+    // PreparedStatement preparedStatement;
 
     // determine total number of plates in new plate set
     int total_num_plates = 0;
@@ -143,16 +148,135 @@ public class DatabaseInserter {
     while (it.hasNext()) {
       HashMap.Entry pair = (HashMap.Entry) it.next();
       total_num_plates = total_num_plates + Integer.parseInt((String) pair.getValue());
-      it.remove(); // avoids a ConcurrentModificationException
+      // it.remove(); // avoids a ConcurrentModificationException
     }
-    LOGGER.info("total: " + total_num_plates);
+    // LOGGER.info("total: " + total_num_plates);
 
     // determine format id
+    LOGGER.info("format: " + plate_format);
+
+    format_id = dbm.getDatabaseRetriever().getPlateFormatID(plate_format);
+    //    format_id = dbr.getPlateFormatID(plate_format);
 
     // determine type id
-
+    int plateTypeID = dbm.getDatabaseRetriever().getIDForPlateType(plate_type);
     // insert new plate set
+    // INSERT INTO plate_set(descr, plate_set_name, num_plates, plate_size_id, plate_type_id,
+    // project_id)
+    String sqlstring = "SELECT new_plate_set_from_group (?, ?, ?, ?, ?, ?);";
 
-    // associate old plates with new plates]
+    try {
+      PreparedStatement preparedStatement =
+          conn.prepareStatement(sqlstring, Statement.RETURN_GENERATED_KEYS);
+      preparedStatement.setString(1, description);
+      preparedStatement.setString(2, name);
+      preparedStatement.setInt(3, total_num_plates);
+      preparedStatement.setInt(4, format_id);
+      preparedStatement.setInt(5, plateTypeID);
+      preparedStatement.setInt(6, project_id);
+
+      preparedStatement.execute(); // executeUpdate expects no returns!!!
+
+      ResultSet resultSet = preparedStatement.getResultSet();
+      resultSet.next();
+      new_plate_set_id = resultSet.getInt("new_plate_set_from_group");
+      // LOGGER.info("resultset: " + result);
+
+    } catch (SQLException sqle) {
+      LOGGER.warning("SQLE at inserting plate set from group: " + sqle);
+    }
+
+    // associate old plates with new plate set id
+    Set<Integer> plate_ids = new HashSet<Integer>();
+    Iterator it2 = plate_set_num_plates.entrySet().iterator();
+    while (it2.hasNext()) {
+      HashMap.Entry pair = (HashMap.Entry) it2.next();
+      int plate_set_id =
+          dbm.getDatabaseRetriever().getPlateSetIDForPlateSetSysName((String) pair.getKey());
+      plate_ids.addAll(dbm.getDatabaseRetriever().getAllPlateIDsForPlateSetID(plate_set_id));
+      it2.remove(); // avoids a ConcurrentModificationException
+    }
+
+    LOGGER.info("keys: " + plate_ids);
+
+    this.associatePlateIDsWithPlateSetID(plate_ids, new_plate_set_id);
+    dbm.getDmf().showPlateSetTable(dbm.getDmf().getSession().getProjectSysName());
+  }
+
+  /** Called from DialogGroupPlates from the plate panel/menubar */
+  public void groupPlatesIntoPlateSet(
+      String _description,
+      String _name,
+      Set<String> _plates,
+      String _format,
+      String _type,
+      int _projectID) {
+    String description = _description;
+    String name = _name;
+    Set<String> plates = _plates;
+    String format = _format;
+    String type = _type;
+    int projectID = _projectID;
+    int new_plate_set_id = 0;
+    // ResultSet resultSet;
+    // PreparedStatement preparedStatement;
+
+    int format_id = dbm.getDatabaseRetriever().getPlateFormatID(format);
+    int plateTypeID = dbm.getDatabaseRetriever().getIDForPlateType(type);
+    int num_plates = plates.size();
+
+    String sqlstring = "SELECT new_plate_set_from_group (?, ?, ?, ?, ?, ?);";
+
+    try {
+      PreparedStatement preparedStatement =
+          conn.prepareStatement(sqlstring, Statement.RETURN_GENERATED_KEYS);
+      preparedStatement.setString(1, description);
+      preparedStatement.setString(2, name);
+      preparedStatement.setInt(3, num_plates);
+      preparedStatement.setInt(4, format_id);
+      preparedStatement.setInt(5, plateTypeID);
+      preparedStatement.setInt(6, projectID);
+
+      preparedStatement.execute(); // executeUpdate expects no returns!!!
+
+      ResultSet resultSet = preparedStatement.getResultSet();
+      resultSet.next();
+      new_plate_set_id = resultSet.getInt("new_plate_set_from_group");
+      // LOGGER.info("resultset: " + result);
+
+    } catch (SQLException sqle) {
+      LOGGER.warning("SQLE at inserting plate set from group: " + sqle);
+    }
+
+    // associate old plates with new plate set id
+    Set<Integer> plate_ids = new HashSet<Integer>();
+    for (String temp : plates) {
+      plate_ids.add(dbm.getDatabaseRetriever().getIDForSysName(temp, "plate"));
+    }
+
+    LOGGER.info("keys: " + plate_ids);
+
+    this.associatePlateIDsWithPlateSetID(plate_ids, new_plate_set_id);
+    dbm.getDmf().showPlateSetTable(dbm.getDmf().getSession().getProjectSysName());
+  }
+
+  public void associatePlateIDsWithPlateSetID(Set<Integer> _plateIDs, int _plate_set_id) {
+    Set<Integer> plateIDs = _plateIDs;
+    int plate_set_id = _plate_set_id;
+
+    String holder = new String("INSERT INTO plate_plate_set (plate_set_id, plate_id) VALUES ");
+    for (int temp : plateIDs) {
+      holder = holder + "('" + plate_set_id + "', '" + temp + "'), ";
+    }
+
+    String insertSql = holder.substring(0, holder.length() - 2) + ";";
+    LOGGER.info("insertSql: " + insertSql);
+    PreparedStatement insertPs;
+    try {
+      insertPs = conn.prepareStatement(insertSql);
+      insertPreparedStatement(insertPs);
+    } catch (SQLException sqle) {
+      LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
+    }
   }
 }

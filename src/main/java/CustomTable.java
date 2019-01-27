@@ -74,7 +74,7 @@ public class CustomTable extends JTable {
         for (int i = minIndex; i <= maxIndex; i++) {
           if (listSelectionModel.isSelectedIndex(i)) {
             selectedRows.add(CustomTable.this.convertRowIndexToModel(i));
-            LOGGER.info("Selected: " + CustomTable.this.convertRowIndexToModel(i));
+            //  LOGGER.info("Selected: " + CustomTable.this.convertRowIndexToModel(i));
           }
         }
       }
