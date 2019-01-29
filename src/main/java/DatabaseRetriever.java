@@ -392,4 +392,92 @@ public class DatabaseRetriever {
     }
     return id;
   }
+
+  public String[] getAssayTypes() {
+    String[] output = null;
+    Array results = null;
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement("SELECT ARRAY (select assay_type_name from assay_type);");
+
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      results = rs.getArray("array");
+      // LOGGER.info("Description: " + results);
+      rs.close();
+      pstmt.close();
+      output = (String[]) results.getArray();
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting plate types: " + sqle);
+    }
+    return output;
+  }
+
+  public String[] getPlateLayouts(int format_id) {
+    String[] output = null;
+    Array results = null;
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+              "SELECT ARRAY (select name from plate_layout_name WHERE plate_format_id = ?);");
+      pstmt.setInt(1, format_id);
+
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      results = rs.getArray("array");
+      // LOGGER.info("Description: " + results);
+      rs.close();
+      pstmt.close();
+      output = (String[]) results.getArray();
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting plate types: " + sqle);
+    }
+    return output;
+  }
+
+  public int getAssayIDForAssayType(String _assay_name) {
+    int result = 0;
+    String assay_name = _assay_name;
+
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement("select id from assay_type WHERE assay_type_name = ?;");
+      pstmt.setString(1, assay_name);
+
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      result = rs.getInt("id");
+      // LOGGER.info("Description: " + results);
+      rs.close();
+      pstmt.close();
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting assay_type_id: " + sqle);
+    }
+    return result;
+  }
+
+  public int getPlateLayoutIDForPlateLayoutName(String _plate_layout_name) {
+    int result = 0;
+    String plate_layout_name = _plate_layout_name;
+
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement("select id from plate_layout_name WHERE name = ?;");
+      pstmt.setString(1, plate_layout_name);
+
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      result = rs.getInt("id");
+      LOGGER.info("resuklt plate layout name: " + result);
+      rs.close();
+      pstmt.close();
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting assay_type_id: " + sqle);
+    }
+    return result;
+  }
 }

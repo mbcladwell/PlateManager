@@ -9,7 +9,7 @@ import javax.swing.table.DefaultTableModel;
 /** */
 public class DatabaseInserter {
   DatabaseManager dbm;
-  DatabaseRetriever dbr;
+  private DatabaseRetriever dbr;
   Connection conn;
   JTable table;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -18,7 +18,7 @@ public class DatabaseInserter {
   public DatabaseInserter(DatabaseManager _dbm) {
     this.dbm = _dbm;
     this.conn = dbm.getConnection();
-    this.dbr = this.dbm.getDatabaseRetriever();
+    this.dbr = dbm.getDatabaseRetriever();
   }
 
   public void insertProject(String _name, String _description, int _pmuser_id) {
@@ -278,5 +278,89 @@ public class DatabaseInserter {
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
     }
+  }
+  /*
+      dbi.associateDataWithPlateSet(
+          nameField.getText(),
+          descrField.getText(),
+          plate_set_sys_name,
+          assayTypes.getSelectedItem(),
+          plateLayouts.getSelectedItem(),
+          fileField.getText());
+  */
+
+  /** Called from DialogAddPlateSetData */
+  public void associateDataWithPlateSet(
+      String _assayName,
+      String _descr,
+      String _plate_set_sys_name,
+      String _assayType,
+      String _plateLayouts,
+      String _file_name) {
+
+    String assayName = _assayName;
+    String descr = _descr;
+    String plate_set_sys_name = _plate_set_sys_name;
+    String assay_type = _assayType;
+    String plate_layout = _plateLayouts;
+    String file_name = _file_name;
+
+    int plate_set_id =
+        dbm.getDatabaseRetriever().getPlateSetIDForPlateSetSysName(plate_set_sys_name);
+    LOGGER.info("plate_set_id: " + plate_set_id);
+
+    int assay_type_id = dbm.getDatabaseRetriever().getAssayIDForAssayType(assay_type);
+    int plate_layout_name_id =
+        dbm.getDatabaseRetriever().getPlateLayoutIDForPlateLayoutName(plate_layout);
+    LOGGER.info("plate_layout: " + plate_layout);
+
+    LOGGER.info("plate_layout_name_id: " + plate_layout_name_id);
+
+    int assay_run_id =
+        createAssayRun(assayName, descr, assay_type_id, plate_set_id, plate_layout_name_id);
+
+    java.io.File file = new java.io.File(file_name);
+  }
+
+  public int createAssayRun(
+      String _assayName,
+      String _descr,
+      int _assay_type_id,
+      int _plate_set_id,
+      int _plate_layout_name_id) {
+
+    String assayName = _assayName;
+    String descr = _descr;
+
+    int plate_set_id = _plate_set_id;
+    int assay_type_id = _assay_type_id;
+    int plate_layout_name_id = _plate_layout_name_id;
+
+    int new_assay_run_id = 0;
+
+    String sqlstring = "SELECT new_assay_run(?, ?, ?, ?, ?);";
+    // LOGGER.info("sql: " + sqlstring);
+
+    try {
+      PreparedStatement preparedStatement =
+          conn.prepareStatement(sqlstring, Statement.RETURN_GENERATED_KEYS);
+      preparedStatement.setString(1, assayName);
+      preparedStatement.setString(2, descr);
+      preparedStatement.setInt(3, assay_type_id);
+      preparedStatement.setInt(4, plate_set_id);
+      preparedStatement.setInt(5, plate_layout_name_id);
+
+      preparedStatement.execute(); // executeUpdate expects no returns!!!
+
+      ResultSet resultSet = preparedStatement.getResultSet();
+      resultSet.next();
+      new_assay_run_id = resultSet.getInt("new_assay_run");
+      // LOGGER.info("resultset: " + result);
+
+    } catch (SQLException sqle) {
+      LOGGER.warning("SQLE at inserting plate set from group: " + sqle);
+    }
+    // LOGGER.info("new assay id: " + new_assay_run_id);
+    return new_assay_run_id;
   }
 }

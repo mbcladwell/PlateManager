@@ -16,6 +16,8 @@ public class DatabaseManager {
   DialogMainFrame dmf;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
+  // psql -U pm_admin -h 192.168.1.7 -d pmdb
+
   /**
    * Use 'pmdb' as the database name. Regular users will connect as pm_user and will have restricted
    * access (no delete etc.). Connect as pm_admin to get administrative priveleges.
@@ -117,7 +119,7 @@ public class DatabaseManager {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate_set_sys_name AS \"PlateSetID\",plate_set.id As \"ID\", plate_set_name As \"Name\", format AS \"Format\", descr AS \"Description\" FROM plate_set, plate_size WHERE plate_size.id = plate_set.plate_size_id AND project_id = (select id from project where project_sys_name like ?) ORDER BY plate_set.id DESC;");
+              "SELECT plate_set_sys_name AS \"PlateSetID\",plate_set.id As \"ID\", plate_set_name As \"Name\", format AS \"Format\", num_plates AS \"# plates\" , descr AS \"Description\" FROM plate_set, plate_format WHERE plate_format.id = plate_set.plate_format_id AND project_id = (select id from project where project_sys_name like ?) ORDER BY plate_set.id DESC;");
 
       pstmt.setString(1, _project_sys_name);
       ResultSet rs = pstmt.executeQuery();
@@ -158,7 +160,7 @@ public class DatabaseManager {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate.plate_sys_name AS \"PlateID\", plate.id AS \"ID\",  plate_type.plate_type_name As \"Type\", plate_size.format AS \"Format\" FROM plate_set, plate, plate_type, plate_size, plate_plate_set WHERE plate_plate_set.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate_plate_set.plate_id = plate.id AND plate_plate_set.plate_set_id = plate_set.id  AND plate_size.id = plate.plate_size_id ORDER BY plate.id DESC;");
+              "SELECT plate.plate_sys_name AS \"PlateID\", plate.id AS \"ID\",  plate_type.plate_type_name As \"Type\", plate_format.format AS \"Format\" FROM plate_set, plate, plate_type, plate_format, plate_plate_set WHERE plate_plate_set.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate_plate_set.plate_id = plate.id AND plate_plate_set.plate_set_id = plate_set.id  AND plate_format.id = plate.plate_format_id ORDER BY plate.id DESC;");
 
       pstmt.setString(1, _plate_set_sys_name);
       ResultSet rs = pstmt.executeQuery();
@@ -238,20 +240,20 @@ public class DatabaseManager {
    * Incoming variables: ( 'plate set name' 'description' '10' '96' 'assay')
    *
    * <p>Method signature in Postgres: CREATE OR REPLACE FUNCTION new_plate_set(_descr
-   * VARCHAR(30),_plate_set_name VARCHAR(30), _num_plates INTEGER, _plate_size_id INTEGER,
+   * VARCHAR(30),_plate_set_name VARCHAR(30), _num_plates INTEGER, _plate_format_id INTEGER,
    * _plate_type_id INTEGER, _project_id INTEGER, _with_samples boolean)
    */
   public void insertPlateSet(
       String _name,
       String _description,
       String _num_plates,
-      String _plate_size_id,
+      String _plate_format_id,
       String _plate_type_id) {
 
     try {
       int project_id = dmf.getSession().getProjectID();
-      int plate_size_id =
-          dmf.getDatabaseManager().getDatabaseRetriever().getPlateFormatID(_plate_size_id);
+      int plate_format_id =
+          dmf.getDatabaseManager().getDatabaseRetriever().getPlateFormatID(_plate_format_id);
       int plate_type_id =
           dmf.getDatabaseManager().getDatabaseRetriever().getPlateTypeID(_plate_type_id);
 
@@ -261,7 +263,7 @@ public class DatabaseManager {
       insertPs.setString(1, _description);
       insertPs.setString(2, _name);
       insertPs.setInt(3, Integer.valueOf(_num_plates));
-      insertPs.setInt(4, plate_size_id);
+      insertPs.setInt(4, plate_format_id);
       insertPs.setInt(5, plate_type_id);
       insertPs.setInt(6, project_id);
       insertPs.setBoolean(7, true);

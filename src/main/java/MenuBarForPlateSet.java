@@ -65,7 +65,14 @@ public class MenuBarForPlateSet extends JMenuBar {
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            new DialogAddPlateSetData();
+            Object[][] results = plate_set_table.getSelectedRowsAndHeaderAsStringArray();
+            String plate_set_sys_name = (String) results[1][0];
+            String plate_set_id_string = (String) results[1][1];
+            String format = (String) results[1][3];
+            String plate_num = (String) results[1][4];
+
+            new DialogAddPlateSetData(
+                dmf, plate_set_sys_name, plate_set_id_string, format, plate_num);
           }
         });
     utilitiesMenu.add(menuItem);
