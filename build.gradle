@@ -54,7 +54,6 @@ compile  'org.apache.poi:ooxml-schemas:1.4'
 implementation   'org.apache.poi:ooxml-schemas:1.4'
 
 
-    
        compile 'net.stihie:bllm:0.1'
     implementation 'net.stihie:bllm:0.1'
     compile 'javax.swing:jnlp:1.0'
@@ -182,5 +181,11 @@ task updateMaven(type: Exec)  {
 
 //	args "install:install-file", "-Dfile=build/libs/pm-0.1.jar", "-DgroupId=net.stihie", "-DartifactId=pm", "-Dversion=0.1", "-Dpackaging=jar"
 
+    
+}
+
+task testData(type: JavaExec){
+
+    main= 'pm.'
     
 }

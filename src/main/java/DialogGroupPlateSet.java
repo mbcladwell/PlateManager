@@ -27,6 +27,7 @@ public class DialogGroupPlateSet extends JDialog {
   final DialogMainFrame dmf;
   final Session session;
   final DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
 
@@ -37,13 +38,17 @@ public class DialogGroupPlateSet extends JDialog {
    * @param _format number of wells per plate
    */
   public DialogGroupPlateSet(
-      DialogMainFrame _dmf, HashMap<String, String> _plate_set_num_plates, String _format) {
+      DialogMainFrame _dmf,
+      HashMap<String, String> _plate_set_num_plates,
+      String _format,
+      ArrayList<String> _plate_sys_names) {
     this.dmf = _dmf;
     this.session = dmf.getSession();
     owner = session.getUserName();
     HashMap<String, String> plate_set_num_plates = _plate_set_num_plates;
     String format = _format;
     String plateSetsAndNumbers = new String("");
+    ArrayList<String> plate_sys_names = _plate_sys_names;
 
     for (HashMap.Entry<String, String> entry : plate_set_num_plates.entrySet()) {
       plateSetsAndNumbers = plateSetsAndNumbers + entry.getKey() + " (" + entry.getValue() + "); ";
@@ -197,7 +202,8 @@ public class DialogGroupPlateSet extends JDialog {
                     plate_set_num_plates,
                     format,
                     typeList.getSelectedItem().toString(),
-                    dmf.getSession().getProjectID());
+                    dmf.getSession().getProjectID(),
+                    plate_sys_names);
             dispose();
           }
         }));

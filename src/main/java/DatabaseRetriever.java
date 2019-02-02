@@ -148,8 +148,8 @@ public class DatabaseRetriever {
    * when grouping plate sets. @Set projectSet a set that contains plate_set IDs to be iterated
    * over.
    */
-  public HashMap<String, String> getNumberOfPlatesInPlateSets(Set<String> _plate_setSet) {
-    Set<String> plate_setSet = _plate_setSet;
+  public HashMap<String, String> getNumberOfPlatesInPlateSets(ArrayList<String> _plate_setSet) {
+    ArrayList<String> plate_setSet = _plate_setSet;
     HashMap<String, String> plate_setPlateCount = new HashMap<String, String>();
     String result;
     for (String s : plate_setSet) {

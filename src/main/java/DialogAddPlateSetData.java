@@ -271,7 +271,7 @@ public class DialogAddPlateSetData extends JDialog
           plate_set_sys_name,
           (String) assayTypes.getSelectedItem(),
           (String) plateLayouts.getSelectedItem(),
-          fileField.getText());
+          dmf.getUtilities().loadDataFile(fileField.getText()));
       dispose();
     }
 

@@ -128,7 +128,8 @@ public class DatabaseInserter {
       HashMap<String, String> _plate_set_num_plates,
       String _plate_format,
       String _plate_type,
-      int _project_id) {
+      int _project_id,
+      ArrayList<String> _plate_sys_names) {
 
     String description = _description;
     String name = _name;
@@ -138,6 +139,7 @@ public class DatabaseInserter {
     int project_id = _project_id;
     int format_id = 0;
     int new_plate_set_id = 0;
+    ArrayList<String> plate_sys_names = _plate_sys_names;
     // ResultSet resultSet;
     // PreparedStatement preparedStatement;
 
@@ -160,10 +162,18 @@ public class DatabaseInserter {
 
     // determine type id
     int plateTypeID = dbm.getDatabaseRetriever().getIDForPlateType(plate_type);
+
+    // determine plate.ids for plate_sys_names
+    int number_of_plate_sys_names = plate_sys_names.size();
+    int[] plate_ids = new int[number_of_plate_sys_names];
+    for (int i; i < number_of_plate_sys_names; i++) {
+      plate_ids[i] = dbr.getIDForSysName(plate_sys_names.get(i), "plate_set");
+    }
     // insert new plate set
     // INSERT INTO plate_set(descr, plate_set_name, num_plates, plate_size_id, plate_type_id,
     // project_id)
-    String sqlstring = "SELECT new_plate_set_from_group (?, ?, ?, ?, ?, ?);";
+
+    String sqlstring = "SELECT new_plate_set_from_group (?, ?, ?, ?, ?, ?, ?);";
 
     try {
       PreparedStatement preparedStatement =
@@ -174,6 +184,8 @@ public class DatabaseInserter {
       preparedStatement.setInt(4, format_id);
       preparedStatement.setInt(5, plateTypeID);
       preparedStatement.setInt(6, project_id);
+      preparedStatement.setArray(
+          7, conn.createArrayOf("VARCHAR", (String[]) plate_sys_names.toArray()));
 
       preparedStatement.execute(); // executeUpdate expects no returns!!!
 
@@ -296,14 +308,14 @@ public class DatabaseInserter {
       String _plate_set_sys_name,
       String _assayType,
       String _plateLayouts,
-      String _file_name) {
+      ArrayList<String[]> _table) {
 
     String assayName = _assayName;
     String descr = _descr;
     String plate_set_sys_name = _plate_set_sys_name;
     String assay_type = _assayType;
     String plate_layout = _plateLayouts;
-    String file_name = _file_name;
+    ArrayList<String[]> table = _table;
 
     int plate_set_id =
         dbm.getDatabaseRetriever().getPlateSetIDForPlateSetSysName(plate_set_sys_name);
@@ -319,7 +331,54 @@ public class DatabaseInserter {
     int assay_run_id =
         createAssayRun(assayName, descr, assay_type_id, plate_set_id, plate_layout_name_id);
 
-    java.io.File file = new java.io.File(file_name);
+    // if (table.get(0)[0] == "plate" & table.get(0)[1] == "plate" & table.get(0)[2] == "plate") {
+    String sql_statement = new String("INSERT INTO temp_data (plate, well, response) VALUES ");
+
+    /*
+    table.remove(0); // get rid of the header
+    for (String[] row : table) {
+      sql_statement =
+          sql_statement
+              + "("
+              + Integer.parseInt(row[0])
+              + ", "
+              + Integer.parseInt(row[1])
+              + ", "
+              + Double.parseDouble(row[2])
+              + "), ";
+    }
+
+    String insertSql = sql_statement.substring(0, sql_statement.length() - 2) + ";";
+
+    PreparedStatement insertPs;
+    try {
+      insertPs = conn.prepareStatement(insertSql);
+      insertPreparedStatement(insertPs);
+    } catch (SQLException sqle) {
+      LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
+    }
+    */
+    // table assay_result: sample_id, response, assay_run_id
+    // table temp_data: plate, well, response
+    // table assay_run: id, plate_set_id, plate_layout_name_id
+    // plate_layout:  plate_layout_name_id, well_by_col, well_type_id
+    // plate:  id
+    // well: plate_id id
+    // sample: id
+    // well_sample:  well_id  sample_id
+    // well_numbers: format  well_name  by_col
+
+    String insertSql =
+        "INSERT INTO assay_result (sample_id, response, assay_run_id ) VALUES (SELECT sample.id, assay_result.response, assay_run.id FROM assay_result, temp_data, assay_run, plate_layout, plate, well, sample, well_sample, well_numbers WHERE well_numbers.plate_format= 1536 AND well_number.by_col  )";
+
+    LOGGER.info("insertSql: " + insertSql);
+    PreparedStatement insertPs;
+    try {
+      insertPs = conn.prepareStatement(insertSql);
+      insertPreparedStatement(insertPs);
+    } catch (SQLException sqle) {
+      LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
+    }
   }
 
   public int createAssayRun(

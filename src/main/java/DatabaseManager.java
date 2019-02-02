@@ -304,7 +304,7 @@ public class DatabaseManager {
     String[][] results = new String[selection.length][4];
 
     //  LOGGER.info("selection: " + selection.toString());
-    Set<String> plateSet = new HashSet<String>();
+    ArrayList<String> plateSet = new ArrayList<String>();
     Set<String> plateFormatSet = new HashSet<String>();
 
     for (int i = 0; i < selection.length; i++) {
@@ -328,7 +328,7 @@ public class DatabaseManager {
       for (Iterator<String> it = plateFormatSet.iterator(); it.hasNext(); ) {
         format = it.next();
       }
-      new DialogGroupPlateSet(dmf, numberOfPlatesInPlateSets, format);
+      new DialogGroupPlateSet(dmf, numberOfPlatesInPlateSets, format, plateSet);
     } else {
       JOptionPane.showMessageDialog(
           dmf,
