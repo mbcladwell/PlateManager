@@ -393,6 +393,36 @@ public class DatabaseRetriever {
     return id;
   }
 
+  public Integer[] getIDsForSysNames(String[] _sys_names, String _table, String _column) {
+    String[] sys_names = _sys_names;
+    String table = _table;
+    String column = _column;
+    Integer[] sys_ids = new Integer[sys_names.length];
+
+    String sqlstring = "SELECT get_plate_ids_for_sys_names (?, ?, ?);";
+
+    try {
+      PreparedStatement preparedStatement =
+          conn.prepareStatement(sqlstring, Statement.RETURN_GENERATED_KEYS);
+      preparedStatement.setArray(1, conn.createArrayOf("VARCHAR", sys_names));
+      preparedStatement.setString(2, table);
+      preparedStatement.setString(3, column);
+
+      preparedStatement.execute(); // executeUpdate expects no returns!!!
+
+      ResultSet resultSet = preparedStatement.getResultSet();
+      resultSet.next();
+      sys_ids = (Integer[]) (resultSet.getArray("array")).getArray();
+
+      // LOGGER.info("resultset: " + result);
+
+    } catch (SQLException sqle) {
+      LOGGER.warning("SQLE at getIDsForSysNames: " + sqle);
+    }
+
+    return sys_ids;
+  }
+
   public String[] getAssayTypes() {
     String[] output = null;
     Array results = null;

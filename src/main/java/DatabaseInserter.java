@@ -166,7 +166,7 @@ public class DatabaseInserter {
     // determine plate.ids for plate_sys_names
     int number_of_plate_sys_names = plate_sys_names.size();
     int[] plate_ids = new int[number_of_plate_sys_names];
-    for (int i; i < number_of_plate_sys_names; i++) {
+    for (int i = 0; i < number_of_plate_sys_names; i++) {
       plate_ids[i] = dbr.getIDForSysName(plate_sys_names.get(i), "plate_set");
     }
     // insert new plate set
@@ -199,6 +199,7 @@ public class DatabaseInserter {
     }
 
     // associate old plates with new plate set id
+    /*
     Set<Integer> plate_ids = new HashSet<Integer>();
     Iterator it2 = plate_set_num_plates.entrySet().iterator();
     while (it2.hasNext()) {
@@ -213,6 +214,8 @@ public class DatabaseInserter {
 
     this.associatePlateIDsWithPlateSetID(plate_ids, new_plate_set_id);
     dbm.getDmf().showPlateSetTable(dbm.getDmf().getSession().getProjectSysName());
+    */
+
   }
 
   /** Called from DialogGroupPlates from the plate panel/menubar */
