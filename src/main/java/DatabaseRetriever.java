@@ -393,13 +393,18 @@ public class DatabaseRetriever {
     return id;
   }
 
+  /**
+   * @param _sys_names array of system_names
+   * @param _table table to be queried
+   * @param _column name of the sys_name column e.g. plate_sys_name, plate_set_sys_name
+   */
   public Integer[] getIDsForSysNames(String[] _sys_names, String _table, String _column) {
     String[] sys_names = _sys_names;
     String table = _table;
     String column = _column;
     Integer[] sys_ids = new Integer[sys_names.length];
 
-    String sqlstring = "SELECT get_plate_ids_for_sys_names (?, ?, ?);";
+    String sqlstring = "SELECT get_ids_for_sys_names (?, ?, ?);";
 
     try {
       PreparedStatement preparedStatement =
@@ -412,7 +417,7 @@ public class DatabaseRetriever {
 
       ResultSet resultSet = preparedStatement.getResultSet();
       resultSet.next();
-      sys_ids = (Integer[]) (resultSet.getArray("array")).getArray();
+      sys_ids = (Integer[]) (resultSet.getArray("get_ids_for_sys_names")).getArray();
 
       // LOGGER.info("resultset: " + result);
 
