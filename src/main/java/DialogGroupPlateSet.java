@@ -196,7 +196,7 @@ public class DialogGroupPlateSet extends JDialog {
 
             dmf.getDatabaseManager()
                 .getDatabaseInserter()
-                .makePlateSetFromGroup(
+                .groupPlateSetsIntoNewPlateSet(
                     descriptionField.getText(),
                     nameField.getText(),
                     plate_set_num_plates,

@@ -9,9 +9,11 @@ import javax.swing.table.DefaultTableModel;
 /** */
 public class DatabaseInserter {
   DatabaseManager dbm;
+  DialogMainFrame dmf;
   private DatabaseRetriever dbr;
   Connection conn;
   JTable table;
+  Utilities utils;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   /** */
@@ -19,6 +21,8 @@ public class DatabaseInserter {
     this.dbm = _dbm;
     this.conn = dbm.getConnection();
     this.dbr = dbm.getDatabaseRetriever();
+    this.dmf = dbm.getDmf();
+    this.utils = dmf.getUtilities();
   }
 
   public void insertProject(String _name, String _description, int _pmuser_id) {
@@ -117,12 +121,12 @@ public class DatabaseInserter {
   }
 
   /**
-   * called from DialogGroupPlates; Performs the creation of a new plate set from existing plates.
-   * The HashMap contains the pair plateset_sys_name:number of plates. A dedicated function
+   * called from DialogGroupPlateSet; Performs the creation of a new plate set from existing plate
+   * sets. The HashMap contains the pair plateset_sys_name:number of plates. A dedicated function
    * "new_plate_set_from_group" will create the plateset and return the id without making any
    * plates.
    */
-  public void makePlateSetFromGroup(
+  public void groupPlateSetsIntoNewPlateSet(
       String _description,
       String _name,
       HashMap<String, String> _plate_set_num_plates,
@@ -198,8 +202,9 @@ public class DatabaseInserter {
       LOGGER.warning("SQLE at inserting plate set from group: " + sqle);
     }
 
-    // associate old plates with new plate set id
-    /*
+    // associate old (existing) plates with new plate set id
+    //
+
     Set<Integer> plate_ids = new HashSet<Integer>();
     Iterator it2 = plate_set_num_plates.entrySet().iterator();
     while (it2.hasNext()) {
@@ -214,8 +219,6 @@ public class DatabaseInserter {
 
     this.associatePlateIDsWithPlateSetID(plate_ids, new_plate_set_id);
     dbm.getDmf().showPlateSetTable(dbm.getDmf().getSession().getProjectSysName());
-    */
-
   }
 
   /** Called from DialogGroupPlates from the plate panel/menubar */
@@ -278,18 +281,17 @@ public class DatabaseInserter {
   public void associatePlateIDsWithPlateSetID(Set<Integer> _plateIDs, int _plate_set_id) {
     Set<Integer> plateIDs = _plateIDs;
     int plate_set_id = _plate_set_id;
+    Integer[] plate_ids =
+        Arrays.stream(utils.getIntArrayForIntegerSet(plateIDs)).boxed().toArray(Integer[]::new);
 
-    String holder = new String("INSERT INTO plate_plate_set (plate_set_id, plate_id) VALUES ");
-    for (int temp : plateIDs) {
-      holder = holder + "('" + plate_set_id + "', '" + temp + "'), ";
-    }
-
-    String insertSql = holder.substring(0, holder.length() - 2) + ";";
-    LOGGER.info("insertSql: " + insertSql);
-    PreparedStatement insertPs;
+    String sqlString = "SELECT assoc_plate_ids_with_plate_set_id(?,?)";
+    // LOGGER.info("insertSql: " + insertSql);
     try {
-      insertPs = conn.prepareStatement(insertSql);
-      insertPreparedStatement(insertPs);
+      PreparedStatement preparedStatement = conn.prepareStatement(sqlString);
+      preparedStatement.setArray(1, conn.createArrayOf("INTEGER", plate_ids));
+      preparedStatement.setInt(2, plate_set_id);
+      preparedStatement.execute(); // executeUpdate expects no returns!!!
+
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
     }

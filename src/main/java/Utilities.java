@@ -70,6 +70,17 @@ public class Utilities {
 
     return table;
   }
+
+  public int[] getIntArrayForIntegerSet(Set<Integer> input) {
+    int count = input.size();
+    Integer[] inputArray = input.toArray(new Integer[count]);
+    int result[] = new int[count];
+
+    for (int i = 0; i < count; i++) {
+      result[i] = inputArray[i];
+    }
+    return result;
+  }
 }
     /*
     try {
