@@ -188,7 +188,7 @@ public class DatabaseRetriever {
 
       while (rs.next()) {
         all_plate_ids.add(rs.getInt(1));
-        LOGGER.info("A plate set ID: " + rs.getInt(1));
+        // LOGGER.info("A plate set ID: " + rs.getInt(1));
       }
 
       rs.close();

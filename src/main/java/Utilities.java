@@ -81,6 +81,19 @@ public class Utilities {
     }
     return result;
   }
+
+  public String[] getStringArrayForStringSet(Set<String> input) {
+    LOGGER.info("input: " + input);
+    int count = input.size();
+    String[] inputArray = input.toArray(new String[count]);
+    String result[] = new String[count];
+
+    for (int i = 0; i < count; i++) {
+      result[i] = inputArray[i];
+      LOGGER.info("result: " + result[i]);
+    }
+    return result;
+  }
 }
     /*
     try {
