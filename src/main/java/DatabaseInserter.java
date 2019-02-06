@@ -309,14 +309,14 @@ public class DatabaseInserter {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
     }
   }
-  /*
+  /* Method signature in DialogAddPlateSetData
       dbi.associateDataWithPlateSet(
           nameField.getText(),
           descrField.getText(),
           plate_set_sys_name,
-          assayTypes.getSelectedItem(),
-          plateLayouts.getSelectedItem(),
-          fileField.getText());
+          (String) assayTypes.getSelectedItem(),
+          (String) plateLayouts.getSelectedItem(),
+          dmf.getUtilities().loadDataFile(fileField.getText()));
   */
 
   /** Called from DialogAddPlateSetData */
@@ -330,13 +330,15 @@ public class DatabaseInserter {
 
     String assayName = _assayName;
     String descr = _descr;
-    String plate_set_sys_name = _plate_set_sys_name;
+    String[] plate_set_sys_name = _plate_set_sys_name;
     String assay_type = _assayType;
     String plate_layout = _plateLayouts;
     ArrayList<String[]> table = _table;
 
-    int plate_set_id =
-        dbm.getDatabaseRetriever().getPlateSetIDForPlateSetSysName(plate_set_sys_name);
+    //int plate_set_id = dbm.getDatabaseRetriever().getPlateSetIDForPlateSetSysName(plate_set_sys_name);
+    int plate_set_id = dbm.getDatabaseRetriever().getIDsForSysNames(plate_set_sys_name, "plate_set", "plate_set_sys_name");
+    
+
     LOGGER.info("plate_set_id: " + plate_set_id);
 
     int assay_type_id = dbm.getDatabaseRetriever().getAssayIDForAssayType(assay_type);

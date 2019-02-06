@@ -160,7 +160,7 @@ public class DatabaseManager {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate.plate_sys_name AS \"PlateID\", plate.id AS \"ID\",  plate_type.plate_type_name As \"Type\", plate_format.format AS \"Format\" FROM plate_set, plate, plate_type, plate_format, plate_plate_set WHERE plate_plate_set.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate_plate_set.plate_id = plate.id AND plate_plate_set.plate_set_id = plate_set.id  AND plate_format.id = plate.plate_format_id ORDER BY plate.id DESC;");
+              "SELECT plate.plate_sys_name AS \"PlateID\", plate.order AS \"Order\",  plate_type.plate_type_name As \"Type\", plate_format.format AS \"Format\" FROM plate_set, plate, plate_type, plate_format, plate_plate_set WHERE plate_plate_set.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate_plate_set.plate_id = plate.id AND plate_plate_set.plate_set_id = plate_set.id  AND plate_format.id = plate.plate_format_id ORDER BY plate.id DESC;");
 
       pstmt.setString(1, _plate_set_sys_name);
       ResultSet rs = pstmt.executeQuery();
@@ -295,7 +295,7 @@ public class DatabaseManager {
     }
   }
 
-  /** TableModel Columns: PSID Name Descr Format */
+  /** TableModel Columns: PSID Name Descr Format  called from the PlateSet menu item "group" */
   public void groupPlateSets(JTable _table) {
     // 4 columns in the plate set table
     JTable plate_set_table = _table;
@@ -317,7 +317,7 @@ public class DatabaseManager {
       plateSet.add(results[k][0]);
       // LOGGER.info("prjID: " + results[k][0]);
 
-      plateFormatSet.add(results[k][2]);
+      plateFormatSet.add(results[k][3]);
       // LOGGER.info("pltformat: " + results[k][2]);
     }
     LOGGER.info("Size of plateFormatSet: " + plateFormatSet.size());
