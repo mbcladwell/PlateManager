@@ -9,6 +9,7 @@
 plugins {
     // Apply the java plugin to add support for Java
     id 'java'
+    id 'idea'
 
     // Apply the application plugin to add support for building an application
     id 'application'
@@ -87,7 +88,7 @@ repositories {
 }
 
 
-task showMeCache << {
+task showMeCache doLast{
   configurations.compile.each { println it }
 }
 
@@ -172,6 +173,11 @@ task copyJavaDocsToWeb(type: Copy, dependsOn: [myJavadocs]) {
     
 }
 
+
+task getDeps(type: Exec) {
+    configurations.testRuntime.files
+    commandLine 'echo', 'Downloaded all dependencies'
+}
 
 //update the local Maven repository
 task updateMaven(type: Exec)  {
