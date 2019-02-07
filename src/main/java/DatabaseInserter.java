@@ -330,31 +330,18 @@ public class DatabaseInserter {
 
     String assayName = _assayName;
     String descr = _descr;
-    String[] plate_set_sys_name = _plate_set_sys_name;
+    String[] plate_set_sys_name = new String[1];
+    plate_set_sys_name[0] = _plate_set_sys_name;
+
     String assay_type = _assayType;
     String plate_layout = _plateLayouts;
     ArrayList<String[]> table = _table;
 
-    //int plate_set_id = dbm.getDatabaseRetriever().getPlateSetIDForPlateSetSysName(plate_set_sys_name);
-    int plate_set_id = dbm.getDatabaseRetriever().getIDsForSysNames(plate_set_sys_name, "plate_set", "plate_set_sys_name");
-    
-
-    LOGGER.info("plate_set_id: " + plate_set_id);
-
-    int assay_type_id = dbm.getDatabaseRetriever().getAssayIDForAssayType(assay_type);
-    int plate_layout_name_id =
-        dbm.getDatabaseRetriever().getPlateLayoutIDForPlateLayoutName(plate_layout);
-    LOGGER.info("plate_layout: " + plate_layout);
-
-    LOGGER.info("plate_layout_name_id: " + plate_layout_name_id);
-
-    int assay_run_id =
-        createAssayRun(assayName, descr, assay_type_id, plate_set_id, plate_layout_name_id);
-
+    // read in data file an populate temp_data with data;
+    // only continue if successful
     // if (table.get(0)[0] == "plate" & table.get(0)[1] == "plate" & table.get(0)[2] == "plate") {
     String sql_statement = new String("INSERT INTO temp_data (plate, well, response) VALUES ");
 
-    /*
     table.remove(0); // get rid of the header
     for (String[] row : table) {
       sql_statement =
@@ -376,8 +363,34 @@ public class DatabaseInserter {
       insertPreparedStatement(insertPs);
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
+      JOptionPane.showMessageDialog(
+          dmf, "Problems parsing data file!.", "Error", JOptionPane.ERROR_MESSAGE);
+      return;
     }
-    */
+
+    // int plate_set_id =
+    // dbm.getDatabaseRetriever().getPlateSetIDForPlateSetSysName(plate_set_sys_name);
+
+    Integer[] plate_set_id =
+        dbm.getDatabaseRetriever()
+            .getIDsForSysNames(plate_set_sys_name, "plate_set", "plate_set_sys_name");
+
+    LOGGER.info("plate_set_id: " + plate_set_id);
+
+    int assay_type_id = dbm.getDatabaseRetriever().getAssayIDForAssayType(assay_type);
+    int plate_layout_name_id =
+        dbm.getDatabaseRetriever().getPlateLayoutIDForPlateLayoutName(plate_layout);
+    LOGGER.info("plate_layout: " + plate_layout);
+
+    LOGGER.info("plate_layout_name_id: " + plate_layout_name_id);
+
+    int assay_run_id =
+        createAssayRun(assayName, descr, assay_type_id, plate_set_id[0], plate_layout_name_id);
+
+    /**
+     * At this point data is in temp_data, and assay run has been created and the assay_run_id
+     * returned. Now populate assay_result.
+     */
     // table assay_result: sample_id, response, assay_run_id
     // table temp_data: plate, well, response
     // table assay_run: id, plate_set_id, plate_layout_name_id
@@ -388,14 +401,17 @@ public class DatabaseInserter {
     // well_sample:  well_id  sample_id
     // well_numbers: format  well_name  by_col
 
-    String insertSql =
-        "INSERT INTO assay_result (sample_id, response, assay_run_id ) VALUES (SELECT sample.id, assay_result.response, assay_run.id FROM assay_result, temp_data, assay_run, plate_layout, plate, well, sample, well_sample, well_numbers WHERE well_numbers.plate_format= 1536 AND well_number.by_col  )";
+    String sql1 =
+        "INSERT INTO assay_result (sample_id, response, assay_run_id ) VALUES (SELECT sample.id, temp_data.response, assay_run.id FROM assay_result, temp_data, assay_run, plate_layout, plate, well, sample, well_sample, well_numbers WHERE well_numbers.plate_format= 1536 AND well_number.by_col  )";
+
+
+    SELECT sample.id, temp_data.response  FROM  temp_data,  plate_layout, plate, well, sample, well_sample, well_numbers WHERE well_numbers.plate_format= 1536 AND well_number.by_col  )
 
     LOGGER.info("insertSql: " + insertSql);
-    PreparedStatement insertPs;
+    PreparedStatement insertPs2;
     try {
-      insertPs = conn.prepareStatement(insertSql);
-      insertPreparedStatement(insertPs);
+      insertPs2 = conn.prepareStatement(insertSql);
+      insertPreparedStatement(insertPs2);
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
     }
