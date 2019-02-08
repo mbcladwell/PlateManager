@@ -57,6 +57,8 @@ public class PlatePanel extends JPanel {
     c.anchor = GridBagConstraints.LINE_END;
     textPanel.add(label, c);
 
+    LOGGER.info("table.getValueAt(1, 0)" + table.getValueAt(1, 0));
+
     plateset_sys_name =
         dmf.getDatabaseManager()
             .getDatabaseRetriever()

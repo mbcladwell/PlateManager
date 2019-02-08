@@ -324,12 +324,14 @@ public class DatabaseInserter {
       String _assayName,
       String _descr,
       String _plate_set_sys_name,
+      String _format,
       String _assayType,
       String _plateLayouts,
       ArrayList<String[]> _table) {
 
     String assayName = _assayName;
     String descr = _descr;
+    String format = _format;
     String[] plate_set_sys_name = new String[1];
     plate_set_sys_name[0] = _plate_set_sys_name;
 
@@ -414,15 +416,18 @@ public class DatabaseInserter {
     // well_numbers: format  well_name  by_col
 
     String sql1 =
-        "INSERT INTO assay_result (sample_id, response, assay_run_id ) VALUES (SELECT sample.id, temp_data.response, assay_run.id FROM assay_result, temp_data, assay_run, plate_layout, plate, well, sample, well_sample, well_numbers WHERE well_numbers.plate_format= 1536 AND well_number.by_col  )";
+        "INSERT INTO assay_result  SELECT sample.id, temp_data.response, "
+            + assay_run_id
+            + " FROM temp_data, plate_plate_set, plate_set, plate, well,sample, well_sample, well_numbers WHERE temp_data.plate = plate_plate_set.plate_order AND plate_plate_set.plate_id = plate.id AND well.plate_id = plate.id AND well_sample.well_id = well.id AND well_sample.sample_id = sample.id AND plate_plate_set.plate_set_id = plate_set.id AND temp_data.well = well_numbers.by_col AND well_numbers.well_name = well.well_name AND well_numbers.plate_format = "
+            + format
+            + " AND plate_plate_set.plate_set_id = "
+            + plate_set_id[0]
+            + "  ORDER BY plate_plate_set.plate_order, well_numbers.by_col;";
 
-    //    SELECT sample.id, temp_data.response  FROM  temp_data,  plate_layout, plate, well, sample,
-    // well_sample, well_numbers WHERE well_numbers.plate_format= 1536 AND well_number.by_col  )
-
-    LOGGER.info("insertSql: " + insertSql);
+    LOGGER.info("insertSql: " + sql1);
     PreparedStatement insertPs2;
     try {
-      insertPs2 = conn.prepareStatement(insertSql);
+      insertPs2 = conn.prepareStatement(sql1);
       insertPreparedStatement(insertPs2);
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);

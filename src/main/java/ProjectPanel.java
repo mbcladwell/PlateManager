@@ -48,8 +48,8 @@ public class ProjectPanel extends JPanel {
         table.getColumnModel().getColumn(1).setMaxWidth(150);
         table.getColumnModel().getColumn(2).setMaxWidth(100);
     */
-    LOGGER.info("table: " + table);
-    LOGGER.info("class: " + table.getClass());
+    //    LOGGER.info("table: " + table);
+    // LOGGER.info("class: " + table.getClass());
 
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 

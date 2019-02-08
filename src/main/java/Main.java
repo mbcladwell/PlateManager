@@ -10,8 +10,8 @@ public class Main {
     // new DialogMainFrame();
 
     DialogMainFrame dmf = new DialogMainFrame();
-    DatabaseInserter dbi = new DatabaseInserter(dmf.getDatabaseManager());
-    dbi.associateDataWithPlateSet(
-        "assayName1", "descr1", "PS-10", "assay", "8 controls columns 47, 48", null);
+    //    DatabaseInserter dbi = new DatabaseInserter(dmf.getDatabaseManager());
+    // dbi.associateDataWithPlateSet(
+    //  "assayName1", "descr1", "PS-10", "assay", "8 controls columns 47, 48", null);
   }
 }
