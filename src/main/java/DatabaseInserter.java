@@ -390,6 +390,18 @@ public class DatabaseInserter {
     /**
      * At this point data is in temp_data, and assay run has been created and the assay_run_id
      * returned. Now populate assay_result.
+     *
+     * <p>Diagnostic query
+     *
+     * <p>SELECT temp_data.plate, temp_data.well, temp_data.response ,plate_plate_set.plate_order ,
+     * plate_set.plate_set_sys_name , plate.plate_sys_name, well.id, well.well_name,
+     * sample.sample_sys_name FROM temp_data, plate_plate_set, plate_set, plate, well,sample,
+     * well_sample, well_numbers WHERE temp_data.plate = plate_plate_set.plate_order AND
+     * plate_plate_set.plate_id = plate.id AND well.plate_id = plate.id AND well_sample.well_id =
+     * well.id AND well_sample.sample_id = sample.id AND plate_plate_set.plate_set_id = plate_set.id
+     * AND plate_plate_set.plate_set_id = 21 AND temp_data.well = well_numbers.by_col AND
+     * well_numbers.well_name = well.well_name AND well_numbers.plate_format = 96 ORDER BY
+     * plate_plate_set.plate_order, well_numbers.by_col;
      */
     // table assay_result: sample_id, response, assay_run_id
     // table temp_data: plate, well, response
@@ -404,8 +416,8 @@ public class DatabaseInserter {
     String sql1 =
         "INSERT INTO assay_result (sample_id, response, assay_run_id ) VALUES (SELECT sample.id, temp_data.response, assay_run.id FROM assay_result, temp_data, assay_run, plate_layout, plate, well, sample, well_sample, well_numbers WHERE well_numbers.plate_format= 1536 AND well_number.by_col  )";
 
-
-    SELECT sample.id, temp_data.response  FROM  temp_data,  plate_layout, plate, well, sample, well_sample, well_numbers WHERE well_numbers.plate_format= 1536 AND well_number.by_col  )
+    //    SELECT sample.id, temp_data.response  FROM  temp_data,  plate_layout, plate, well, sample,
+    // well_sample, well_numbers WHERE well_numbers.plate_format= 1536 AND well_number.by_col  )
 
     LOGGER.info("insertSql: " + insertSql);
     PreparedStatement insertPs2;

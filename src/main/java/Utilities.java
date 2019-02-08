@@ -56,9 +56,12 @@ public class Utilities {
 
     try (Stream<String> lines = Files.lines(path)) {
       for (String line : (Iterable<String>) lines::iterator) {
-        String[] values = line.split("\t");
-        // LOGGER.info("values: " + values);
-        table.add(values);
+        if (line != null && !line.isEmpty()) {
+          String[] values = line.split("\t");
+
+          // LOGGER.info("values: " + values);
+          table.add(values);
+        }
       }
     } catch (IOException ioe) {
       LOGGER.severe("IOException: " + ioe);
