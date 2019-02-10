@@ -1,12 +1,15 @@
 package pm;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.sql.*;
-import java.util.logging.*;
-import javax.swing.*;
-import javax.swing.JComponent.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Toolkit;
+import java.io.File;
+import java.sql.SQLException;
+import java.util.logging.Logger;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 public class DialogMainFrame extends JFrame {
 
@@ -48,9 +51,9 @@ public class DialogMainFrame extends JFrame {
       session.setUserTypeID(1);
       session.setUserType("pm_admin");
       session.setTempDir((new File(System.getProperty("java.io.tmpdir")).toString()));
-      LOGGER.info("Temporary directory set to: " + session.getTempDir());
+      //LOGGER.info("Temporary directory set to: " + session.getTempDir());
       session.setWorkingDir((new File(System.getProperty("user.dir")).toString()));
-      LOGGER.info("Working directory set to: " + session.getWorkingDir());
+      //LOGGER.info("Working directory set to: " + session.getWorkingDir());
 
     } catch (SQLException sqle) {
       System.out.println("Invalid password");

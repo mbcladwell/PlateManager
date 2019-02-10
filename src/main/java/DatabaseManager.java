@@ -1,10 +1,24 @@
 package pm;
 
-import java.sql.*;
-import java.util.*;
-import java.util.logging.*;
-import javax.swing.*;
-import javax.swing.table.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 /** */
@@ -119,7 +133,7 @@ public class DatabaseManager {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate_set_sys_name AS \"PlateSetID\",plate_set.id As \"ID\", plate_set_name As \"Name\", format AS \"Format\", num_plates AS \"# plates\" , descr AS \"Description\" FROM plate_set, plate_format WHERE plate_format.id = plate_set.plate_format_id AND project_id = (select id from project where project_sys_name like ?) ORDER BY plate_set.id DESC;");
+              "SELECT plate_set_sys_name AS \"PlateSetID\", plate_set_name As \"Name\", format AS \"Format\", num_plates AS \"# plates\" , descr AS \"Description\" FROM plate_set, plate_format WHERE plate_format.id = plate_set.plate_format_id AND project_id = (select id from project where project_sys_name like ?) ORDER BY plate_set.id DESC;");
 
       pstmt.setString(1, _project_sys_name);
       ResultSet rs = pstmt.executeQuery();
@@ -160,7 +174,7 @@ public class DatabaseManager {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate.plate_sys_name AS \"PlateID\", plate.order AS \"Order\",  plate_type.plate_type_name As \"Type\", plate_format.format AS \"Format\" FROM plate_set, plate, plate_type, plate_format, plate_plate_set WHERE plate_plate_set.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate_plate_set.plate_id = plate.id AND plate_plate_set.plate_set_id = plate_set.id  AND plate_format.id = plate.plate_format_id ORDER BY plate.id DESC;");
+              "SELECT plate.plate_sys_name AS \"PlateID\", plate_plate_set.plate_order AS \"Order\",  plate_type.plate_type_name As \"Type\", plate_format.format AS \"Format\" FROM plate_set, plate, plate_type, plate_format, plate_plate_set WHERE plate_plate_set.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate_plate_set.plate_id = plate.id AND plate_plate_set.plate_set_id = plate_set.id  AND plate_format.id = plate.plate_format_id ORDER BY plate_plate_set.plate_order DESC;");
 
       pstmt.setString(1, _plate_set_sys_name);
       ResultSet rs = pstmt.executeQuery();

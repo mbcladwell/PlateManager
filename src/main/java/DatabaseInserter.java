@@ -1,9 +1,23 @@
 package pm;
 
-import java.sql.*;
-import java.util.*;
-import java.util.logging.*;
-import javax.swing.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 /** */
@@ -150,9 +164,9 @@ public class DatabaseInserter {
     // determine total number of plates in new plate set
     int total_num_plates = 0;
 
-    Iterator it = plate_set_num_plates.entrySet().iterator();
+    Iterator<Map.Entry<String,String>> it = plate_set_num_plates.entrySet().iterator();
     while (it.hasNext()) {
-      HashMap.Entry pair = (HashMap.Entry) it.next();
+	HashMap.Entry<String, String> pair = (HashMap.Entry<String, String>) it.next();
       total_num_plates = total_num_plates + Integer.parseInt((String) pair.getValue());
       // it.remove(); // avoids a ConcurrentModificationException
     }
@@ -171,12 +185,12 @@ public class DatabaseInserter {
     // use   public Integer[] getIDsForSysNames(String[] _sys_names, String _table, String _column)
     // {
     // from DatabaseRetriever
-    LOGGER.info("plate_sys_names: " + plate_sys_names);
-    LOGGER.info("hassetplate_sys_names: " + new HashSet<String>(plate_sys_names));
+    //LOGGER.info("plate_sys_names: " + plate_sys_names);
+    //LOGGER.info("hashsetplate_sys_names: " + new HashSet<String>(plate_sys_names));
 
-    LOGGER.info(
-        "set: "
-            + dmf.getUtilities().getStringArrayForStringSet(new HashSet<String>(plate_sys_names)));
+    //LOGGER.info(
+    //  "set: "
+    //      + dmf.getUtilities().getStringArrayForStringSet(new HashSet<String>(plate_sys_names)));
     Integer[] plate_ids =
         dbm.getDatabaseRetriever()
             .getIDsForSysNames(
