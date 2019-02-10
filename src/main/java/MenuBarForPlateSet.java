@@ -60,6 +60,16 @@ public class MenuBarForPlateSet extends JMenuBar {
         });
     utilitiesMenu.add(menuItem);
 
+        menuItem = new JMenuItem("Reformat");
+    menuItem.setMnemonic(KeyEvent.VK_R);
+    menuItem.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            dmf.getDatabaseManager().reformatPlateSet(plate_set_table);
+          }
+        });
+    utilitiesMenu.add(menuItem);
+
     menuItem = new JMenuItem("Import assay data");
     menuItem.setMnemonic(KeyEvent.VK_I);
     menuItem.addActionListener(

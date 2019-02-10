@@ -489,4 +489,16 @@ public class DatabaseInserter {
     // LOGGER.info("new assay id: " + new_assay_run_id);
     return new_assay_run_id;
   }
+
+
+    /**
+     * Called from DatabaseManager.reformatPlateSet(plate_set_id, format)
+     */
+    public void reformatPlateSet(DialogMainFrame _dmf, Integer[] _plate_set_id, String _format){
+	DialogMainFrame dmf = _dmf;
+	int plate_set_id = _plate_set_id[0];
+	String format = _format;
+	
+	
+    }
 }

@@ -384,6 +384,43 @@ public class DatabaseManager {
     new DialogGroupPlates(dmf, plateSet, format);
   }
 
+     /**
+      * Collapse multiple plates by quadrant. 
+      *
+      *<p> Plate set table:  id|plate_set_name|descr| plate_set_sys_name | num_plates|
+      *plate_format_id|plate_type_id|project_id |updated            
+      */
+    public void reformatPlateSet(CustomTable _table){
+    CustomTable plate_set_table = _table;
+    TableModel tableModel = plate_set_table.getModel();
+    int[] selection = plate_set_table.getSelectedRows();
+    if (selection.length > 1){
+       JOptionPane.showMessageDialog(dmf,
+    "Select one plate set.",
+    "Error",
+    JOptionPane.ERROR_MESSAGE);
+    }else{
+	    String format = tableModel.getValueAt(selection[0], 2).toString();
+	    String[] plate_set_sys_name = new String[1];
+	    plate_set_sys_name[0] = tableModel.getValueAt(selection[0], 0).toString();
+	    Integer[] plate_set_id = this.getDatabaseRetriever().getIDsForSysNames(plate_set_sys_name, "plate_set", "plate_set_sys_name");
+	    switch(format){
+	    case "96": this.getDatabaseInserter().reformatPlateSet(plate_set_id, format);
+		    break;
+	    case "384": this.getDatabaseInserter().reformatPlateSet(plate_set_id, format);
+		    break;
+	    case "1536":  JOptionPane.showMessageDialog(dmf,
+    "1536 well plates can not be reformatted.",
+    "Error", JOptionPane.ERROR_MESSAGE);
+		    break;
+		    }
+	
+    }
+    
+    }
+    
+
+    
   public DialogMainFrame getDmf() {
     return this.dmf;
   }
