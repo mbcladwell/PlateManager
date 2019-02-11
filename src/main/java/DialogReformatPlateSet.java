@@ -184,7 +184,7 @@ JLabel oldDescrLabel = new JLabel(old_descr, SwingConstants.RIGHT);
     c.anchor = GridBagConstraints.LINE_START;
     pane2.add(label, c);
 
-    label = new JLabel("Plate Type:", SwingConstants.RIGHT);
+           label = new JLabel("# samples:", SwingConstants.RIGHT);
     c.gridx = 2;
     c.gridy = 4;
     c.gridheight = 1;
@@ -192,17 +192,33 @@ JLabel oldDescrLabel = new JLabel(old_descr, SwingConstants.RIGHT);
     c.anchor = GridBagConstraints.LINE_END;
     pane2.add(label, c);
 
-    label = new JLabel(old_plate_type, SwingConstants.RIGHT);
+    label = new JLabel(Integer.valueOf(old_num_samples).toString(), SwingConstants.RIGHT);
     c.gridx = 3;
     c.gridy = 4;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane2.add(label, c);
+
+    label = new JLabel("Plate Type:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 5;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane2.add(label, c);
+
+    label = new JLabel(old_plate_type, SwingConstants.RIGHT);
+    c.gridx = 1;
+    c.gridy = 5;
     c.gridheight = 1;
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_END;
     pane2.add(label, c);
 
     label = new JLabel("Format:", SwingConstants.RIGHT);
-    c.gridx = 4;
-    c.gridy = 4;
+    c.gridx = 2;
+    c.gridy = 5;
     c.gridheight = 1;
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_END;
@@ -210,8 +226,8 @@ JLabel oldDescrLabel = new JLabel(old_descr, SwingConstants.RIGHT);
   
     label = new JLabel(old_plate_format + " well");
 
-    c.gridx = 5;
-    c.gridy = 4;
+    c.gridx = 3;
+    c.gridy = 5;
     c.gridheight = 1;
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_START;

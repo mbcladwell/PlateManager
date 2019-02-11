@@ -32,6 +32,7 @@ public class DatabaseManager {
 
   // psql -U pm_admin -h 192.168.1.7 -d pmdb
 
+
   /**
    * Use 'pmdb' as the database name. Regular users will connect as pm_user and will have restricted
    * access (no delete etc.). Connect as pm_admin to get administrative priveleges.
@@ -41,7 +42,7 @@ public class DatabaseManager {
     try {
       Class.forName("org.postgresql.Driver");
 
-      // String url = "jdbc:postgresql://localhost/postgres";
+// String url = "jdbc:postgresql://localhost/postgres";
       String url = "jdbc:postgresql://192.168.1.7/pmdb";
       Properties props = new Properties();
       props.setProperty("user", "pm_admin");
@@ -400,27 +401,30 @@ public class DatabaseManager {
     "Error",
     JOptionPane.ERROR_MESSAGE);
     }else{
-	/*
-	    String format = tableModel.getValueAt(selection[0], 2).toString();
+       
+	String format = (String)tableModel.getValueAt(selection[0], 2).toString();
 	    String[] plate_set_sys_name = new String[1];
 	    plate_set_sys_name[0] = tableModel.getValueAt(selection[0], 0).toString();
 	    Integer[] plate_set_id = this.getDatabaseRetriever().getIDsForSysNames(plate_set_sys_name, "plate_set", "plate_set_sys_name");
+	    String descr = (String)tableModel.getValueAt(selection[0], 4);
+	    int num_plates = (int)tableModel.getValueAt(selection[0], 3);
+	    String plate_type = (String)tableModel.getValueAt(selection[0], 4);
+	    int num_samples = 2000;
+	    
+	     
 	    switch(format){
-	    case "96": this.getDatabaseInserter().reformatPlateSet(dmf, plate_set_id, format);
+	    case "96": this.getDatabaseInserter().reformatPlateSet(dmf, (int)plate_set_id[0], plate_set_sys_name[0], descr, num_plates, num_samples, plate_type, format);
 		    break;
-	    case "384": this.getDatabaseInserter().reformatPlateSet(dmf, plate_set_id, format);
+	    case "384": this.getDatabaseInserter().reformatPlateSet(dmf, (int)plate_set_id[0], plate_set_sys_name[0], descr, num_plates, num_samples, plate_type, format);
 		    break;
 	    case "1536":  JOptionPane.showMessageDialog(dmf,
     "1536 well plates can not be reformatted.",
     "Error", JOptionPane.ERROR_MESSAGE);
 		    break;
-	*/	    
-		    }
-	
+		    
+		    }	
     }
-    
-    
-    
+    }
 
     
   public DialogMainFrame getDmf() {
