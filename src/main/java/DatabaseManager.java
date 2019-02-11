@@ -400,24 +400,26 @@ public class DatabaseManager {
     "Error",
     JOptionPane.ERROR_MESSAGE);
     }else{
+	/*
 	    String format = tableModel.getValueAt(selection[0], 2).toString();
 	    String[] plate_set_sys_name = new String[1];
 	    plate_set_sys_name[0] = tableModel.getValueAt(selection[0], 0).toString();
 	    Integer[] plate_set_id = this.getDatabaseRetriever().getIDsForSysNames(plate_set_sys_name, "plate_set", "plate_set_sys_name");
 	    switch(format){
-	    case "96": this.getDatabaseInserter().reformatPlateSet(plate_set_id, format);
+	    case "96": this.getDatabaseInserter().reformatPlateSet(dmf, plate_set_id, format);
 		    break;
-	    case "384": this.getDatabaseInserter().reformatPlateSet(plate_set_id, format);
+	    case "384": this.getDatabaseInserter().reformatPlateSet(dmf, plate_set_id, format);
 		    break;
 	    case "1536":  JOptionPane.showMessageDialog(dmf,
     "1536 well plates can not be reformatted.",
     "Error", JOptionPane.ERROR_MESSAGE);
 		    break;
+	*/	    
 		    }
 	
     }
     
-    }
+    
     
 
     

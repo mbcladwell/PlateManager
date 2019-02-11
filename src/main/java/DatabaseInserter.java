@@ -491,12 +491,15 @@ public class DatabaseInserter {
   }
 
 
+
+     
     /**
      * Called from DatabaseManager.reformatPlateSet(plate_set_id, format)
      */
-    public void reformatPlateSet(DialogMainFrame _dmf, Integer[] _plate_set_id, String _format){
+    public void reformatPlateSet(DialogMainFrame _dmf, int _plate_set_id, String _plate_set_sys_name,
+      String _descr, int _num_plates, int _num_samples, String _plate_type, String _format){
 	DialogMainFrame dmf = _dmf;
-	int plate_set_id = _plate_set_id[0];
+	int plate_set_id = _plate_set_id;
 	String format = _format;
 	
 	

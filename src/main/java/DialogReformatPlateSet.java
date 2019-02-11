@@ -1,15 +1,29 @@
 package pm;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.*;
-import java.util.logging.*;
-
-import javax.swing.*;
-import javax.swing.JComponent.*;
+import java.util.Date;
+import java.util.logging.Logger;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 public class DialogReformatPlateSet extends JDialog {
   static JButton button;
@@ -41,134 +55,247 @@ public class DialogReformatPlateSet extends JDialog {
   public DialogReformatPlateSet(
       DialogMainFrame _dmf,
       int _plate_set_id,
-      String _format) {
+      String _plate_set_sys_name,
+      String _descr,
+      int _num_plates,
+      int _num_samples,
+      String _plate_type,
+      String _plate_format) {
     this.dmf = _dmf;
     this.session = dmf.getSession();
     owner = session.getUserName();
-    HashMap<String, String> plate_set_num_plates = _plate_set_num_plates;
-    String format = _format;
-    String plateSetsAndNumbers = new String("");
-    ArrayList<String> plate_sys_names = _plate_sys_names;
+    //  HashMap<String, String> plate_set_num_plates = _plate_set_num_plates;
+    String old_plate_format = _plate_format;
+    String plate_set_sys_name = _plate_set_sys_name;
+    String old_descr =_descr;
+    int old_num_plates = _num_plates;
+    int old_num_samples = _num_samples;
+    String old_plate_type =  _plate_type;
+    String new_plate_format = _plate_format;
+   
+     
+    //ArrayList<String> plate_sys_names = _plate_sys_names;
 
-    for (HashMap.Entry<String, String> entry : plate_set_num_plates.entrySet()) {
-      plateSetsAndNumbers = plateSetsAndNumbers + entry.getKey() + " (" + entry.getValue() + "); ";
-    }
+    // for (HashMap.Entry<String, String> entry : plate_set_num_plates.entrySet()) {
+    //  plateSetsAndNumbers = plateSetsAndNumbers + entry.getKey() + " (" + entry.getValue() + "); ";
+    // }
 
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
     // this.em = em;
-    JPanel pane = new JPanel(new GridBagLayout());
+    JPanel pane = new JPanel();
+    pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
+    
     pane.setBorder(BorderFactory.createRaisedBevelBorder());
+
+     JPanel pane1 = new JPanel(new GridBagLayout());
 
     GridBagConstraints c = new GridBagConstraints();
     // Image img = new
     // ImageIcon(DialogAddProject.class.getResource("../resources/mwplate.png")).getImage();
     // this.setIconImage(img);
-    this.setTitle("Group Plate Sets");
-    // c.gridwidth = 2;
-
+    this.setTitle("Reformat Plate Set " + plate_set_sys_name);
+   
     label = new JLabel("Date:", SwingConstants.RIGHT);
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 0;
     c.gridy = 0;
-    c.anchor = GridBagConstraints.LINE_END;
+    c.gridwidth = 1;
+ c.anchor = GridBagConstraints.LINE_END;
 
     c.insets = new Insets(5, 5, 2, 2);
-    pane.add(label, c);
+    pane1.add(label, c);
 
     label = new JLabel(df.format(Date.from(instant)));
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 1;
     c.gridy = 0;
     c.anchor = GridBagConstraints.LINE_START;
-    pane.add(label, c);
+    pane1.add(label, c);
 
     label = new JLabel("Owner:", SwingConstants.RIGHT);
-    c.gridx = 0;
-    c.gridy = 1;
+    c.gridx = 4;
+    c.gridy = 0;
     c.anchor = GridBagConstraints.LINE_END;
-    pane.add(label, c);
+    pane1.add(label, c);
 
     ownerLabel = new JLabel(owner);
+    c.gridx = 5;
+    c.gridy = 0;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane1.add(ownerLabel, c);
+
+
+    
+javax.swing.border.TitledBorder source = BorderFactory.createTitledBorder("Source Plate Set");
+    source.setTitlePosition(javax.swing.border.TitledBorder.TOP);
+
+    JPanel pane2 = new JPanel(new GridBagLayout());
+    pane2.setBorder(source);
+
+    label = new JLabel("System Name:", SwingConstants.RIGHT);
+    // c.fill = GridBagConstraints.HORIZONTAL;
+    c.gridx = 0;
+    c.gridy = 2;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane2.add(label, c);
+
+    JLabel oldNameLabel = new JLabel(plate_set_sys_name, SwingConstants.RIGHT);
+    // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 1;
-    c.gridy = 1;
+    c.gridy = 2;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane2.add(oldNameLabel, c);
+
+    
+    label = new JLabel("Description:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 3;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane2.add(label, c);
+
+JLabel oldDescrLabel = new JLabel(old_descr, SwingConstants.RIGHT);
+    c.gridx = 1;
+    c.gridy = 3;
+    c.gridheight = 1;
     c.gridwidth = 5;
     c.anchor = GridBagConstraints.LINE_START;
-    pane.add(ownerLabel, c);
+    pane2.add(oldDescrLabel, c);
 
+    
+       label = new JLabel("# plates:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 4;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane2.add(label, c);
+
+    label = new JLabel(Integer.valueOf(old_num_plates).toString(), SwingConstants.RIGHT);
+    c.gridx = 1;
+    c.gridy = 4;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane2.add(label, c);
+
+    label = new JLabel("Plate Type:", SwingConstants.RIGHT);
+    c.gridx = 2;
+    c.gridy = 4;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane2.add(label, c);
+
+    label = new JLabel(old_plate_type, SwingConstants.RIGHT);
+    c.gridx = 3;
+    c.gridy = 4;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane2.add(label, c);
+
+    label = new JLabel("Format:", SwingConstants.RIGHT);
+    c.gridx = 4;
+    c.gridy = 4;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane2.add(label, c);
+  
+    label = new JLabel(old_plate_format + " well");
+
+    c.gridx = 5;
+    c.gridy = 4;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane2.add(label, c);
+  
+ 
+javax.swing.border.TitledBorder dest = BorderFactory.createTitledBorder("Destination Plate Set");
+    dest.setTitlePosition(javax.swing.border.TitledBorder.TOP);
+
+    JPanel pane3 = new JPanel(new GridBagLayout());
+    pane3.setBorder(dest);
+    
     label = new JLabel("New Plate Set Name:", SwingConstants.RIGHT);
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 0;
     c.gridy = 2;
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_END;
-    pane.add(label, c);
-
+    pane3.add(label, c);
+    
     nameField = new JTextField(30);
     c.gridx = 1;
     c.gridy = 2;
     c.gridheight = 1;
     c.gridwidth = 5;
     c.anchor = GridBagConstraints.LINE_START;
-    pane.add(nameField, c);
-
+    pane3.add(nameField, c);
+  
     label = new JLabel("New Plate Set Description:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 3;
     c.gridheight = 1;
     c.gridwidth = 1;
-    pane.add(label, c);
-
+    pane3.add(label, c);
+  
     descriptionField = new JTextField(30);
     c.gridx = 1;
     c.gridy = 3;
     c.gridheight = 1;
     c.gridwidth = 5;
     c.anchor = GridBagConstraints.LINE_START;
-    pane.add(descriptionField, c);
-
-    label = new JLabel("Plate Set ID (# plates):", SwingConstants.RIGHT);
+    pane3.add(descriptionField, c);
+ 
+    label = new JLabel("Predicted # plates:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 4;
     c.gridheight = 1;
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_END;
-    pane.add(label, c);
-
-    label = new JLabel(plateSetsAndNumbers);
+    pane3.add(label, c);
+ 
+    label = new JLabel("");
     c.gridx = 1;
     c.gridy = 4;
     c.gridheight = 1;
     c.gridwidth = 5;
     c.anchor = GridBagConstraints.LINE_START;
-    pane.add(label, c);
-
+    pane3.add(label, c);
+ 
     label = new JLabel("Format:", SwingConstants.RIGHT);
     c.gridx = 4;
     c.gridy = 6;
     c.gridheight = 1;
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_END;
-    pane.add(label, c);
-
-    label = new JLabel(format + " well");
+    pane3.add(label, c);
+  
+    label = new JLabel(new_plate_format + " well");
 
     c.gridx = 5;
     c.gridy = 6;
     c.gridheight = 1;
     c.gridwidth = 5;
     c.anchor = GridBagConstraints.LINE_START;
-    pane.add(label, c);
-    // formatList.addActionListener(this);
-
+    pane3.add(label, c);
+  
     label = new JLabel("New Plate Set Type:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 6;
     c.gridheight = 1;
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_END;
-    pane.add(label, c);
-
+    pane3.add(label, c);
+ 
     String[] plateTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateTypes();
 
     typeList = new JComboBox<String>(plateTypes);
@@ -178,8 +305,11 @@ public class DialogReformatPlateSet extends JDialog {
     c.gridheight = 1;
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_START;
-    pane.add(typeList, c);
+    pane3.add(typeList, c);
 
+    JPanel pane4 = new JPanel(new GridBagLayout());
+
+    
     okButton = new JButton("OK");
     okButton.setMnemonic(KeyEvent.VK_O);
     okButton.setActionCommand("ok");
@@ -193,7 +323,7 @@ public class DialogReformatPlateSet extends JDialog {
     okButton.addActionListener(
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-
+	      /*
             dmf.getDatabaseManager()
                 .getDatabaseInserter()
                 .groupPlateSetsIntoNewPlateSet(
@@ -204,11 +334,12 @@ public class DialogReformatPlateSet extends JDialog {
                     typeList.getSelectedItem().toString(),
                     dmf.getSession().getProjectID(),
                     plate_sys_names);
+*/
             dispose();
           }
         }));
 
-    pane.add(okButton, c);
+    pane4.add(okButton, c);
 
     cancelButton = new JButton("Cancel");
     cancelButton.setMnemonic(KeyEvent.VK_C);
@@ -218,13 +349,18 @@ public class DialogReformatPlateSet extends JDialog {
     c.gridx = 1;
     c.gridy = 7;
     c.gridwidth = 1;
-    pane.add(cancelButton, c);
+    pane4.add(cancelButton, c);
     cancelButton.addActionListener(
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             dispose();
           }
         }));
+
+        pane.add(pane1);
+        pane.add(pane2);
+        pane.add(pane3);
+        pane.add(pane4);
 
     this.getContentPane().add(pane, BorderLayout.CENTER);
     this.pack();

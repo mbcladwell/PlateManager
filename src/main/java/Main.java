@@ -1,6 +1,6 @@
 package pm;
 
-import java.sql.*;
+import java.sql.SQLException;
 
 /** */
 public class Main {
@@ -10,6 +10,9 @@ public class Main {
     // new DialogMainFrame();
 
     DialogMainFrame dmf = new DialogMainFrame();
+
+    DialogReformatPlateSet drps = new DialogReformatPlateSet(dmf, 16, "PS-16","description 1", 20,6000,"assay", "96");
+
     //    DatabaseInserter dbi = new DatabaseInserter(dmf.getDatabaseManager());
     // dbi.associateDataWithPlateSet(
     //  "assayName1", "descr1", "PS-10", "assay", "8 controls columns 47, 48", null);
