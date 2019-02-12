@@ -3,6 +3,7 @@ package pm;
 import java.sql.*;
 import java.util.*;
 import java.util.logging.*;
+
 import javax.swing.*;
 
 /** */
@@ -449,7 +450,7 @@ public class DatabaseRetriever {
     return output;
   }
 
-  public String[] getPlateLayouts(int format_id) {
+  public String[] getPlateLayoutNames(int format_id) {
     String[] output = null;
     Array results = null;
     try {
@@ -472,6 +473,32 @@ public class DatabaseRetriever {
     return output;
   }
 
+
+      public String[] getPlateLayout(int _plate_layout_name_id) {
+    String[] output = null;
+    int plate_layout_name_id = _plate_layout_name_id;
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+              "SELECT ARRAY (select name from plate_layout_name WHERE plate_layout_name_id = ?);");
+      pstmt.setInt(1, plate_layout_name_id);
+
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      results = rs.getInt("plate_layout_name_id");
+      // LOGGER.info("Description: " + results);
+      rs.close();
+      pstmt.close();
+      output =  results.getInt();
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting plate types: " + sqle);
+    }
+    return output;
+  }
+
+
+    
   public int getAssayIDForAssayType(String _assay_name) {
     int result = 0;
     String assay_name = _assay_name;
