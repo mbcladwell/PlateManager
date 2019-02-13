@@ -416,6 +416,7 @@ public class DatabaseRetriever {
     Integer[] sys_ids = new Integer[sys_names.length];
 
     String sqlstring = "SELECT get_ids_for_sys_names (?, ?, ?);";
+      LOGGER.info("SQL at getIDsForSysNames: " + sqlstring);
 
     try {
       PreparedStatement preparedStatement =
@@ -439,6 +440,34 @@ public class DatabaseRetriever {
     return sys_ids;
   }
 
+  public int getIDforLayoutName(String _layout_name) {
+    String layout_name = _layout_name;
+    int id = 0;
+
+    String sqlstring = "SELECT id FROM plate_layout_name WHERE name = ?;";
+      LOGGER.info("SQL : " + sqlstring);
+
+    try {
+      PreparedStatement preparedStatement =
+          conn.prepareStatement(sqlstring, Statement.RETURN_GENERATED_KEYS);
+      preparedStatement.setString(1, layout_name);
+
+      preparedStatement.execute(); // executeUpdate expects no returns!!!
+
+      ResultSet resultSet = preparedStatement.getResultSet();
+      resultSet.next();
+      id = resultSet.getInt("id");
+
+      // LOGGER.info("resultset: " + result);
+
+    } catch (SQLException sqle) {
+      LOGGER.warning("SQLE at getIDsForSysNames: " + sqle);
+    }
+
+    return id;
+  }
+
+    
   public String[] getAssayTypes() {
     String[] output = null;
     Array results = null;
@@ -485,17 +514,17 @@ public class DatabaseRetriever {
 
    
   public CustomTable getPlateLayout(int _plate_layout_name_id) {
-CustomTable table;
+      CustomTable table = null;;
 int plate_layout_name_id = _plate_layout_name_id;
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
               "SELECT *  FROM plate_layout WHERE plate_layout_name_id = ? ORDER BY well_by_col;");
 
-      pstmt.setString(1, plate_layout_name_id);
+      pstmt.setInt(1, plate_layout_name_id);
       ResultSet rs = pstmt.executeQuery();
 
-      CustomTable table = new CustomTable(dmf, buildTableModel(rs));
+      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
       // LOGGER.info("Got plate table ");
       rs.close();
       pstmt.close();
