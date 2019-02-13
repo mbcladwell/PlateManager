@@ -1,10 +1,20 @@
 package pm;
 
-import java.sql.*;
-import java.util.*;
-import java.util.logging.*;
+import java.sql.Array;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.Logger;
 
-import javax.swing.*;
+import javax.swing.JTable;
 
 /** */
 public class DatabaseRetriever {
@@ -473,31 +483,33 @@ public class DatabaseRetriever {
     return output;
   }
 
-
-      public String[] getPlateLayout(int _plate_layout_name_id) {
-    String[] output = null;
-    int plate_layout_name_id = _plate_layout_name_id;
+   
+  public CustomTable getPlateLayout(int _plate_layout_name_id) {
+CustomTable table;
+int plate_layout_name_id = _plate_layout_name_id;
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT ARRAY (select name from plate_layout_name WHERE plate_layout_name_id = ?);");
-      pstmt.setInt(1, plate_layout_name_id);
+              "SELECT *  FROM plate_layout WHERE plate_layout_name_id = ? ORDER BY well_by_col;");
 
+      pstmt.setString(1, plate_layout_name_id);
       ResultSet rs = pstmt.executeQuery();
-      rs.next();
-      results = rs.getInt("plate_layout_name_id");
-      // LOGGER.info("Description: " + results);
+
+      CustomTable table = new CustomTable(dmf, buildTableModel(rs));
+      // LOGGER.info("Got plate table ");
       rs.close();
       pstmt.close();
-      output =  results.getInt();
+    
 
     } catch (SQLException sqle) {
-      LOGGER.severe("SQL exception getting plate types: " + sqle);
+
     }
-    return output;
+    return table;
   }
 
 
+
+    
     
   public int getAssayIDForAssayType(String _assay_name) {
     int result = 0;

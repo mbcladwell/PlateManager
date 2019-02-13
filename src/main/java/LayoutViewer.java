@@ -1,14 +1,21 @@
 package pm;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.Date;
-import java.util.logging.*;
-import javax.swing.*;
-import javax.swing.JComponent.*;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.util.logging.Logger;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
 
 public class LayoutViewer extends JDialog {
   static JButton button;
@@ -17,22 +24,26 @@ public class LayoutViewer extends JDialog {
   static JComboBox<String> typeList;
   static JButton okButton;
   static JButton cancelButton;
-  final DialogMainFrame parent;
+  final DialogMainFrame dmf;
   final Session session;
+    private String owner;
   private CustomTable table;
   private JScrollPane scrollPane;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
+  private static final long serialVersionUID = 1L;
+  private DefaultTableModel tableModel;
 
-  public LayoutViewer(DialogMainFrame _parent) {
-    this.parent = _parent;
-    this.session = parent.getSession();
+    
+  public LayoutViewer(DialogMainFrame _dmf) {
+    this.dmf = _dmf;
+    this.session = dmf.getSession();
     owner = session.getUserName();
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
     // this.em = em;
     JPanel parentPane = new JPanel(new BorderLayout());
-    pane.setBorder(BorderFactory.createRaisedBevelBorder());
+    parentPane.setBorder(BorderFactory.createRaisedBevelBorder());
 
         JPanel pane1 = new JPanel(new GridBagLayout());
     pane1.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -71,58 +82,15 @@ public class LayoutViewer extends JDialog {
         JPanel pane2 = new JPanel(new GridBagLayout());
     pane2.setBorder(BorderFactory.createRaisedBevelBorder());
 
-    table = new CustomTable();
+    table = new CustomTable(dmf, tableModel);
         scrollPane = new JScrollPane(table);
     pane2.add(scrollPane, BorderLayout.CENTER);
     table.setFillsViewportHeight(true);
 
 
-    okButton = new JButton("OK");
-    okButton.setMnemonic(KeyEvent.VK_O);
-    okButton.setActionCommand("ok");
-    okButton.setEnabled(true);
-    okButton.setForeground(Color.GREEN);
-    c.fill = GridBagConstraints.HORIZONTAL;
-    c.gridx = 2;
-    c.gridy = 5;
-    c.gridwidth = 2;
-    c.gridheight = 1;
-    okButton.addActionListener(
-        (new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-
-            parent
-                .getDatabaseManager()
-                .insertPlateSet(
-                    nameField.getText(),
-                    descriptionField.getText(),
-                    numberField.getText(),
-                    formatList.getSelectedItem().toString(),
-                    typeList.getSelectedItem().toString());
-            dispose();
-          }
-        }));
-
-    pane.add(okButton, c);
-
-    cancelButton = new JButton("Cancel");
-    cancelButton.setMnemonic(KeyEvent.VK_C);
-    cancelButton.setActionCommand("cancel");
-    cancelButton.setEnabled(true);
-    cancelButton.setForeground(Color.RED);
-    c.gridx = 1;
-    c.gridy = 5;
-    c.gridwidth = 1;
-    pane.add(cancelButton, c);
-    cancelButton.addActionListener(
-        (new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            dispose();
-          }
-        }));
 
     this.getContentPane().add(parentPane, BorderLayout.CENTER);
-    parentPane.add(pane1, Borderlayout.NORTH);
+    parentPane.add(pane1, BorderLayout.NORTH);
     this.pack();
     this.setLocation(
         (Toolkit.getDefaultToolkit().getScreenSize().width) / 2 - getWidth() / 2,

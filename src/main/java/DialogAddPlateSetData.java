@@ -1,12 +1,27 @@
 package pm;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.logging.*;
-import javax.swing.*;
-import javax.swing.JComponent.*;
-import javax.swing.event.*;
-import javax.swing.filechooser.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.logging.Logger;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
 
 public class DialogAddPlateSetData extends JDialog
     implements java.awt.event.ActionListener, javax.swing.event.DocumentListener {
@@ -184,7 +199,7 @@ public class DialogAddPlateSetData extends JDialog
     pane.add(label, c);
 
     // LOGGER.info("format: " + );
-    plateLayouts = new JComboBox<String>(dbr.getPlateLayouts(dbr.getPlateFormatID(format)));
+    plateLayouts = new JComboBox<String>(dbr.getPlateLayoutNames(dbr.getPlateFormatID(format)));
     c.gridx = 3;
     c.gridy = 5;
     c.gridwidth = 3;
