@@ -1,20 +1,17 @@
 package pm;
 
-import java.awt.*;
-import java.awt.Dialog.*;
-import java.awt.event.*;
-import java.io.*;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
-import java.util.logging.*;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
-import javax.swing.*;
-import javax.swing.JComponent.*;
-import javax.swing.JFileChooser.*;
-import javax.swing.table.*;
+
+import javax.swing.JFileChooser;
+import javax.swing.table.DefaultTableModel;
 
 public class Utilities {
 
@@ -97,6 +94,25 @@ public class Utilities {
     }
     return result;
   }
+
+    public Object[][] getPlateLayoutGrid(CustomTable _custom_table){
+	CustomTable custom_table = _custom_table;
+    DefaultTableModel tm = custom_table.getTableModel();
+
+    int nRow = tm.getRowCount();
+    LOGGER.info("nRow: " + nRow);
+    //96 well plate  tableData[row][col]
+    Object[][] tableData = new Object[8][12];
+
+    for (int i = 0; i < nRow; i++) {
+	//LOGGER.info("tdata i: " + i + " " + tm.getValueAt(i,1) );
+	//System.out.println("i: " + i + " array[" + ((i)%8) +"][" + (int)Math.floor((i)/8)+ "] = " + tm.getValueAt(i,1) );
+       
+       	tableData[((i)%8)][(int)Math.floor((i)/8)] = tm.getValueAt(i,1);
+    }
+
+    return tableData;	
+    }
 }
     /*
     try {

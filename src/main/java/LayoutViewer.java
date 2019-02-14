@@ -5,23 +5,20 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
-import java.awt.event.*;
-
+import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-
-
-import pm.DatabaseRetriever;
 
 public class LayoutViewer extends JDialog implements java.awt.event.ActionListener {
   static JButton button;
@@ -33,7 +30,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
   final DialogMainFrame dmf;
   final Session session;
     private String owner;
-  private CustomTable table;
+  private JTable table;
   private JScrollPane scrollPane;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
@@ -41,7 +38,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
   private DefaultTableModel tableModel;
     private String [] layoutNames;
     
-    private DefaultComboBoxModel layout_names_list_model;
+    private DefaultComboBoxModel<String> layout_names_list_model;
 
 
     
@@ -53,7 +50,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     // JFrame frame = new JFrame("Add Project");
     // this.em = em;
     layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);
-    layout_names_list_model = new DefaultComboBoxModel( layoutNames );
+    layout_names_list_model = new DefaultComboBoxModel<String>( layoutNames );
     
     JPanel parentPane = new JPanel(new BorderLayout());
     parentPane.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -104,18 +101,25 @@ layoutList = new JComboBox<String>();
     pane1.add(layoutList, c);
 
     
-        JPanel pane2 = new JPanel(new GridBagLayout());
+        JPanel pane2 = new JPanel(new BorderLayout());
     pane2.setBorder(BorderFactory.createRaisedBevelBorder());
 
-    table = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayout(96);
+    this.refreshTable(1);    	
+
     scrollPane = new JScrollPane(table);
-    pane2.add(scrollPane);
+    JTable rowTable = new RowNumberTable(table);
+scrollPane.setRowHeaderView(rowTable);
+scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
+    rowTable.getTableHeader());
+    pane2.add(scrollPane, BorderLayout.CENTER);
     table.setFillsViewportHeight(true);
 
 
 
     this.getContentPane().add(parentPane, BorderLayout.CENTER);
     parentPane.add(pane1, BorderLayout.NORTH);
+    parentPane.add(pane2, BorderLayout.CENTER);
+    
     this.pack();
     this.setLocation(
         (Toolkit.getDefaultToolkit().getScreenSize().width) / 2 - getWidth() / 2,
@@ -129,23 +133,39 @@ layoutList = new JComboBox<String>();
 
     if (e.getSource() == formatList) {
        layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames((int)formatList.getSelectedItem());
-       layout_names_list_model = new DefaultComboBoxModel( layoutNames );
+       layout_names_list_model = new DefaultComboBoxModel<String>( layoutNames );
        layoutList.setModel(layout_names_list_model );
+       layoutList.setSelectedIndex(-1);
  
 	
     }
 
     if (e.getSource() == layoutList) {
 	String selected = (String)layoutList.getSelectedItem();
+	
 		int plate_layout_id  = dmf.getDatabaseManager().getDatabaseRetriever().getIDforLayoutName(selected);
-
-
-    table = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayout(plate_layout_id);
-        TableModel model = table.getModel();
-    table.setModel(model);
- 
-    LOGGER.info("table " + table);
+		this.refreshTable(plate_layout_id); 
+   
     }
   }
+    public void refreshTable(int _plate_layout_id){
+		CustomTable  table2 = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayout(_plate_layout_id);
+		Object[][] gridData =  dmf.getUtilities().getPlateLayoutGrid(table2);
+		LOGGER.info("griddata: " + gridData);
+		Object[] columnNames = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
+		LOGGER.info("columnnames: " + columnNames);
+		DefaultTableModel tableModel = new DefaultTableModel(gridData, columnNames);
+		
+		LOGGER.info("tableModel: " + tableModel.getValueAt(6,11));
+	table = new JTable(tableModel);
+	javax.swing.table.JTableHeader header = table.getTableHeader();
+      header.setBackground(java.awt.Color.DARK_GRAY);
+      header.setForeground(java.awt.Color.WHITE);
+
+		
+	
+		//table = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayout(1);
+
+    }
 
 }

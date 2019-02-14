@@ -519,19 +519,19 @@ int plate_layout_name_id = _plate_layout_name_id;
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT *  FROM plate_layout WHERE plate_layout_name_id = ? ORDER BY well_by_col;");
+              "SELECT well_by_col, well_type.name  FROM plate_layout, well_type WHERE plate_layout_name_id = ? AND plate_layout.well_type_id=well_type.id ORDER BY well_by_col;");
 
       pstmt.setInt(1, plate_layout_name_id);
       ResultSet rs = pstmt.executeQuery();
 
       table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
-      // LOGGER.info("Got plate table ");
+       LOGGER.info("Got plate table " + table);
       rs.close();
       pstmt.close();
     
 
     } catch (SQLException sqle) {
-
+ LOGGER.severe("Failed to retrieve plate_layout table: " + sqle);
     }
     return table;
   }

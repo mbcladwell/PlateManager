@@ -211,7 +211,7 @@ public class DatabaseManager {
     return null;
   }
 
-  public static DefaultTableModel buildTableModel(ResultSet _rs) {
+  public DefaultTableModel buildTableModel(ResultSet _rs) {
 
     try {
       ResultSet rs = _rs;

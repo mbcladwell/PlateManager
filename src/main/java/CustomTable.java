@@ -1,13 +1,14 @@
 package pm;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import java.util.logging.*;
-import javax.swing.*;
-import javax.swing.JComponent.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 
 public class CustomTable extends JTable {
 
@@ -35,7 +36,7 @@ public class CustomTable extends JTable {
 
     this.getColumnModel().getColumn(0).setMaxWidth(75);
     this.getColumnModel().getColumn(1).setMaxWidth(150);
-    this.getColumnModel().getColumn(2).setMaxWidth(100);
+    //    this.getColumnModel().getColumn(2).setMaxWidth(100);
 
     this.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
   }
