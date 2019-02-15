@@ -28,6 +28,7 @@ public class RowNumberTable extends JTable
 	implements ChangeListener, PropertyChangeListener, TableModelListener
 {
 	private JTable main;
+    private  String[] ROW_NAME = {"A", "B", "C", "D", "E", "F", "G", "H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","AA","AB","AC","AD","AE","AF"};
 
 	public RowNumberTable(JTable table)
 	{
@@ -94,7 +95,8 @@ public class RowNumberTable extends JTable
 	@Override
 	public Object getValueAt(int row, int column)
 	{
-		return Integer.toString(row + 1);
+	    //return Integer.toString(row + 1);
+		return ROW_NAME[row];
 	}
 
 	/*
