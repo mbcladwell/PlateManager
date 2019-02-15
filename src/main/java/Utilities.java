@@ -98,17 +98,30 @@ public class Utilities {
     public Object[][] getPlateLayoutGrid(CustomTable _custom_table){
 	CustomTable custom_table = _custom_table;
     DefaultTableModel tm = custom_table.getTableModel();
-
+    int row = 0;
+    int col = 0;
     int nRow = tm.getRowCount();
     LOGGER.info("nRow: " + nRow);
     //96 well plate  tableData[row][col]
-    Object[][] tableData = new Object[8][12];
+    switch(nRow){
+    case 96:
+    row = 8; col=12;
+    break;
+case 384:
+    row = 16; col=24;
+    break;
+case 1536:
+    row = 32; col=48;
+    break;    
+    }
+        Object[][] tableData = new Object[row][col];
+
 
     for (int i = 0; i < nRow; i++) {
 	//LOGGER.info("tdata i: " + i + " " + tm.getValueAt(i,1) );
 	//System.out.println("i: " + i + " array[" + ((i)%8) +"][" + (int)Math.floor((i)/8)+ "] = " + tm.getValueAt(i,1) );
        
-       	tableData[((i)%8)][(int)Math.floor((i)/8)] = tm.getValueAt(i,1);
+       	tableData[((i)%row)][(int)Math.floor((i)/row)] = tm.getValueAt(i,1);
     }
 
     return tableData;	

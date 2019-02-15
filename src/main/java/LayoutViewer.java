@@ -34,6 +34,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     private String owner;
   private JTable table;
   private JScrollPane scrollPane;
+    private  JPanel pane2;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
   private static final long serialVersionUID = 1L;
@@ -103,19 +104,19 @@ layoutList = new JComboBox<String>();
     pane1.add(layoutList, c);
 
     
-        JPanel pane2 = new JPanel(new BorderLayout());
+    pane2 = new JPanel(new BorderLayout());
     pane2.setBorder(BorderFactory.createRaisedBevelBorder());
 
     this.refreshTable(1);    	
 
-    scrollPane = new JScrollPane(table);
+    /*    scrollPane = new JScrollPane(table);
     JTable rowTable = new RowNumberTable(table);
     scrollPane.setRowHeaderView(rowTable);
     scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
     rowTable.getTableHeader());
     pane2.add(scrollPane, BorderLayout.CENTER);
     table.setFillsViewportHeight(true);
-
+    */
 
 
     this.getContentPane().add(parentPane, BorderLayout.CENTER);
@@ -138,16 +139,15 @@ layoutList = new JComboBox<String>();
        layout_names_list_model = new DefaultComboBoxModel<String>( layoutNames );
        layoutList.setModel(layout_names_list_model );
        layoutList.setSelectedIndex(-1);
- 
 	
     }
 
     if (e.getSource() == layoutList) {
-	String selected = (String)layoutList.getSelectedItem();
-	
-		int plate_layout_id  = dmf.getDatabaseManager().getDatabaseRetriever().getIDforLayoutName(selected);
-		this.refreshTable(plate_layout_id); 
-   
+	if(layoutList.getSelectedIndex() > -1){
+	    String selected = (String)layoutList.getSelectedItem();
+	    int plate_layout_id  = dmf.getDatabaseManager().getDatabaseRetriever().getIDforLayoutName(selected);
+	    this.refreshTable(plate_layout_id); 
+	}
     }
   }
     public void refreshTable(int _plate_layout_id){
@@ -155,12 +155,21 @@ layoutList = new JComboBox<String>();
 		Object[][] gridData =  dmf.getUtilities().getPlateLayoutGrid(table2);
 		MyModel tableModel = new MyModel(gridData);
 		
-		//LOGGER.info("tableModel: " + tableModel.getValueAt(6,11));
+		LOGGER.info("griddata length: " + gridData.length + "  " + gridData[0].length  );
 		table = new JTable(tableModel);
+		LOGGER.info("value at 7,11: " + table.getValueAt(6,11));
 		javax.swing.table.JTableHeader header = table.getTableHeader();
 		header.setBackground(java.awt.Color.DARK_GRAY);
 		header.setForeground(java.awt.Color.WHITE);
-		table.setDefaultRenderer(String.class, new MyRenderer());		
+		table.setDefaultRenderer(String.class, new MyRenderer());
+
+		scrollPane = new JScrollPane(table);
+    JTable rowTable = new RowNumberTable(table);
+    scrollPane.setRowHeaderView(rowTable);
+    scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
+    rowTable.getTableHeader());
+    pane2.add(scrollPane, BorderLayout.CENTER);
+    table.setFillsViewportHeight(true);
 	
     }
 
@@ -176,7 +185,7 @@ layoutList = new JComboBox<String>();
             Component c = super.getTableCellRendererComponent(
                 table, value, isSelected, hasFocus, row, column);
             MyModel model = (MyModel) table.getModel();
-	    LOGGER.info("6,11: " + (String)model.getValueAt(row,column));
+	    //LOGGER.info("6,11: " + (String)model.getValueAt(row,column));
 	    switch((String)model.getValueAt(row,column)){
 	    case "unknown":
 		c.setBackground(java.awt.Color.WHITE);
@@ -206,6 +215,7 @@ layoutList = new JComboBox<String>();
 	  
         public MyModel(Object[][] _data) {
 	    this.data = _data;
+	     fireTableDataChanged();
             //list.add(new Row("One", true));
             //list.add(new Row("Two", false));
             //list.add(new Row("Three", false));

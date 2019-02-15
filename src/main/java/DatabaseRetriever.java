@@ -452,7 +452,7 @@ public class DatabaseRetriever {
           conn.prepareStatement(sqlstring, Statement.RETURN_GENERATED_KEYS);
       preparedStatement.setString(1, layout_name);
 
-      preparedStatement.execute(); // executeUpdate expects no returns!!!
+      preparedStatement.executeQuery(); // executeUpdate expects no returns!!!
 
       ResultSet resultSet = preparedStatement.getResultSet();
       resultSet.next();
@@ -461,7 +461,7 @@ public class DatabaseRetriever {
       // LOGGER.info("resultset: " + result);
 
     } catch (SQLException sqle) {
-      LOGGER.warning("SQLE at getIDsForSysNames: " + sqle);
+      LOGGER.warning("SQLE at getIDforLayoutName: " + sqle);
     }
 
     return id;
