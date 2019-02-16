@@ -40,6 +40,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
   private static final long serialVersionUID = 1L;
   private MyModel tableModel;
     private String [] layoutNames;
+    private Object[][] gridData;
     
     private DefaultComboBoxModel<String> layout_names_list_model;
 
@@ -73,7 +74,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     c.insets = new Insets(5, 5, 2, 2);
     pane1.add(label, c);
  
-        Integer[] formats = {96, 384, 1536};
+    Integer[] formats = {96, 384, 1536};
 
     formatList = new JComboBox<Integer>(formats);
     formatList.setSelectedIndex(0);
@@ -92,33 +93,22 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     c.anchor = GridBagConstraints.LINE_START;
     pane1.add(label, c);
 
-layoutList = new JComboBox<String>();
+    layoutList = new JComboBox<String>();
 //formatList.setSelectedIndex(0);
     c.gridx = 3;
     c.gridy = 0;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_START;
     layoutList.setModel(layout_names_list_model );
- layoutList.addActionListener(this);
+    layoutList.addActionListener(this);
    
     pane1.add(layoutList, c);
 
     
     pane2 = new JPanel(new BorderLayout());
     pane2.setBorder(BorderFactory.createRaisedBevelBorder());
-
-    this.refreshTable(1);    	
-
-    /*    scrollPane = new JScrollPane(table);
-    JTable rowTable = new RowNumberTable(table);
-    scrollPane.setRowHeaderView(rowTable);
-    scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
-    rowTable.getTableHeader());
-    pane2.add(scrollPane, BorderLayout.CENTER);
-    table.setFillsViewportHeight(true);
-    */
-
-
+    this.refreshTable(3);
+   
     this.getContentPane().add(parentPane, BorderLayout.CENTER);
     parentPane.add(pane1, BorderLayout.NORTH);
     parentPane.add(pane2, BorderLayout.CENTER);
@@ -151,26 +141,28 @@ layoutList = new JComboBox<String>();
     }
   }
     public void refreshTable(int _plate_layout_id){
-		CustomTable  table2 = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayout(_plate_layout_id);
-		Object[][] gridData =  dmf.getUtilities().getPlateLayoutGrid(table2);
-		MyModel tableModel = new MyModel(gridData);
-		
-		LOGGER.info("griddata length: " + gridData.length + "  " + gridData[0].length  );
-		table = new JTable(tableModel);
-		LOGGER.info("value at 7,11: " + table.getValueAt(6,11));
-		javax.swing.table.JTableHeader header = table.getTableHeader();
-		header.setBackground(java.awt.Color.DARK_GRAY);
-		header.setForeground(java.awt.Color.WHITE);
-		table.setDefaultRenderer(String.class, new MyRenderer());
-
-		scrollPane = new JScrollPane(table);
-    JTable rowTable = new RowNumberTable(table);
-    scrollPane.setRowHeaderView(rowTable);
-    scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
-    rowTable.getTableHeader());
-    pane2.add(scrollPane, BorderLayout.CENTER);
-    table.setFillsViewportHeight(true);
+	pane2.removeAll();
+	CustomTable  table2 = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayout(_plate_layout_id);
+	gridData =  dmf.getUtilities().getPlateLayoutGrid(table2);
+	tableModel = new MyModel(gridData);
 	
+	LOGGER.info("griddata length: " + gridData.length + "  " + gridData[0].length  );
+	table = new JTable( tableModel);
+	javax.swing.table.JTableHeader header = table.getTableHeader();
+	header.setBackground(java.awt.Color.DARK_GRAY);
+	header.setForeground(java.awt.Color.WHITE);
+	table.setDefaultRenderer(String.class, new MyRenderer());
+	scrollPane = new JScrollPane(table);
+	JTable rowTable = new RowNumberTable(table);
+	scrollPane.setRowHeaderView(rowTable);
+	scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
+			     rowTable.getTableHeader());
+	pane2.add(scrollPane, BorderLayout.CENTER);
+	table.setFillsViewportHeight(true);
+	pane2.revalidate();
+	pane2.repaint();
+	
+    
     }
 
     private static class MyRenderer extends DefaultTableCellRenderer {
