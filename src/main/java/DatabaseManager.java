@@ -411,7 +411,6 @@ public class DatabaseManager {
 	    String plate_type = (String)tableModel.getValueAt(selection[0], 4);
 	    int num_samples = 2000;
 	    
-	     
 	    switch(format){
 	    case "96": this.getDatabaseInserter().reformatPlateSet(dmf, (int)plate_set_id[0], plate_set_sys_name[0], descr, num_plates, num_samples, plate_type, format);
 		    break;

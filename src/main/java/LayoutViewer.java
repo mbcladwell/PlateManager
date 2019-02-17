@@ -107,7 +107,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     
     pane2 = new JPanel(new BorderLayout());
     pane2.setBorder(BorderFactory.createRaisedBevelBorder());
-    this.refreshTable(3);
+    this.refreshTable(1);
    
     this.getContentPane().add(parentPane, BorderLayout.CENTER);
     parentPane.add(pane1, BorderLayout.NORTH);

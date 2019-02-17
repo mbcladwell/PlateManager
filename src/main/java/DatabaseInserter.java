@@ -501,7 +501,12 @@ public class DatabaseInserter {
 	DialogMainFrame dmf = _dmf;
 	int plate_set_id = _plate_set_id;
 	String format = _format;
+	String plate_set_sys_name = _plate_set_sys_name;
+	String descr = _descr;
+	int num_plates = _num_plates;
+	int num_samples = _num_samples;
+	String plate_type= _plate_type;
 	
-	
-    }
+	DialogReformatPlateSet drps = new DialogReformatPlateSet( dmf, plate_set_id, plate_set_sys_name, descr, num_plates, num_samples, plate_type, format);
+}
 }
