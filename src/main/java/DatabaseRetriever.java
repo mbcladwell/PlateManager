@@ -583,4 +583,10 @@ int plate_layout_name_id = _plate_layout_name_id;
     }
     return result;
   }
+    /*
+    public int getNumberOfSamplesInPlateSet(int _plate_set_id){
+
+	
+    }
+    */
 }

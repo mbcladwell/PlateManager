@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
 import java.util.logging.*;
+
 import javax.swing.*;
 import javax.swing.JComponent.*;
 
@@ -21,18 +22,22 @@ public class DialogAddPlateSet extends JDialog {
   static JTextField numberField;
   static JComboBox<Integer> formatList;
   static JComboBox<String> typeList;
+    private String [] layoutNames;
+    private JComboBox<String> layoutList;
+    private DefaultComboBoxModel<String> layout_names_list_model;
+
   static JButton okButton;
   static JButton cancelButton;
   final Instant instant = Instant.now();
-  final DialogMainFrame parent;
+    final DialogMainFrame dmf;
   final Session session;
   final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
 
-  public DialogAddPlateSet(DialogMainFrame _parent) {
-    this.parent = _parent;
-    this.session = parent.getSession();
+  public DialogAddPlateSet(DialogMainFrame _dmf) {
+    this.dmf = _dmf;
+    this.session = dmf.getSession();
     owner = session.getUserName();
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
@@ -128,6 +133,15 @@ public class DialogAddPlateSet extends JDialog {
     c.gridy = 4;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_START;
+ formatList.addActionListener(
+        (new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+	      layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames((int)formatList.getSelectedItem());
+	      layout_names_list_model = new DefaultComboBoxModel<String>( layoutNames );
+	      layoutList.setModel(layout_names_list_model );
+	      layoutList.setSelectedIndex(-1);
+          }
+        }));
     pane.add(formatList, c);
     // formatList.addActionListener(this);
 
@@ -138,16 +152,38 @@ public class DialogAddPlateSet extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    String[] plateTypes = parent.getDatabaseManager().getDatabaseRetriever().getPlateTypes();
+    String[] plateTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateTypes();
 
     typeList = new JComboBox<String>(plateTypes);
-    formatList.setSelectedIndex(0);
+    typeList.setSelectedIndex(0);
     c.gridx = 5;
     c.gridy = 4;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(typeList, c);
 
+    label = new JLabel("Layout:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 5;
+    c.gridheight = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane.add(label, c);
+
+    String[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);
+    LOGGER.info("layoutTypes: " + layoutTypes[0]);
+    layoutList = new JComboBox<String>(layoutTypes);
+    layoutList.setSelectedIndex(0);
+    c.gridx = 1;
+    c.gridy = 5;
+    c.gridheight = 1;
+    c.gridwidth = 3;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane.add(layoutList, c);
+
+
+
+
+    
     okButton = new JButton("OK");
     okButton.setMnemonic(KeyEvent.VK_O);
     okButton.setActionCommand("ok");
@@ -155,14 +191,14 @@ public class DialogAddPlateSet extends JDialog {
     okButton.setForeground(Color.GREEN);
     c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 2;
-    c.gridy = 5;
+    c.gridy = 6;
     c.gridwidth = 2;
     c.gridheight = 1;
     okButton.addActionListener(
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 
-            parent
+            dmf
                 .getDatabaseManager()
                 .insertPlateSet(
                     nameField.getText(),
@@ -182,7 +218,7 @@ public class DialogAddPlateSet extends JDialog {
     cancelButton.setEnabled(true);
     cancelButton.setForeground(Color.RED);
     c.gridx = 1;
-    c.gridy = 5;
+    c.gridy = 6;
     c.gridwidth = 1;
     pane.add(cancelButton, c);
     cancelButton.addActionListener(
