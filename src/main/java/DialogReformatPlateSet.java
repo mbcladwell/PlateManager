@@ -21,6 +21,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -36,6 +37,7 @@ public class DialogReformatPlateSet extends JDialog {
   static JTextField numberField;
   static JComboBox<Integer> formatList;
   static JComboBox<String> typeList;
+  static JComboBox<String> layoutList;
   static JButton okButton;
   static JButton cancelButton;
   final Instant instant = Instant.now();
@@ -72,17 +74,27 @@ public class DialogReformatPlateSet extends JDialog {
     int old_num_samples = _num_samples;
     String old_plate_type =  _plate_type;
     String new_plate_format = _plate_format;
-   
-     
-    //ArrayList<String> plate_sys_names = _plate_sys_names;
+    int new_plate_format_id = 0;
+    
 
-    // for (HashMap.Entry<String, String> entry : plate_set_num_plates.entrySet()) {
-    //  plateSetsAndNumbers = plateSetsAndNumbers + entry.getKey() + " (" + entry.getValue() + "); ";
-    // }
+    switch(old_plate_format){
+    case "96":
+	new_plate_format = "384";
+	new_plate_format_id = 384;
+	break;
+  case "384":
+	new_plate_format = "1536";
+	new_plate_format_id = 1536;
+	break;
+  case "1536":
+      JOptionPane.showMessageDialog(dmf, "1536 well plates cannot be reformated", "Error", JOptionPane.ERROR_MESSAGE);
+	break;
+    }
 
-    // Create and set up the window.
-    // JFrame frame = new JFrame("Add Project");
-    // this.em = em;
+    int predicted_number_of_plates_int = (int)Math.ceil(old_num_samples/new_plate_format_id);
+    String predicted_number_of_plates = String.valueOf(predicted_number_of_plates_int);
+	
+
     JPanel pane = new JPanel();
     pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
     
@@ -128,7 +140,7 @@ public class DialogReformatPlateSet extends JDialog {
 
 
     
-javax.swing.border.TitledBorder source = BorderFactory.createTitledBorder("Source Plate Set");
+javax.swing.border.TitledBorder source = BorderFactory.createTitledBorder("Source Plate Set:");
     source.setTitlePosition(javax.swing.border.TitledBorder.TOP);
 
     JPanel pane2 = new JPanel(new GridBagLayout());
@@ -147,7 +159,7 @@ javax.swing.border.TitledBorder source = BorderFactory.createTitledBorder("Sourc
     c.gridx = 1;
     c.gridy = 2;
     c.gridwidth = 1;
-    c.anchor = GridBagConstraints.LINE_END;
+    c.anchor = GridBagConstraints.LINE_START;
     pane2.add(oldNameLabel, c);
 
     
@@ -234,7 +246,7 @@ JLabel oldDescrLabel = new JLabel(old_descr, SwingConstants.RIGHT);
     pane2.add(label, c);
   
  
-javax.swing.border.TitledBorder dest = BorderFactory.createTitledBorder("Destination Plate Set");
+javax.swing.border.TitledBorder dest = BorderFactory.createTitledBorder("Destination Plate Set:");
     dest.setTitlePosition(javax.swing.border.TitledBorder.TOP);
 
     JPanel pane3 = new JPanel(new GridBagLayout());
@@ -279,7 +291,7 @@ javax.swing.border.TitledBorder dest = BorderFactory.createTitledBorder("Destina
     c.anchor = GridBagConstraints.LINE_END;
     pane3.add(label, c);
  
-    label = new JLabel("");
+    label = new JLabel(predicted_number_of_plates);
     c.gridx = 1;
     c.gridy = 4;
     c.gridheight = 1;
@@ -287,23 +299,6 @@ javax.swing.border.TitledBorder dest = BorderFactory.createTitledBorder("Destina
     c.anchor = GridBagConstraints.LINE_START;
     pane3.add(label, c);
  
-    label = new JLabel("Format:", SwingConstants.RIGHT);
-    c.gridx = 4;
-    c.gridy = 6;
-    c.gridheight = 1;
-    c.gridwidth = 1;
-    c.anchor = GridBagConstraints.LINE_END;
-    pane3.add(label, c);
-  
-    label = new JLabel(new_plate_format + " well");
-
-    c.gridx = 5;
-    c.gridy = 6;
-    c.gridheight = 1;
-    c.gridwidth = 5;
-    c.anchor = GridBagConstraints.LINE_START;
-    pane3.add(label, c);
-  
     label = new JLabel("New Plate Set Type:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 6;
@@ -322,6 +317,43 @@ javax.swing.border.TitledBorder dest = BorderFactory.createTitledBorder("Destina
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_START;
     pane3.add(typeList, c);
+
+    
+    label = new JLabel("Format:", SwingConstants.RIGHT);
+    c.gridx = 3;
+    c.gridy = 6;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane3.add(label, c);
+  
+    label = new JLabel(new_plate_format + " well");
+
+    c.gridx = 4;
+    c.gridy = 6;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane3.add(label, c);
+  
+        label = new JLabel("New Plate Set Layout:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 7;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane3.add(label, c);
+ 
+    String[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(new_plate_format_id);
+
+    layoutList = new JComboBox<String>(layoutTypes);
+    typeList.setSelectedIndex(0);
+    c.gridx = 1;
+    c.gridy = 7;
+    c.gridheight = 1;
+    c.gridwidth = 3;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane3.add(layoutList, c);
 
     JPanel pane4 = new JPanel(new GridBagLayout());
 

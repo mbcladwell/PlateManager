@@ -1,14 +1,20 @@
 package pm;
 
-import bllm.*;
-import java.awt.*;
-import java.awt.Dialog.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.logging.*;
-import javax.help.*;
-import javax.swing.*;
-import javax.swing.JComponent.*;
+import java.awt.Desktop;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Logger;
+
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 public class MenuBarForProject extends JMenuBar {
 
@@ -128,6 +134,8 @@ public class MenuBarForProject extends JMenuBar {
         });
     this.add(downbutton);
 
+    menu = new AdminMenu(dmf, project_table);
+     this.add(menu);
     this.add(Box.createHorizontalGlue());
 
     menu = new HelpMenu();
