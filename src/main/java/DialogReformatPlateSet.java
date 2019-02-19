@@ -36,8 +36,8 @@ public class DialogReformatPlateSet extends JDialog {
   static JTextField descriptionField;
   static JTextField numberField;
   static JComboBox<Integer> formatList;
-  static JComboBox<String> typeList;
-  static JComboBox<String> layoutList;
+  static JComboBox<ComboItem> typeList;
+  static JComboBox<ComboItem> layoutList;
   static JButton okButton;
   static JButton cancelButton;
   final Instant instant = Instant.now();
@@ -307,9 +307,9 @@ javax.swing.border.TitledBorder dest = BorderFactory.createTitledBorder("Destina
     c.anchor = GridBagConstraints.LINE_END;
     pane3.add(label, c);
  
-    String[] plateTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateTypes();
+    ComboItem[] plateTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateTypes();
 
-    typeList = new JComboBox<String>(plateTypes);
+    typeList = new JComboBox<ComboItem>(plateTypes);
     typeList.setSelectedIndex(0);
     c.gridx = 1;
     c.gridy = 6;
@@ -344,9 +344,9 @@ javax.swing.border.TitledBorder dest = BorderFactory.createTitledBorder("Destina
     c.anchor = GridBagConstraints.LINE_END;
     pane3.add(label, c);
  
-    String[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(new_plate_format_id);
+    ComboItem[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(new_plate_format_id);
 
-    layoutList = new JComboBox<String>(layoutTypes);
+    layoutList = new JComboBox<ComboItem>(layoutTypes);
     typeList.setSelectedIndex(0);
     c.gridx = 1;
     c.gridy = 7;

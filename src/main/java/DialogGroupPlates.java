@@ -1,14 +1,29 @@
 package pm;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.*;
-import java.util.logging.*;
-import javax.swing.*;
-import javax.swing.JComponent.*;
+import java.util.Date;
+import java.util.Set;
+import java.util.logging.Logger;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 public class DialogGroupPlates extends JDialog {
   static JButton button;
@@ -20,7 +35,7 @@ public class DialogGroupPlates extends JDialog {
   static JTextField descriptionField;
   static JTextField numberField;
   static JComboBox<Integer> formatList;
-  static JComboBox<String> typeList;
+  static JComboBox<ComboItem> typeList;
   static JButton okButton;
   static JButton cancelButton;
   final Instant instant = Instant.now();
@@ -168,9 +183,9 @@ public class DialogGroupPlates extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    String[] plateTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateTypes();
+    ComboItem[] plateTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateTypes();
 
-    typeList = new JComboBox<String>(plateTypes);
+    typeList = new JComboBox<ComboItem>(plateTypes);
     typeList.setSelectedIndex(0);
     c.gridx = 1;
     c.gridy = 6;

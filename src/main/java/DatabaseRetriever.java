@@ -253,25 +253,30 @@ public class DatabaseRetriever {
    *
    * <p>****************************************************************
    */
-  public String[] getPlateTypes() {
-    String[] output = null;
-    Array results = null;
+  public ComboItem[] getPlateTypes() {
+    ComboItem[] results = null;
+    ArrayList<ComboItem> combo_items = new ArrayList<ComboItem>();
+ 
     try {
       PreparedStatement pstmt =
-          conn.prepareStatement("SELECT ARRAY (select plate_type_name from plate_type);");
+          conn.prepareStatement("SELECT id, plate_type_name from plate_type;");
 
       ResultSet rs = pstmt.executeQuery();
-      rs.next();
-      results = rs.getArray("array");
+      while (rs.next()) {
+     //all_plate_ids.add(rs.getInt(1));
+	combo_items.add(new ComboItem(rs.getInt(1), rs.getString(2)));
+        // LOGGER.info("A plate set ID: " + rs.getInt(1));
+      }
+
       // LOGGER.info("Description: " + results);
       rs.close();
       pstmt.close();
-      output = (String[]) results.getArray();
+      results = combo_items.toArray(new ComboItem[combo_items.size()]);
 
     } catch (SQLException sqle) {
       LOGGER.severe("SQL exception getting plate types: " + sqle);
     }
-    return output;
+    return results;
   }
 
   /** To reduce traffic, hardcode as the formats are unlikely to change */
@@ -468,48 +473,56 @@ public class DatabaseRetriever {
   }
 
     
-  public String[] getAssayTypes() {
-    String[] output = null;
-    Array results = null;
+  public ComboItem[] getAssayTypes() { 
+    ComboItem[] results = null;
+     ArrayList<ComboItem> combo_items = new ArrayList<ComboItem>();
+ 
     try {
       PreparedStatement pstmt =
-          conn.prepareStatement("SELECT ARRAY (select assay_type_name from assay_type);");
+          conn.prepareStatement("select id, assay_type_name from assay_type;");
 
       ResultSet rs = pstmt.executeQuery();
-      rs.next();
-      results = rs.getArray("array");
-      // LOGGER.info("Description: " + results);
+      while (rs.next()) {
+	  combo_items.add(new ComboItem(rs.getInt(1), rs.getString(2)));
+      }
+
       rs.close();
       pstmt.close();
-      output = (String[]) results.getArray();
+         results = combo_items.toArray(new ComboItem[combo_items.size()]);
 
     } catch (SQLException sqle) {
       LOGGER.severe("SQL exception getting plate types: " + sqle);
     }
-    return output;
+    return results;
   }
 
-  public String[] getPlateLayoutNames(int format_id) {
-    String[] output = null;
+  public ComboItem[] getPlateLayoutNames(int format_id) {
+    ComboItem[] output = null;
     Array results = null;
+    ArrayList<ComboItem> combo_items = new ArrayList<ComboItem>();
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT ARRAY (select name from plate_layout_name WHERE plate_format_id = ?);");
+              "select id, name from plate_layout_name WHERE plate_format_id = ?;");
       pstmt.setInt(1, format_id);
 
       ResultSet rs = pstmt.executeQuery();
-      rs.next();
-      results = rs.getArray("array");
-      // LOGGER.info("Description: " + results);
+      //rs.next();
+ while (rs.next()) {
+     //all_plate_ids.add(rs.getInt(1));
+	combo_items.add(new ComboItem(rs.getInt(1), rs.getString(2)));
+        // LOGGER.info("A plate set ID: " + rs.getInt(1));
+      }
+
+
       rs.close();
       pstmt.close();
-      output = (String[]) results.getArray();
+      output = combo_items.toArray(new ComboItem[combo_items.size()]);
 
     } catch (SQLException sqle) {
       LOGGER.severe("SQL exception getting plate types: " + sqle);
     }
-    return output;
+    return (ComboItem[])output;
   }
 
    

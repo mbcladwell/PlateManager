@@ -27,8 +27,8 @@ public class DialogAddPlateSetData extends JDialog
     implements java.awt.event.ActionListener, javax.swing.event.DocumentListener {
   static JButton button;
   static JLabel label;
-  static JComboBox<String> assayTypes;
-  static JComboBox<String> plateLayouts;
+  static JComboBox<ComboItem> assayTypes;
+  static JComboBox<ComboItem> plateLayouts;
   static JTextField fileField;
   static JTextField nameField;
   static JTextField descrField;
@@ -185,7 +185,7 @@ public class DialogAddPlateSetData extends JDialog
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    assayTypes = new JComboBox<String>(dbr.getAssayTypes());
+    assayTypes = new JComboBox<ComboItem>(dbr.getAssayTypes());
     c.gridx = 1;
     c.gridy = 5;
     c.anchor = GridBagConstraints.LINE_START;
@@ -199,7 +199,7 @@ public class DialogAddPlateSetData extends JDialog
     pane.add(label, c);
 
     // LOGGER.info("format: " + );
-    plateLayouts = new JComboBox<String>(dbr.getPlateLayoutNames(dbr.getPlateFormatID(format)));
+    plateLayouts = new JComboBox<ComboItem>(dbr.getPlateLayoutNames(dbr.getPlateFormatID(format)));
     c.gridx = 3;
     c.gridy = 5;
     c.gridwidth = 3;

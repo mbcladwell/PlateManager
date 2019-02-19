@@ -1,15 +1,29 @@
 package pm;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
-import java.util.logging.*;
+import java.util.logging.Logger;
 
-import javax.swing.*;
-import javax.swing.JComponent.*;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 public class DialogAddPlateSet extends JDialog {
   static JButton button;
@@ -21,10 +35,10 @@ public class DialogAddPlateSet extends JDialog {
   static JTextField descriptionField;
   static JTextField numberField;
   static JComboBox<Integer> formatList;
-  static JComboBox<String> typeList;
-    private String [] layoutNames;
-    private JComboBox<String> layoutList;
-    private DefaultComboBoxModel<String> layout_names_list_model;
+  static JComboBox<ComboItem> typeList;
+    private ComboItem [] layoutNames;
+    private JComboBox<ComboItem> layoutList;
+    private DefaultComboBoxModel<ComboItem> layout_names_list_model;
 
   static JButton okButton;
   static JButton cancelButton;
@@ -137,7 +151,7 @@ public class DialogAddPlateSet extends JDialog {
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 	      layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames((int)formatList.getSelectedItem());
-	      layout_names_list_model = new DefaultComboBoxModel<String>( layoutNames );
+	      layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
 	      layoutList.setModel(layout_names_list_model );
 	      layoutList.setSelectedIndex(-1);
           }
@@ -152,9 +166,9 @@ public class DialogAddPlateSet extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    String[] plateTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateTypes();
+    ComboItem[] plateTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateTypes();
 
-    typeList = new JComboBox<String>(plateTypes);
+    typeList = new JComboBox<ComboItem>(plateTypes);
     typeList.setSelectedIndex(0);
     c.gridx = 5;
     c.gridy = 4;
@@ -169,9 +183,9 @@ public class DialogAddPlateSet extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    String[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);
-    LOGGER.info("layoutTypes: " + layoutTypes[0]);
-    layoutList = new JComboBox<String>(layoutTypes);
+    ComboItem[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);
+    LOGGER.info("layoutTypes: " + layoutTypes[0].toString());
+    layoutList = new JComboBox<ComboItem>(layoutTypes);
     layoutList.setSelectedIndex(0);
     c.gridx = 1;
     c.gridy = 5;
@@ -205,7 +219,8 @@ public class DialogAddPlateSet extends JDialog {
                     descriptionField.getText(),
                     numberField.getText(),
                     formatList.getSelectedItem().toString(),
-                    typeList.getSelectedItem().toString());
+                    ((ComboItem)typeList.getSelectedItem()).getKey(),
+			((ComboItem)layoutList.getSelectedItem()).getKey());
             dispose();
           }
         }));

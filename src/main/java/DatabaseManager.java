@@ -263,16 +263,18 @@ public class DatabaseManager {
       String _description,
       String _num_plates,
       String _plate_format_id,
-      String _plate_type_id) {
+      int _plate_type_id,
+      int _plate_layout_id) {
 
     try {
       int project_id = dmf.getSession().getProjectID();
       int plate_format_id =
           dmf.getDatabaseManager().getDatabaseRetriever().getPlateFormatID(_plate_format_id);
-      int plate_type_id =
-          dmf.getDatabaseManager().getDatabaseRetriever().getPlateTypeID(_plate_type_id);
+      int plate_type_id = _plate_type_id;
+      int plate_layout_id = _plate_layout_id;
+         
 
-      String insertSql = "SELECT new_plate_set ( ?, ?, ?, ?, ?, ?, ?);";
+      String insertSql = "SELECT new_plate_set ( ?, ?, ?, ?, ?, ?, ?, ?);";
       PreparedStatement insertPs =
           conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
       insertPs.setString(1, _description);
@@ -281,7 +283,8 @@ public class DatabaseManager {
       insertPs.setInt(4, plate_format_id);
       insertPs.setInt(5, plate_type_id);
       insertPs.setInt(6, project_id);
-      insertPs.setBoolean(7, true);
+      insertPs.setInt(7, plate_layout_id);    
+      insertPs.setBoolean(8, true);
 
       // LOGGER.info(insertPs.toString());
       insertPs.executeUpdate();

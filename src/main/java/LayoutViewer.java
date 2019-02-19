@@ -26,7 +26,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
   static JButton button;
   static JLabel label;
   static JComboBox<Integer> formatList;
-  static JComboBox<String> layoutList;
+  static JComboBox<ComboItem> layoutList;
   static JButton okButton;
   static JButton cancelButton;
   final DialogMainFrame dmf;
@@ -39,10 +39,10 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
   // final EntityManager em;
   private static final long serialVersionUID = 1L;
   private MyModel tableModel;
-    private String [] layoutNames;
+    private ComboItem [] layoutNames;
     private Object[][] gridData;
     
-    private DefaultComboBoxModel<String> layout_names_list_model;
+    private DefaultComboBoxModel<ComboItem> layout_names_list_model;
 
 
     
@@ -54,7 +54,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     // JFrame frame = new JFrame("Add Project");
     // this.em = em;
     layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);
-    layout_names_list_model = new DefaultComboBoxModel<String>( layoutNames );
+    layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
     
     JPanel parentPane = new JPanel(new BorderLayout());
     parentPane.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -93,7 +93,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     c.anchor = GridBagConstraints.LINE_START;
     pane1.add(label, c);
 
-    layoutList = new JComboBox<String>();
+    layoutList = new JComboBox<ComboItem>();
 //formatList.setSelectedIndex(0);
     c.gridx = 3;
     c.gridy = 0;
@@ -126,7 +126,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 
     if (e.getSource() == formatList) {
        layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames((int)formatList.getSelectedItem());
-       layout_names_list_model = new DefaultComboBoxModel<String>( layoutNames );
+       layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
        layoutList.setModel(layout_names_list_model );
        layoutList.setSelectedIndex(-1);
 	
