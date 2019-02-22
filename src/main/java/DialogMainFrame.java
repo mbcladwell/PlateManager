@@ -1,3 +1,4 @@
+
 package pm;
 
 import java.awt.BorderLayout;
@@ -34,17 +35,17 @@ public class DialogMainFrame extends JFrame {
   public static final String PLATEPANEL = "Card with plates";
   public static final String WELLPANEL = "Card with wells";
 
-  public static final JFrame frame = new JFrame("LIMS*Nucleus");
-
+ 
   public DialogMainFrame() throws SQLException {
     dbm = new DatabaseManager(this);
     utils = new Utilities(this);
+      this.setTitle("LIMS*Nucleus");
     // new DialogLogin();
     // Create and set up the window.
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     try {
       ImageIcon img = new ImageIcon(this.getClass().getResource("images/mwplate.png"));
-      frame.setIconImage(img.getImage());
+      this.setIconImage(img.getImage());
       session.setSessionID(dbm.initializeSession("admin1", "welcome"));
       session.setUserName("admin1");
       session.setUserID(1);
@@ -67,13 +68,13 @@ public class DialogMainFrame extends JFrame {
     card_layout = (CardLayout) cards.getLayout();
     cards.add(project_card, PROJECTPANEL);
 
-    frame.getContentPane().add(cards, BorderLayout.CENTER);
+    this.getContentPane().add(cards, BorderLayout.CENTER);
 
-    frame.pack();
-    frame.setLocation(
+    this.pack();
+    this.setLocation(
         (Toolkit.getDefaultToolkit().getScreenSize().width) / 2 - getWidth() / 2,
         (Toolkit.getDefaultToolkit().getScreenSize().height) / 2 - getHeight() / 2);
-    frame.setVisible(true);
+    this.setVisible(true);
   }
 
   public void showProjectTable() {
@@ -129,5 +130,8 @@ public class DialogMainFrame extends JFrame {
     return utils;
   }
 
+    public void setMainFrameTitle(String s){
+	this.setTitle("LIMS*Nucleus::" + s);
+    }
   public void updateProjectPanel() {}
 }

@@ -123,10 +123,10 @@ public class MenuBarForProject extends JMenuBar {
               // String project_sys_name = (String) project_table.getValueAt(i, 0);
               String results[][] = project_table.getSelectedRowsAndHeaderAsStringArray();
               // LOGGER.info("down button results: " + results);
-              // LOGGER.info("down button results: " + results[1][0]);
+               LOGGER.info("down button results: " + results[1][0]);
 
               dmf.getDatabaseManager().updateSessionWithProject(results[1][0]);
-
+	      dmf.setMainFrameTitle(results[1][0]);
               dmf.showPlateSetTable(results[1][0]);
             } catch (ArrayIndexOutOfBoundsException s) {
             }
