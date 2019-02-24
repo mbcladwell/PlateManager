@@ -596,10 +596,29 @@ int plate_layout_name_id = _plate_layout_name_id;
     }
     return result;
   }
-    /*
-    public int getNumberOfSamplesInPlateSet(int _plate_set_id){
+    /**
+     * pgPL/SQL: get_number_samples_for_psid( _psid INTEGER )
+     */
 
+    public int getNumberOfSamplesForPlateSetID(int _plate_set_id){
+	int result = 0;
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement("SELECT  get_number_samples_for_psid(?);");
+      pstmt.setInt(1, _plate_set_id);
+
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      result = rs.getInt(1);
+      LOGGER.info("number of samples: " + result);
+      rs.close();
+      pstmt.close();
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting number of samples: " + sqle);
+    }
+    return result;
 	
     }
-    */
+    
 }

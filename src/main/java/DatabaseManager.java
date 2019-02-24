@@ -134,7 +134,7 @@ public class DatabaseManager {
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "SELECT plate_set_sys_name AS \"PlateSetID\", plate_set_name As \"Name\", format AS \"Format\", num_plates AS \"# plates\" , descr AS \"Description\" FROM plate_set, plate_format WHERE plate_format.id = plate_set.plate_format_id AND project_id = (select id from project where project_sys_name like ?) ORDER BY plate_set.id DESC;");
+              "SELECT plate_set.plate_set_sys_name AS \"PlateSetID\", plate_set_name As \"Name\", format AS \"Format\", num_plates AS \"# plates\" , plate_type.plate_type_name AS \"Type\", plate_layout_name.name AS \"Layout\"   , plate_set.descr AS \"Description\" FROM plate_set, plate_format, plate_type, plate_layout_name WHERE plate_format.id = plate_set.plate_format_id AND plate_set.plate_layout_name_id = plate_layout_name.id  AND plate_set.plate_type_id = plate_type.id AND project_id = (select id from project where project_sys_name like ?) ORDER BY plate_set.id DESC;");
 
       pstmt.setString(1, _project_sys_name);
       ResultSet rs = pstmt.executeQuery();
@@ -412,7 +412,7 @@ public class DatabaseManager {
 	    String descr = (String)tableModel.getValueAt(selection[0], 4);
 	    int num_plates = (int)tableModel.getValueAt(selection[0], 3);
 	    String plate_type = (String)tableModel.getValueAt(selection[0], 4);
-	    int num_samples = 2000;
+	    int num_samples = this.getDatabaseRetriever().getNumberOfSamplesForPlateSetID(plate_set_id[0]);
 	    
 	    switch(format){
 	    case "96": this.getDatabaseInserter().reformatPlateSet(dmf, (int)plate_set_id[0], plate_set_sys_name[0], descr, num_plates, num_samples, plate_type, format);
