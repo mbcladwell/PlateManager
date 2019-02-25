@@ -26,6 +26,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
   static JButton button;
   static JLabel label;
   static JComboBox<Integer> formatList;
+  static JComboBox<String> displayList;
   static JComboBox<ComboItem> layoutList;
   static JButton okButton;
   static JButton cancelButton;
@@ -34,7 +35,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     private String owner;
   private JTable table;
   private JScrollPane scrollPane;
-    private  JPanel pane2;
+    private  JPanel pane3;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
   private static final long serialVersionUID = 1L;
@@ -66,52 +67,85 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     this.setTitle("Plate Layout Viewer");
     // c.gridwidth = 2;
 
-    label = new JLabel("Format:", SwingConstants.RIGHT);
+    javax.swing.border.TitledBorder layoutBorder = BorderFactory.createTitledBorder("Layout:");
+    layoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
+    pane1.setBorder(layoutBorder);
+
+    label = new JLabel("# controls|sample replicates|include edge|wellstart-wellfinish", SwingConstants.RIGHT);
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 0;
     c.gridy = 0;
+    c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
     c.insets = new Insets(5, 5, 2, 2);
     pane1.add(label, c);
+
+
+    layoutList = new JComboBox<ComboItem>();
+//formatList.setSelectedIndex(0);
+    c.gridx = 1;
+    c.gridy = 1;
+    c.gridheight = 1;
+    c.anchor = GridBagConstraints.CENTER;
+    layoutList.setModel(layout_names_list_model );
+    layoutList.addActionListener(this);
+    pane1.add(layoutList, c);
+
+            JPanel pane2 = new JPanel(new GridBagLayout());
+    pane2.setBorder(BorderFactory.createRaisedBevelBorder());
+
+    
+    label = new JLabel("Format:", SwingConstants.RIGHT);
+    // c.fill = GridBagConstraints.HORIZONTAL;
+    c.gridx = 0;
+    c.gridy = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    c.insets = new Insets(5, 5, 2, 2);
+    pane2.add(label, c);
  
     Integer[] formats = {96, 384, 1536};
 
     formatList = new JComboBox<Integer>(formats);
     formatList.setSelectedIndex(0);
     c.gridx = 1;
-    c.gridy = 0;
+    c.gridy = 1;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_START;
     formatList.addActionListener(this);
-    pane1.add(formatList, c);
+    pane2.add(formatList, c);
  
-
-    label = new JLabel("Layout:");
+    label = new JLabel("Display:", SwingConstants.RIGHT);
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 2;
-    c.gridy = 0;
-    c.anchor = GridBagConstraints.LINE_START;
-    pane1.add(label, c);
+    c.gridy = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    c.insets = new Insets(5, 5, 2, 2);
+    pane2.add(label, c);
+ 
+    String[] displayOptions = {"samples", "replicates"};
 
-    layoutList = new JComboBox<ComboItem>();
-//formatList.setSelectedIndex(0);
+    displayList = new JComboBox<String>(displayOptions);
+    displayList.setSelectedIndex(0);
     c.gridx = 3;
-    c.gridy = 0;
+    c.gridy = 1;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_START;
-    layoutList.setModel(layout_names_list_model );
-    layoutList.addActionListener(this);
-   
-    pane1.add(layoutList, c);
+    displayList.addActionListener(this);
+    pane2.add(displayList, c);
+ 
 
+  
     
-    pane2 = new JPanel(new BorderLayout());
-    pane2.setBorder(BorderFactory.createRaisedBevelBorder());
+    pane3 = new JPanel(new BorderLayout());
+    pane3.setBorder(BorderFactory.createRaisedBevelBorder());
     this.refreshTable(1);
    
     this.getContentPane().add(parentPane, BorderLayout.CENTER);
-    parentPane.add(pane1, BorderLayout.NORTH);
-    parentPane.add(pane2, BorderLayout.CENTER);
+    parentPane.add(pane1, BorderLayout.CENTER);
+    parentPane.add(pane2, BorderLayout.NORTH);
+    parentPane.add(pane3, BorderLayout.SOUTH);
     
     this.pack();
     this.setLocation(
@@ -134,14 +168,15 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 
     if (e.getSource() == layoutList) {
 	if(layoutList.getSelectedIndex() > -1){
-	    String selected = (String)layoutList.getSelectedItem();
-	    int plate_layout_id  = dmf.getDatabaseManager().getDatabaseRetriever().getIDforLayoutName(selected);
+	    int plate_layout_id  = ((ComboItem)layoutList.getSelectedItem()).getKey();
+	    //  String selected = (String)layoutList.getSelectedItem();
+	    // int plate_layout_id  = dmf.getDatabaseManager().getDatabaseRetriever().getIDforLayoutName(selected);
 	    this.refreshTable(plate_layout_id); 
 	}
     }
   }
     public void refreshTable(int _plate_layout_id){
-	pane2.removeAll();
+	pane3.removeAll();
 	CustomTable  table2 = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayout(_plate_layout_id);
 	gridData =  dmf.getUtilities().getPlateLayoutGrid(table2);
 	tableModel = new MyModel(gridData);
@@ -157,10 +192,10 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 	scrollPane.setRowHeaderView(rowTable);
 	scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
 			     rowTable.getTableHeader());
-	pane2.add(scrollPane, BorderLayout.CENTER);
+	pane3.add(scrollPane, BorderLayout.CENTER);
 	table.setFillsViewportHeight(true);
-	pane2.revalidate();
-	pane2.repaint();
+	pane3.revalidate();
+	pane3.repaint();
 	
     
     }
