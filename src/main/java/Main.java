@@ -11,7 +11,7 @@ public class Main {
 
     DialogMainFrame dmf = new DialogMainFrame();
 
-       LayoutViewer lv = new LayoutViewer(dmf);
+    //   LayoutViewer lv = new LayoutViewer(dmf);
     
     // DialogReformatPlateSet drps = new DialogReformatPlateSet(dmf, 16, "PS-16","description 1", 20,6000,"assay", "96");
 

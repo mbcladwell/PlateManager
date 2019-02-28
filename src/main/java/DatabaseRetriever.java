@@ -279,6 +279,34 @@ public class DatabaseRetriever {
     return results;
   }
 
+
+  public ComboItem[] getUserGroups() {
+    ComboItem[] results = null;
+    ArrayList<ComboItem> combo_items = new ArrayList<ComboItem>();
+ 
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement("SELECT id, usergroup from pmuser_groups;");
+
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next()) {
+     //all_plate_ids.add(rs.getInt(1));
+	combo_items.add(new ComboItem(rs.getInt(1), rs.getString(2)));
+        // LOGGER.info("A plate set ID: " + rs.getInt(1));
+      }
+
+      // LOGGER.info("Description: " + results);
+      rs.close();
+      pstmt.close();
+      results = combo_items.toArray(new ComboItem[combo_items.size()]);
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting plate types: " + sqle);
+    }
+    return results;
+  }
+
+    
   /** To reduce traffic, hardcode as the formats are unlikely to change */
   public int getPlateFormatID(String _format) {
     int results = 0;

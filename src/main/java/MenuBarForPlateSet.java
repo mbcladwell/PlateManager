@@ -111,6 +111,19 @@ public class MenuBarForPlateSet extends JMenuBar {
         });
     utilitiesMenu.add(menuItem);
 
+    menuItem = new JMenuItem("View plate layouts", KeyEvent.VK_E);
+     menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.ALT_MASK));
+    menuItem.putClientProperty("mf", dmf);
+    menuItem.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+	      LayoutViewer lv = new LayoutViewer(dmf);
+          }
+        });
+    utilitiesMenu.add(menuItem);
+
+
+    
     JButton downbutton = new JButton();
     try {
       ImageIcon down =

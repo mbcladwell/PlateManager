@@ -7,7 +7,7 @@
 pmhelp
   </project>
   <projectdir>
-/home/mbc/syncd/prog/plate-manager/jws/pm/pmhelpset
+/home/mbc/syncd/prog/plate-manager/pm/src/main/resources/helpset
   </projectdir>
   <startpage>
 index.html

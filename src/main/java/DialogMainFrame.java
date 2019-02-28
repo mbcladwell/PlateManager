@@ -131,7 +131,8 @@ public class DialogMainFrame extends JFrame {
   }
 
     public void setMainFrameTitle(String s){
-	this.setTitle("LIMS*Nucleus::" + s);
+	if(s==""){this.setTitle("LIMS*Nucleus");}else{
+	    this.setTitle("LIMS*Nucleus::" + s);}
     }
   public void updateProjectPanel() {}
 }

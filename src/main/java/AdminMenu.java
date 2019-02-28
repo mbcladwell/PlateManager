@@ -29,7 +29,7 @@ DialogMainFrame dmf;
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            
+	      new DialogAddUser(dmf);           
           }
         });
     this.add(menuItem);
@@ -39,8 +39,7 @@ DialogMainFrame dmf;
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            new DialogAddProject(
-                (DialogMainFrame) ((JMenuItem) e.getSource()).getClientProperty("mf"));
+	      new DialogAddProject(dmf);
    
           }
         });
