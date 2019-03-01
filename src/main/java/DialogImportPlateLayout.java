@@ -10,18 +10,17 @@ import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
 
-public class DialogAddUser extends JDialog {
+public class DialogImportPlateLayout extends JDialog {
   static JButton button;
   static JLabel label;
   static JLabel Description;
   static JTextField nameField;
   static JTextField ownerField;
-  static JTextField tagsField;
-  static JTextField passwordField;
+  static JTextField descriptionField;
+    static JComboBox<ComboItem> formatList;
   static JButton okButton;
   static JButton cancelButton;
-    static JComboBox<ComboItem> groupList;
-
+  static String projectID;
   final Instant instant = Instant.now();
   static DialogMainFrame dmf;
   private static Session session;
@@ -30,10 +29,12 @@ public class DialogAddUser extends JDialog {
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-  public DialogAddUser(DialogMainFrame _dmf) {
+  public DialogImportPlateLayout(
+      DialogMainFrame _dmf) {
     dmf = _dmf;
     session = dmf.getSession();
     dbm = dmf.getDatabaseManager();
+    
 
     JPanel pane = new JPanel(new GridBagLayout());
     pane.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -42,7 +43,7 @@ public class DialogAddUser extends JDialog {
     // Image img = new
     // ImageIcon(DialogAddProject.class.getResource("../resources/mwplate.png")).getImage();
     // this.setIconImage(img);
-    this.setTitle("Add a User");
+    this.setTitle("Import Plate Layout File");
     // c.gridwidth = 2;
 
     label = new JLabel("Date:", SwingConstants.RIGHT);
@@ -53,24 +54,20 @@ public class DialogAddUser extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    label = new JLabel("User Name:", SwingConstants.RIGHT);
+
+    label = new JLabel("Layout Name:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 2;
     pane.add(label, c);
 
-    label = new JLabel("Tags:", SwingConstants.RIGHT);
+    label = new JLabel("Description:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 3;
     pane.add(label, c);
 
-        label = new JLabel("Password:", SwingConstants.RIGHT);
+        label = new JLabel("Format:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 4;
-    pane.add(label, c);
-
-    label = new JLabel("Group:", SwingConstants.RIGHT);
-    c.gridx = 0;
-    c.gridy = 5;
     pane.add(label, c);
 
     label = new JLabel(df.format(Date.from(instant)));
@@ -79,61 +76,45 @@ public class DialogAddUser extends JDialog {
     c.gridy = 0;
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(label, c);
- 
-   nameField = new JTextField(30);
+
+    nameField = new JTextField(30);
+    //nameField.setText(_name);
     c.gridwidth = 2;
     c.gridx = 1;
     c.gridy = 2;
     pane.add(nameField, c);
 
-    tagsField = new JTextField(30);
+    descriptionField = new JTextField(30);
+    //descriptionField.setText(_description);
     c.gridx = 1;
     c.gridy = 3;
     c.gridheight = 1;
-    pane.add(tagsField, c);
+    pane.add(descriptionField, c);
 
-        passwordField = new JTextField(30);
+
+    ComboItem[] formats = dmf.getDatabaseManager().getDatabaseRetriever().getPlateFormats();
+
+    formatList = new JComboBox<ComboItem>(formats);
+    formatList.setSelectedIndex(0);
     c.gridx = 1;
     c.gridy = 4;
     c.gridheight = 1;
-    pane.add(passwordField, c);
-
-    ComboItem[] groups = dmf.getDatabaseManager().getDatabaseRetriever().getUserGroups();
-
-    groupList = new JComboBox<ComboItem>(groups);
-    groupList.setSelectedIndex(0);
-    c.gridx = 1;
-    c.gridy = 5;
-    c.gridheight = 1;
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_START;
-    pane.add(groupList, c);
+    pane.add(formatList, c);
 
-    okButton = new JButton("OK");
-    okButton.setMnemonic(KeyEvent.VK_O);
-    okButton.setActionCommand("ok");
+    
+    okButton = new JButton("Select File");
+    okButton.setMnemonic(KeyEvent.VK_S);
+    okButton.setActionCommand("select");
     okButton.setEnabled(true);
     okButton.setForeground(Color.GREEN);
     c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 2;
-    c.gridy = 6;
+    c.gridy = 5;
     c.gridwidth = 1;
     c.gridheight = 1;
-    okButton.addActionListener(
-        (new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-
-            // DatabaseManager dm = new DatabaseManager();
-            // dbm.persistObject(new Project(descriptionField.getText(), ownerField.getText(),
-            // nameField.getText()));
-	      
-            dbm.getDatabaseInserter()
-                .insertUser(
-			    nameField.getText(), tagsField.getText(), passwordField.getText(), ((ComboItem)groupList.getSelectedItem()).getKey() ); 
-            dispose();
-          }
-        }));
-
+    okButton.addActionListener(this);
     pane.add(okButton, c);
 
     cancelButton = new JButton("Cancel");
@@ -142,7 +123,7 @@ public class DialogAddUser extends JDialog {
     cancelButton.setEnabled(true);
     cancelButton.setForeground(Color.RED);
     c.gridx = 1;
-    c.gridy = 6;
+    c.gridy = 5;
     pane.add(cancelButton, c);
     cancelButton.addActionListener(
         (new ActionListener() {
@@ -157,6 +138,33 @@ public class DialogAddUser extends JDialog {
         (Toolkit.getDefaultToolkit().getScreenSize().width) / 2 - getWidth() / 2,
         (Toolkit.getDefaultToolkit().getScreenSize().height) / 2 - getHeight() / 2);
     this.setVisible(true);
+  }
+
+      public void actionPerformed(ActionEvent e) {
+
+    if (e.getSource() == okButton) {
+      dbi.associateDataWithPlateSet(
+          nameField.getText(),
+          descrField.getText(),
+          plate_set_sys_name,
+          format,
+          (String) assayTypes.getSelectedItem(),
+          (String) plateLayouts.getSelectedItem(),
+          dmf.getUtilities().loadDataFile(fileField.getText()));
+      dispose();
+    }
+
+    if (e.getSource() == select) {
+      int returnVal = fileChooser.showOpenDialog(DialogAddPlateSetData.this);
+
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        java.io.File file = fileChooser.getSelectedFile();
+        // This is where a real application would open the file.
+        fileField.setText(file.toString());
+      } else {
+        LOGGER.info("Open command cancelled by user.\n");
+      }
+    }
   }
 
   private void addToDB() {}

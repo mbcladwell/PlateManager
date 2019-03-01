@@ -509,4 +509,26 @@ public class DatabaseInserter {
 	
 	DialogReformatPlateSet drps = new DialogReformatPlateSet( dmf, plate_set_id, plate_set_sys_name, descr, num_plates, num_samples, plate_type, format);
 }
+    
+    public void insertUser(String _name, String _tags, String _password, int _group){
+
+	    String sqlString = "SELECT new_user(?,?, ?, ?)";
+    // LOGGER.info("insertSql: " + insertSql);
+    try {
+      PreparedStatement preparedStatement = conn.prepareStatement(sqlString);
+      preparedStatement.setString(1, _name);
+      preparedStatement.setString(2, _tags);
+      preparedStatement.setString(3, _password);
+      preparedStatement.setInt(4, _group);
+      preparedStatement.execute(); // executeUpdate expects no returns!!!
+
+    } catch (SQLException sqle) {
+      LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
+    }
+
+	
+
+
+	
+    }
 }

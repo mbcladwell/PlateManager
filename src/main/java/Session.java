@@ -13,8 +13,8 @@ public class Session {
 
   private int userID;
   private String userName;
-  private int userTypeID;
-  private String userType; // admin, superuser, user
+  private int userGroupID;
+  private String userGroup; // admin, superuser, user
   private int projectID;
   private String projectSysName;
   private String plateSetSysName;
@@ -44,20 +44,20 @@ public class Session {
     return userName;
   }
 
-  public void setUserType(String _s) {
-    userType = _s;
+  public void setUserGroup(String _s) {
+    userGroup = _s;
   }
 
-  public String getUserType() {
-    return userType;
+  public String getUserGroup() {
+    return userGroup;
   }
 
-  public int getUserTypeID() {
-    return userTypeID;
+  public int getUserGroupID() {
+    return userGroupID;
   }
 
-  public void setUserTypeID(int _i) {
-    userTypeID = _i;
+  public void setUserGroupID(int _i) {
+    userGroupID = _i;
   }
 
   public void setProjectID(int _id) {

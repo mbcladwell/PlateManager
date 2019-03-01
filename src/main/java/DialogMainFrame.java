@@ -46,11 +46,11 @@ public class DialogMainFrame extends JFrame {
     try {
       ImageIcon img = new ImageIcon(this.getClass().getResource("images/mwplate.png"));
       this.setIconImage(img.getImage());
-      session.setSessionID(dbm.initializeSession("admin1", "welcome"));
-      session.setUserName("admin1");
+      session.setSessionID(dbm.initializeSession("admin", "welcome"));
+      session.setUserName("admin");
       session.setUserID(1);
-      session.setUserTypeID(1);
-      session.setUserType("pm_admin");
+      session.setUserGroupID(1);
+      session.setUserGroup("pm_admin");
       session.setTempDir((new File(System.getProperty("java.io.tmpdir")).toString()));
       //LOGGER.info("Temporary directory set to: " + session.getTempDir());
       session.setWorkingDir((new File(System.getProperty("user.dir")).toString()));

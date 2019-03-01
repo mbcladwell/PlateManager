@@ -68,7 +68,7 @@ public class ProjectPanel extends JPanel {
     c.insets = new Insets(5, 5, 2, 2);
     textPanel.add(label, c);
 
-    label = new JLabel("Privileges:", SwingConstants.RIGHT);
+    label = new JLabel("Group:", SwingConstants.RIGHT);
     c.gridy = 1;
     textPanel.add(label, c);
 
@@ -81,10 +81,10 @@ public class ProjectPanel extends JPanel {
     c.anchor = GridBagConstraints.LINE_START;
     textPanel.add(userLabel, c);
 
-    JLabel privilegesLabel = new JLabel(dmf.getSession().getUserType(), SwingConstants.LEFT);
+    JLabel groupLabel = new JLabel(dmf.getSession().getUserGroup(), SwingConstants.LEFT);
     c.gridx = 1;
     c.gridy = 1;
-    textPanel.add(privilegesLabel, c);
+    textPanel.add(groupLabel, c);
     headerPanel.add(textPanel, BorderLayout.CENTER);
 
     this.add(headerPanel, BorderLayout.NORTH);

@@ -648,5 +648,36 @@ int plate_layout_name_id = _plate_layout_name_id;
     return result;
 	
     }
+
+      public ComboItem[] getPlateFormats() {
+    ComboItem[] output = null;
+    Array results = null;
+    ArrayList<ComboItem> combo_items = new ArrayList<ComboItem>();
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+              "select id, format from plate_format;");
+    
+
+      ResultSet rs = pstmt.executeQuery();
+      //rs.next();
+ while (rs.next()) {
+     //all_plate_ids.add(rs.getInt(1));
+	combo_items.add(new ComboItem(rs.getInt(1), rs.getString(2)));
+        // LOGGER.info("A plate set ID: " + rs.getInt(1));
+      }
+
+
+      rs.close();
+      pstmt.close();
+      output = combo_items.toArray(new ComboItem[combo_items.size()]);
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting plate types: " + sqle);
+    }
+    return (ComboItem[])output;
+  }
+
+
     
 }

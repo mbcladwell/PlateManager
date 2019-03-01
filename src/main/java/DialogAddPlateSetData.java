@@ -32,6 +32,7 @@ public class DialogAddPlateSetData extends JDialog
   static JTextField fileField;
   static JTextField nameField;
   static JTextField descrField;
+  static JTextField layoutField;
   static JButton okButton;
 
   static JButton select;
@@ -47,6 +48,7 @@ public class DialogAddPlateSetData extends JDialog
   private String plate_set_description;
   private String format;
   private String plate_num;
+    private String plate_layout;
   private JFileChooser fileChooser;
 
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -56,12 +58,14 @@ public class DialogAddPlateSetData extends JDialog
       String _plate_set_sys_name,
       String _plate_set_id_string,
       String _format,
-      String _plate_num) {
+      String _plate_num,
+      String _plate_layout) {
 
     plate_set_sys_name = _plate_set_sys_name;
     plate_set_id_string = _plate_set_id_string;
     format = _format;
     plate_num = _plate_num;
+    plate_layout = _plate_layout;
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
     this.dmf = _dmf;
@@ -69,6 +73,7 @@ public class DialogAddPlateSetData extends JDialog
     this.dbr = dbm.getDatabaseRetriever();
     this.dbi = dbm.getDatabaseInserter();
 
+    LOGGER.info("plate_set_id_string: " + plate_set_id_string);
     int plate_set_id = Integer.valueOf(plate_set_id_string);
     plate_set_description = dbr.getDescriptionForPlateSet(plate_set_sys_name);
 
@@ -198,15 +203,23 @@ public class DialogAddPlateSetData extends JDialog
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    // LOGGER.info("format: " + );
+    label = new JLabel(plate_layout);
+    c.gridx = 3;
+    c.gridy = 5;
+    c.gridwidth = 3;
+    c.gridheight = 1;
+    c.fill = GridBagConstraints.HORIZONTAL;
+    // c.anchor = GridBagConstraints.LINE_START;
+    pane.add(label, c);
+    /*
     plateLayouts = new JComboBox<ComboItem>(dbr.getPlateLayoutNames(dbr.getPlateFormatID(format)));
     c.gridx = 3;
     c.gridy = 5;
     c.gridwidth = 3;
-
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(plateLayouts, c);
-
+    */
+    
     select =
         new JButton(
             "Select data file...", createImageIcon("/toolbarButtonGraphics/general/Open16.gif"));

@@ -71,6 +71,9 @@ DialogMainFrame dmf;
             } catch(ArrayIndexOutOfBoundsException aioob) {
               JOptionPane.showMessageDialog(
                   dmf, "Please select a project!", "Error", JOptionPane.ERROR_MESSAGE);
+            }catch(IndexOutOfBoundsException ioob) {
+              JOptionPane.showMessageDialog(
+                  dmf, "Please select a project!", "Error", JOptionPane.ERROR_MESSAGE);
             }
 	 	
 	  }
@@ -82,7 +85,7 @@ DialogMainFrame dmf;
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-
+	      new DialogImportPlateLayout(dmf);
 
 	  }
         });
