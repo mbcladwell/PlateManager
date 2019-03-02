@@ -27,7 +27,7 @@ public class DatabaseInserter {
   // private DatabaseRetriever dbr;
   Connection conn;
   JTable table;
-  // Utilities utils;
+  Utilities utils;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   /** */
@@ -36,7 +36,7 @@ public class DatabaseInserter {
     this.conn = dbm.getConnection();
     // this.dbr = dbm.getDatabaseRetriever();
     this.dmf = dbm.getDmf();
-    // this.utils = dmf.getUtilities();
+    this.utils = dmf.getUtilities();
   }
 
   public void insertProject(String _name, String _description, int _pmuser_id) {
@@ -528,7 +528,32 @@ public class DatabaseInserter {
 	
     }
 
-    public void insertPlateLayout(String _name, String _descr, int _format, ArrayList<String[]> _file_contents ){
+    public void insertPlateLayout(String _name, String _descr, int _format, String _file_name){
+	String name = _name;
+	String descr = _descr;
+	int format = _format;
+	ArrayList<String[]> data = dmf.getUtilities().loadDataFile(_file_name);
+	if(data.size()-1 != format){
+	    JOptionPane.showMessageDialog(
+					  dmf, "Expecting " + format + " lines of data. Found " + (data.size()-1) +  "!", "Error", JOptionPane.ERROR_MESSAGE);
+	    
+	}
+	    
+       
+	    String sqlString = "SELECT new_plate_layout(?,?, ?, ?)";
+    // LOGGER.info("insertSql: " + insertSql);
+    try {
+      PreparedStatement preparedStatement = conn.prepareStatement(sqlString);
+      preparedStatement.setString(1, name);
+      preparedStatement.setString(2, descr);
+      preparedStatement.setInt(3, format);
+      preparedStatement.setArray(4, conn.createArrayOf("VARCHAR", (data.toArray())));
+      preparedStatement.execute(); // executeUpdate expects no returns!!!
+
+    } catch (SQLException sqle) {
+      LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
+    }
+	
 	
     }
 }

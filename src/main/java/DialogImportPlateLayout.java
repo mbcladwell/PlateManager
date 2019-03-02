@@ -25,8 +25,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
-public class DialogImportPlateLayout extends JDialog implements ActionListener, javax.swing.event.DocumentListener {
+public class DialogImportPlateLayout extends JDialog implements ActionListener, DocumentListener {
   static JButton button;
   static JLabel label;
   static JLabel Description;
@@ -58,6 +59,7 @@ public class DialogImportPlateLayout extends JDialog implements ActionListener, 
     dbm = dmf.getDatabaseManager();
     dbi = dbm.getDatabaseInserter();
     
+    fileChooser = new JFileChooser();
 
     JPanel pane = new JPanel(new GridBagLayout());
     pane.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -128,8 +130,8 @@ public class DialogImportPlateLayout extends JDialog implements ActionListener, 
 
       select =
         new JButton(
-            "Select data file...", createImageIcon("/toolbarButtonGraphics/general/Open16.gif"));
-    select.setMnemonic(KeyEvent.VK_O);
+            "Select Layout file...", createImageIcon("/toolbarButtonGraphics/general/Open16.gif"));
+    select.setMnemonic(KeyEvent.VK_S);
     select.setActionCommand("select");
     select.setEnabled(true);
     c.fill = GridBagConstraints.HORIZONTAL;
@@ -151,7 +153,7 @@ public class DialogImportPlateLayout extends JDialog implements ActionListener, 
     okButton = new JButton("OK");
     okButton.setMnemonic(KeyEvent.VK_O);
     okButton.setActionCommand("ok");
-    okButton.setEnabled(true);
+    okButton.setEnabled(false);
     okButton.setForeground(Color.GREEN);
     c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 2;
@@ -191,8 +193,19 @@ public class DialogImportPlateLayout extends JDialog implements ActionListener, 
           nameField.getText(),
           descriptionField.getText(),
           ((ComboItem)formatList.getSelectedItem()).getKey(),
-          dmf.getUtilities().loadDataFile(fileField.getText()));
+	  fileField.getText());
       dispose();
+    }
+        if (e.getSource() == select) {
+      int returnVal = fileChooser.showOpenDialog(this);
+
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        java.io.File file = fileChooser.getSelectedFile();
+        // This is where a real application would open the file.
+        fileField.setText(file.toString());
+      } else {
+        LOGGER.info("Open command cancelled by user.\n");
+      }
     }
 
   }
@@ -208,7 +221,23 @@ public class DialogImportPlateLayout extends JDialog implements ActionListener, 
     }
   }
 
-    
+  public void removeUpdate(DocumentEvent e) {
+    if (nameField.getText().length() > 0 & fileField.getText().length() > 0) {
+      okButton.setEnabled(true);
+    } else {
+      okButton.setEnabled(false);
+    }
+  }
+
+      public void insertUpdate(DocumentEvent e) {
+
+    if (nameField.getText().length() > 0 & fileField.getText().length() > 0) {
+      okButton.setEnabled(true);
+    } else {
+      okButton.setEnabled(false);
+    }
+  }
+
   public void changedUpdate(DocumentEvent e) {
     // Plain text components don't fire these events.
   }
