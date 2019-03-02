@@ -525,10 +525,10 @@ public class DatabaseInserter {
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
     }
-
 	
+    }
 
-
+    public void insertPlateLayout(String _name, String _descr, int _format, ArrayList<String[]> _file_contents ){
 	
     }
 }
