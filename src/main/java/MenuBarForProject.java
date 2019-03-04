@@ -134,6 +134,9 @@ public class MenuBarForProject extends JMenuBar {
         });
     this.add(downbutton);
 
+    menu = new ViewerMenu(dmf);
+    this.add(menu);
+    
     menu = new AdminMenu(dmf, project_table);
      this.add(menu);
     this.add(Box.createHorizontalGlue());

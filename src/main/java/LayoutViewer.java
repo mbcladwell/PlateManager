@@ -36,6 +36,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
   private JTable table;
   private JScrollPane scrollPane;
     private  JPanel pane3;
+    private  JPanel pane4;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
   private static final long serialVersionUID = 1L;
@@ -60,26 +61,18 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     JPanel parentPane = new JPanel(new BorderLayout());
     parentPane.setBorder(BorderFactory.createRaisedBevelBorder());
 
-        JPanel pane1 = new JPanel(new GridBagLayout());
-    pane1.setBorder(BorderFactory.createRaisedBevelBorder());
+        JPanel pane3  = new JPanel(new GridBagLayout());
+    pane3.setBorder(BorderFactory.createRaisedBevelBorder());
 
     GridBagConstraints c = new GridBagConstraints();
     this.setTitle("Plate Layout Viewer");
     // c.gridwidth = 2;
 
-    javax.swing.border.TitledBorder layoutBorder = BorderFactory.createTitledBorder("Layout:");
+    javax.swing.border.TitledBorder layoutBorder = BorderFactory.createTitledBorder("Source:");
     layoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
-    pane1.setBorder(layoutBorder);
+    pane3.setBorder(layoutBorder);
 
-    label = new JLabel("# controls|sample replicates|include edge|wellstart-wellfinish", SwingConstants.RIGHT);
-    // c.fill = GridBagConstraints.HORIZONTAL;
-    c.gridx = 0;
-    c.gridy = 0;
-    c.gridwidth = 3;
-    c.anchor = GridBagConstraints.LINE_END;
-    c.insets = new Insets(5, 5, 2, 2);
-    pane1.add(label, c);
-
+  
 
     layoutList = new JComboBox<ComboItem>();
 //formatList.setSelectedIndex(0);
@@ -89,8 +82,11 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     c.anchor = GridBagConstraints.CENTER;
     layoutList.setModel(layout_names_list_model );
     layoutList.addActionListener(this);
-    pane1.add(layoutList, c);
+    pane3.add(layoutList, c);
 
+    javax.swing.border.TitledBorder destLayoutBorder = BorderFactory.createTitledBorder("Destination: ");
+
+    
             JPanel pane2 = new JPanel(new GridBagLayout());
     pane2.setBorder(BorderFactory.createRaisedBevelBorder());
 
@@ -138,14 +134,14 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 
   
     
-    pane3 = new JPanel(new BorderLayout());
-    pane3.setBorder(BorderFactory.createRaisedBevelBorder());
+    pane4 = new JPanel(new BorderLayout());
+    pane4.setBorder(BorderFactory.createRaisedBevelBorder());
     this.refreshTable(1);
    
     this.getContentPane().add(parentPane, BorderLayout.CENTER);
-    parentPane.add(pane1, BorderLayout.CENTER);
+    parentPane.add(pane3, BorderLayout.CENTER);
     parentPane.add(pane2, BorderLayout.NORTH);
-    parentPane.add(pane3, BorderLayout.SOUTH);
+    parentPane.add(pane4, BorderLayout.SOUTH);
     
     this.pack();
     this.setLocation(
@@ -176,12 +172,12 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     }
   }
     public void refreshTable(int _plate_layout_id){
-	pane3.removeAll();
+	pane4.removeAll();
 	CustomTable  table2 = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayout(_plate_layout_id);
 	gridData =  dmf.getUtilities().getPlateLayoutGrid(table2);
 	tableModel = new MyModel(gridData);
 	
-	LOGGER.info("griddata length: " + gridData.length + "  " + gridData[0].length  );
+	//LOGGER.info("griddata length: " + gridData.length + "  " + gridData[0].length  );
 	table = new JTable( tableModel);
 	javax.swing.table.JTableHeader header = table.getTableHeader();
 	header.setBackground(java.awt.Color.DARK_GRAY);
@@ -192,10 +188,10 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 	scrollPane.setRowHeaderView(rowTable);
 	scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
 			     rowTable.getTableHeader());
-	pane3.add(scrollPane, BorderLayout.CENTER);
+	pane4.add(scrollPane, BorderLayout.CENTER);
 	table.setFillsViewportHeight(true);
-	pane3.revalidate();
-	pane3.repaint();
+	pane4.revalidate();
+	pane4.repaint();
 	
     
     }
