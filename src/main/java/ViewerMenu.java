@@ -4,14 +4,12 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.logging.*;
 
-import javax.help.*;
-import javax.swing.*;
 import javax.swing.JComponent.*;
 
 import bllm.*;
 
-public class ViewerMenu extends JMenu {
-
+public class Vie
+
    DialogMainFrame dmf;
   // J/Table table;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
