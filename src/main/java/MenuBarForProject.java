@@ -14,7 +14,6 @@ import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 
 public class MenuBarForProject extends JMenuBar {
 
@@ -33,56 +32,7 @@ public class MenuBarForProject extends JMenuBar {
     menu.getAccessibleContext().setAccessibleDescription("Project");
     this.add(menu);
 
-    // a group of JMenuItems
-    JMenuItem menuItem = new JMenuItem("Add project", KeyEvent.VK_A);
-    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
-    menuItem.getAccessibleContext().setAccessibleDescription("Launch the Add Project dialog.");
-    menuItem.putClientProperty("mf", dmf);
-    menuItem.addActionListener(
-        new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            new DialogAddProject(
-                (DialogMainFrame) ((JMenuItem) e.getSource()).getClientProperty("mf"));
-          }
-        });
-    menu.add(menuItem);
-
-    menuItem = new JMenuItem("Edit project", KeyEvent.VK_E);
-    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
-    menuItem.getAccessibleContext().setAccessibleDescription("Launch the Edit Project dialog.");
-    menuItem.putClientProperty("mf", dmf);
-    menuItem.addActionListener(
-        new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            try {
-              int rowIndex = project_table.getSelectedRow();
-              String projectid = project_table.getValueAt(rowIndex, 0).toString();
-              String name = project_table.getValueAt(rowIndex, 1).toString();
-              String owner = project_table.getValueAt(rowIndex, 2).toString();
-              String description = project_table.getValueAt(rowIndex, 3).toString();
-              if (owner.equals(dmf.getSession().getUserName())) {
-                new DialogEditProject(dmf, projectid, name, description);
-              } else {
-                JOptionPane.showMessageDialog(
-                    dmf,
-                    "Only the owner can modify a project.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-              }
-            } catch (ArrayIndexOutOfBoundsException aioob) {
-              JOptionPane.showMessageDialog(
-                  dmf, "Please select a project!", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-          }
-        });
-    menu.add(menuItem);
-
-    menu = new JMenu("Utilities");
-    menu.setMnemonic(KeyEvent.VK_U);
-    menu.getAccessibleContext().setAccessibleDescription("Project utilities");
-    this.add(menu);
-
-    menuItem = new JMenuItem("Export", KeyEvent.VK_E);
+    JMenuItem    menuItem = new JMenuItem("Export", KeyEvent.VK_E);
     // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
     menuItem.getAccessibleContext().setAccessibleDescription("Export as .csv.");
     menuItem.putClientProperty("mf", dmf);
@@ -104,6 +54,8 @@ public class MenuBarForProject extends JMenuBar {
           }
         });
     menu.add(menuItem);
+
+
 
     JButton downbutton = new JButton();
     try {

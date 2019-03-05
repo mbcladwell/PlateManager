@@ -195,3 +195,34 @@ task testData(type: JavaExec){
     main= 'pm.'
     
 }
+
+
+
+
+task prep {
+    doLast{
+
+	exec{
+	    commandLine 'git', 'pull'
+	}
+	exec{
+	    workingDir '../postgres'
+	    commandLine 'git', 'pull'
+	    
+	}
+	exec{
+	   workingDir '/home/mbc'
+	//    commandLine 'gnome-terminal psql -U pm_admin -h 192.168.1.7 -d pmdb'
+	    commandLine 'gnome-terminal', '--command=/usr/bin/psql -U pm_admin -h 192.168.1.7 -d pmdb'
+	}
+	//exec{
+	  // workingDir '/home/mbc'
+	   // commandLine 'psql','-Upm_admin', '-h192.168.1.7', '-dpmdb'
+	//}
+	exec{
+	    commandLine 'gnome-terminal','--command=emacs &'
+	}
+   
+    }
+    
+}

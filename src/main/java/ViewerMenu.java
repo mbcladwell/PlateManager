@@ -1,16 +1,15 @@
 package pm;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.logging.*;
-
-import javax.swing.JComponent.*;
-
-import bllm.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.logging.Logger;
 
-public class Vie
-
-   DialogMainFrame dmf;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+
+public class ViewerMenu extends JMenu{
+    DialogMainFrame dmf;
   // J/Table table;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 

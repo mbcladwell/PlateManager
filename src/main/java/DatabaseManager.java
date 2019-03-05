@@ -357,12 +357,12 @@ public class DatabaseManager {
   }
 
   /**
-   * Launched by the menu item "group". Since by definition a plate set can only have one format of
+   * Launched by the Plate menu item "group". Since by definition a plate set can only have one format of
    * plate, no need to check that there is only one format
    */
   public void groupPlates(CustomTable _table) {
     // 4 columns in the plate  table
-    // plate_sys_name plate_id type format
+    // plate_sys_name Order type format
     CustomTable plate_table = _table;
     TableModel tableModel = plate_table.getModel();
     int[] selection = plate_table.getSelectedRows();

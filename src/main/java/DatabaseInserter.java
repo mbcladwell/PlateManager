@@ -139,6 +139,8 @@ public class DatabaseInserter {
    * sets. The HashMap contains the pair plateset_sys_name:number of plates. A dedicated Postgres
    * function "new_plate_set_from_group" will create the plateset and return the id without making
    * any plates, nor will it associate the new plate_set.id with plates.
+   *
+   *<p>Note that the method groupPlateSetsIntoPlateSet is for grouping individual plates
    */
   public void groupPlateSetsIntoNewPlateSet(
       String _description,
@@ -253,7 +255,8 @@ public class DatabaseInserter {
       Set<String> _plates,
       String _format,
       String _type,
-      int _projectID) {
+      int _projectID,
+      int _plate_layout_name_id) {
     String description = _description;
     String name = _name;
     Set<String> plates = _plates;
@@ -261,6 +264,7 @@ public class DatabaseInserter {
     String type = _type;
     int projectID = _projectID;
     int new_plate_set_id = 0;
+    int plate_layout_name_id = _plate_layout_name_id;
     // ResultSet resultSet;
     // PreparedStatement preparedStatement;
 
@@ -268,7 +272,7 @@ public class DatabaseInserter {
     int plateTypeID = dbm.getDatabaseRetriever().getIDForPlateType(type);
     int num_plates = plates.size();
 
-    String sqlstring = "SELECT new_plate_set_from_group (?, ?, ?, ?, ?, ?);";
+    String sqlstring = "SELECT new_plate_set_from_group (?, ?, ?, ?, ?, ?, ?);";
 
     try {
       PreparedStatement preparedStatement =
@@ -279,6 +283,8 @@ public class DatabaseInserter {
       preparedStatement.setInt(4, format_id);
       preparedStatement.setInt(5, plateTypeID);
       preparedStatement.setInt(6, projectID);
+      preparedStatement.setInt(7, plate_layout_name_id);
+      
 
       preparedStatement.execute(); // executeUpdate expects no returns!!!
 
