@@ -507,7 +507,7 @@ public class DatabaseInserter {
      * Called from DatabaseManager.reformatPlateSet(plate_set_id, format)
      */
     public void reformatPlateSet(DialogMainFrame _dmf, int _plate_set_id, String _plate_set_sys_name,
-      String _descr, int _num_plates, int _num_samples, String _plate_type, String _format){
+				 String _descr, int _num_plates, int _num_samples, String _plate_type, String _format, int _plate_layout_name_id){
 	DialogMainFrame dmf = _dmf;
 	int plate_set_id = _plate_set_id;
 	String format = _format;
@@ -516,8 +516,9 @@ public class DatabaseInserter {
 	int num_plates = _num_plates;
 	int num_samples = _num_samples;
 	String plate_type= _plate_type;
+	int plate_layout_name_id = _plate_layout_name_id;
 	
-	DialogReformatPlateSet drps = new DialogReformatPlateSet( dmf, plate_set_id, plate_set_sys_name, descr, num_plates, num_samples, plate_type, format);
+	DialogReformatPlateSet drps = new DialogReformatPlateSet( dmf, plate_set_id, plate_set_sys_name, descr, num_plates, num_samples, plate_type, format, plate_layout_name_id);
 }
     
     public void insertUser(String _name, String _tags, String _password, int _group){
