@@ -269,7 +269,7 @@ public class DatabaseManager {
     try {
       int project_id = dmf.getSession().getProjectID();
       int plate_format_id =
-          dmf.getDatabaseManager().getDatabaseRetriever().getPlateFormatID(_plate_format_id);
+          Integer.parseInt(_plate_format_id);
       int plate_type_id = _plate_type_id;
       int plate_layout_id = _plate_layout_id;
          
@@ -335,7 +335,7 @@ public class DatabaseManager {
       plateSet.add(results[k][0]);
       // LOGGER.info("prjID: " + results[k][0]);
 
-      plateFormatSet.add(results[k][3]);
+      plateFormatSet.add(results[k][2]);
       // LOGGER.info("pltformat: " + results[k][2]);
     }
     LOGGER.info("Size of plateFormatSet: " + plateFormatSet.size());
@@ -350,7 +350,7 @@ public class DatabaseManager {
     } else {
       JOptionPane.showMessageDialog(
           dmf,
-          "Plate set must be of the same formats\ne.g. all 96 well plates!",
+          "Plate sets to be grouped must be of the same formats\n and of the same layout!",
           "Error!",
           JOptionPane.ERROR_MESSAGE);
     }

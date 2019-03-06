@@ -140,7 +140,7 @@ public class DatabaseInserter {
    * function "new_plate_set_from_group" will create the plateset and return the id without making
    * any plates, nor will it associate the new plate_set.id with plates.
    *
-   *<p>Note that the method groupPlateSetsIntoPlateSet is for grouping individual plates
+   *<p>Note that the method groupPlatesIntoPlateSet is for grouping individual plates
    */
   public void groupPlateSetsIntoNewPlateSet(
       String _description,
@@ -149,6 +149,7 @@ public class DatabaseInserter {
       String _plate_format,
       String _plate_type,
       int _project_id,
+      int _plate_layout_name_id,
       ArrayList<String> _plate_sys_names) {
 
     String description = _description;
@@ -159,10 +160,9 @@ public class DatabaseInserter {
     int project_id = _project_id;
     int format_id = 0;
     int new_plate_set_id = 0;
+    int plate_layout_name_id = _plate_layout_name_id;
     ArrayList<String> plate_sys_names = _plate_sys_names;
-    // ResultSet resultSet;
-    // PreparedStatement preparedStatement;
-
+  
     // determine total number of plates in new plate set
     int total_num_plates = 0;
 
@@ -177,7 +177,7 @@ public class DatabaseInserter {
     // determine format id
     LOGGER.info("format: " + plate_format);
 
-    format_id = dbm.getDatabaseRetriever().getPlateFormatID(plate_format);
+    format_id = Integer.parseInt(plate_format);
     //    format_id = dbr.getPlateFormatID(plate_format);
 
     // determine type id
@@ -204,7 +204,7 @@ public class DatabaseInserter {
     // INSERT INTO plate_set(descr, plate_set_name, num_plates, plate_size_id, plate_type_id,
     // project_id)
 
-    String sqlstring = "SELECT new_plate_set_from_group (?, ?, ?, ?, ?, ?);";
+    String sqlstring = "SELECT new_plate_set_from_group (?, ?, ?, ?, ?, ?, ?);";
 
     try {
       PreparedStatement preparedStatement =
@@ -215,6 +215,8 @@ public class DatabaseInserter {
       preparedStatement.setInt(4, format_id);
       preparedStatement.setInt(5, plateTypeID);
       preparedStatement.setInt(6, project_id);
+       preparedStatement.setInt(7, plate_layout_name_id);
+     
       //      preparedStatement.setArray(7, conn.createArrayOf("VARCHAR",
       // (plate_sys_names.toArray())));
 
@@ -233,9 +235,9 @@ public class DatabaseInserter {
     //
 
     Set<Integer> all_plate_ids = new HashSet<Integer>();
-    Iterator it2 = plate_set_num_plates.entrySet().iterator();
+    Iterator<Map.Entry<String,String>> it2 = plate_set_num_plates.entrySet().iterator();
     while (it2.hasNext()) {
-      HashMap.Entry pair = (HashMap.Entry) it2.next();
+	HashMap.Entry<String,String> pair = (HashMap.Entry<String,String>) it2.next();
       int plate_set_id =
           dbm.getDatabaseRetriever().getPlateSetIDForPlateSetSysName((String) pair.getKey());
       all_plate_ids.addAll(dbm.getDatabaseRetriever().getAllPlateIDsForPlateSetID(plate_set_id));
@@ -268,7 +270,9 @@ public class DatabaseInserter {
     // ResultSet resultSet;
     // PreparedStatement preparedStatement;
 
-    int format_id = dbm.getDatabaseRetriever().getPlateFormatID(format);
+    int format_id = Integer.parseInt(format);
+        
+
     int plateTypeID = dbm.getDatabaseRetriever().getIDForPlateType(type);
     int num_plates = plates.size();
 

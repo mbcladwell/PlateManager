@@ -59,7 +59,6 @@ public class DialogGroupPlates extends JDialog {
     Set<String> plates = _plates;
     String num_plates = Integer.valueOf(plates.size()).toString();
     String format = _format;
-
     String plate_sys_names = new String();
     for (String temp : plates) {
       plate_sys_names = plate_sys_names + temp + ";";
@@ -203,7 +202,7 @@ public class DialogGroupPlates extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    ComboItem[] plateLayouts = dmf.getDatabaseManager().getDatabaseRetriever().getSourcePlateLayoutNames(96);
+    ComboItem[] plateLayouts = dmf.getDatabaseManager().getDatabaseRetriever().getSourcePlateLayoutNames(Integer.parseInt(format));
 
     layoutList = new JComboBox<ComboItem>(plateLayouts);
     layoutList.setSelectedIndex(0);
@@ -238,7 +237,7 @@ public class DialogGroupPlates extends JDialog {
                     format,
                     typeList.getSelectedItem().toString(),
                     dmf.getSession().getProjectID(),
-		    (int)layoutList.getSelectedItem());
+		    ((ComboItem)layoutList.getSelectedItem()).getKey());
 
             dispose();
           }

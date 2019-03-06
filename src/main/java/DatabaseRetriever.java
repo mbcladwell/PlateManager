@@ -308,11 +308,12 @@ public class DatabaseRetriever {
 
     
   /** To reduce traffic, hardcode as the formats are unlikely to change */
+    /*
   public int getPlateFormatID(String _format) {
     int results = 0;
     switch (_format) {
       case "96":
-        results = 1;
+        results = 96;
         break;
       case "384":
         results = 2;
@@ -323,7 +324,8 @@ public class DatabaseRetriever {
     }
     return results;
   }
-
+    */
+    
   public int getPlateTypeID(String _type) {
     int results = 0;
 

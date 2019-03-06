@@ -37,6 +37,8 @@ public class DialogGroupPlateSet extends JDialog {
   static JTextField numberField;
   static JComboBox<Integer> formatList;
   static JComboBox<ComboItem> typeList;
+      static JComboBox<ComboItem> layoutList;
+
   static JButton okButton;
   static JButton cancelButton;
   final Instant instant = Instant.now();
@@ -196,6 +198,26 @@ public class DialogGroupPlateSet extends JDialog {
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(typeList, c);
 
+           label = new JLabel("New Plate Set Layout:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 7;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane.add(label, c);
+    LOGGER.info("format: " + format);
+    ComboItem[] plateLayouts = dmf.getDatabaseManager().getDatabaseRetriever().getSourcePlateLayoutNames(Integer.parseInt(format));
+    LOGGER.info("plateLayout: " + plateLayouts);
+
+    layoutList = new JComboBox<ComboItem>(plateLayouts);
+    layoutList.setSelectedIndex(0);
+    c.gridx = 1;
+    c.gridy = 7;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane.add(layoutList, c);
+
     okButton = new JButton("OK");
     okButton.setMnemonic(KeyEvent.VK_O);
     okButton.setActionCommand("ok");
@@ -203,7 +225,7 @@ public class DialogGroupPlateSet extends JDialog {
     okButton.setForeground(Color.GREEN);
     c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 2;
-    c.gridy = 7;
+    c.gridy = 8;
     c.gridwidth = 2;
     c.gridheight = 1;
     okButton.addActionListener(
@@ -218,8 +240,9 @@ public class DialogGroupPlateSet extends JDialog {
                     plate_set_num_plates,
                     format,
                     typeList.getSelectedItem().toString(),
-                    dmf.getSession().getProjectID(),
-                    plate_sys_names);
+                    dmf.getSession().getProjectID(),             
+		    ((ComboItem)layoutList.getSelectedItem()).getKey(),
+		    plate_sys_names);
             dispose();
           }
         }));
@@ -232,7 +255,7 @@ public class DialogGroupPlateSet extends JDialog {
     cancelButton.setEnabled(true);
     cancelButton.setForeground(Color.RED);
     c.gridx = 1;
-    c.gridy = 7;
+    c.gridy = 8;
     c.gridwidth = 1;
     pane.add(cancelButton, c);
     cancelButton.addActionListener(

@@ -62,20 +62,21 @@ public class DialogReformatPlateSet extends JDialog {
       int _num_plates,
       int _num_samples,
       String _plate_type,
-      String _plate_format) {
+      String _plate_format,
+				int _plate_layout_id) {
     this.dmf = _dmf;
     this.session = dmf.getSession();
     owner = session.getUserName();
     //  HashMap<String, String> plate_set_num_plates = _plate_set_num_plates;
     String old_plate_format = _plate_format;
+    String new_plate_format = _plate_format;
+    int new_plate_format_id = 0;
     String plate_set_sys_name = _plate_set_sys_name;
     String old_descr =_descr;
     int old_num_plates = _num_plates;
     int old_num_samples = _num_samples;
     String old_plate_type =  _plate_type;
-    String new_plate_format = _plate_format;
-    int new_plate_format_id = 0;
-    
+    int old_plate_layout_id = _plate_layout_id; 
 
     switch(old_plate_format){
     case "96":
