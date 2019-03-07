@@ -539,18 +539,31 @@ public class DatabaseInserter {
 	
     }
 
-    public void insertPlateLayout(String _name, String _descr, int _format, String _file_name){
+    public void insertPlateLayout(String _name, String _descr,  String _file_name){
 	String name = _name;
 	String descr = _descr;
-	int format = _format;
+	int format = 0;
 	ArrayList<String[]> data = dmf.getUtilities().loadDataFile(_file_name);
-	if(data.size()-1 != format){
-	    JOptionPane.showMessageDialog(
-					  dmf, "Expecting " + format + " lines of data. Found " + (data.size()-1) +  "!", "Error", JOptionPane.ERROR_MESSAGE);
+
+	Object[][]  dataObject = dmf.getUtilities().getObjectArrayForArrayList(data); 
+
+	switch(data.size()-1){
+	case 96:
+	    format = 96;
+	    ImportLayoutViewer ilv = new ImportLayoutViewer(dmf, dataObject);   
+	    break;
+	case 384:
+	    format = 384;
 	    
+	    break;
+	case 1536:
+	    format = 1536;
+	    
+	    break;
+	default:
+	    JOptionPane.showMessageDialog( dmf, "Expecting 96, 384, or 1536 lines of data. Found " + (data.size()-1) +  "!", "Error", JOptionPane.ERROR_MESSAGE);	    
 	}
-	    
-       
+	      
 	    String sqlString = "SELECT new_plate_layout(?,?, ?, ?)";
     // LOGGER.info("insertSql: " + insertSql);
     try {
@@ -564,7 +577,5 @@ public class DatabaseInserter {
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
     }
-	
-	
     }
 }

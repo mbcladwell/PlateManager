@@ -126,6 +126,83 @@ case 1536:
 
     return tableData;	
     }
+
+    /**
+     * Converts ArrayList of String[] to Object[][].
+     */
+    public Object[][] getObjectArrayForArrayList(ArrayList<String[]> _array_list){
+	ArrayList<String[]> array_list = _array_list;
+	int nrow = array_list.size();
+	int ncol = array_list.get(1).length;
+	Object[][] results = new Object[nrow][ncol];
+	
+	int counter = 0;
+	for (String[] row : array_list) {
+	    for(int i=0; i < ncol; i++){
+		results[counter][i] = row[i];
+	    LOGGER.info("results  counter(row): " + counter + " column " + i + " element " + results[counter][i] + "\n");
+	
+	}
+    counter++;
+	}
+
+	return results;
+    }
+
+    /**
+     * Convert a columnar table with well identifiers to a column/row table object.  The Object array is filled by columns.  Header will be stripped.  Column_name is the column to be converted to a plate layout.
+     * @param int _format 96, 384, or 1536
+@param String column_name column to be processed
+     */
+    public Object[][] convertTableToPlate(Object[][] _input,  String _column_name){
+       
+   
+	String column_name = _column_name;
+	int column_of_interest = 0;
+	Object[][] input = _input;
+	
+	int row = 0;
+	int col = 0;
+	int nRow = input.length-1;
+	    
+    LOGGER.info("nRow: " + nRow);
+    //96 well plate  tableData[row][col]
+    switch(nRow){
+    case 96:
+    row = 8; col=12;
+    break;
+case 384:
+    row = 16; col=24;
+    break;
+case 1536:
+    row = 32; col=48;
+    break;    
+    }
+        Object[][] output = new Object[row][col];
+
+	//which column to process?
+	for(int i=0; i < input[0].length; i++){
+	    if(input[0][i].equals(column_name)){
+		column_of_interest = i;
+		LOGGER.info("column of interest: " + i);
+		break;
+	    }
+	}
+
+    for (int i = 1; i < nRow; i++) {
+	//LOGGER.info("tdata i: " + i + " " + tm.getValueAt(i,1) );
+	System.out.println("i: " + i + " array[" + ((i)%8) +"][" + (int)Math.floor((i)/8)+ "] = " + input[i][column_of_interest]);
+       	//tableData[((i)%row)][(int)Math.floor((i)/row)] = tm.getValueAt(i,1);
+	
+	output[((i)%row)][(int)Math.floor((i)/row)] = input[i][column_of_interest];
+	//LOGGER.info("Object row: " + i + " " + tm.getValueAt(i,1) );
+    }
+
+    return output;	
+       
+	
+    }
+   
 }
     /*
     try {

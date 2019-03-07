@@ -89,12 +89,12 @@ public class DialogImportPlateLayout extends JDialog implements ActionListener, 
     c.gridx = 0;
     c.gridy = 3;
     pane.add(label, c);
-
+    /*
         label = new JLabel("Format:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 4;
     pane.add(label, c);
-
+    */
     label = new JLabel(df.format(Date.from(instant)));
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 1;
@@ -116,7 +116,7 @@ public class DialogImportPlateLayout extends JDialog implements ActionListener, 
     c.gridheight = 1;
     pane.add(descriptionField, c);
 
-
+    /*
     ComboItem[] formats = dmf.getDatabaseManager().getDatabaseRetriever().getPlateFormats();
 
     formatList = new JComboBox<ComboItem>(formats);
@@ -127,7 +127,7 @@ public class DialogImportPlateLayout extends JDialog implements ActionListener, 
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(formatList, c);
-
+    */
       select =
         new JButton(
             "Select Layout file...", createImageIcon("/toolbarButtonGraphics/general/Open16.gif"));
@@ -153,7 +153,7 @@ public class DialogImportPlateLayout extends JDialog implements ActionListener, 
     okButton = new JButton("OK");
     okButton.setMnemonic(KeyEvent.VK_O);
     okButton.setActionCommand("ok");
-    okButton.setEnabled(false);
+    //okButton.setEnabled(false);
     okButton.setForeground(Color.GREEN);
     c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 2;
@@ -192,7 +192,7 @@ public class DialogImportPlateLayout extends JDialog implements ActionListener, 
       dbi.insertPlateLayout(
           nameField.getText(),
           descriptionField.getText(),
-          ((ComboItem)formatList.getSelectedItem()).getKey(),
+          //((ComboItem)formatList.getSelectedItem()).getKey(),
 	  fileField.getText());
       dispose();
     }
