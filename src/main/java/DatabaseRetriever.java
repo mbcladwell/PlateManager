@@ -585,6 +585,33 @@ public class DatabaseRetriever {
     return (ComboItem[])output;
   }
 
+      public ComboItem[] getLayoutDestinationsForSourceID(int _source_id) {
+    ComboItem[] output = null;
+    Array results = null;
+    int source_id = _source_id;
+    ArrayList<ComboItem> combo_items = new ArrayList<ComboItem>();
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+              "select id, sys_name, name, descr FROM plate_layout_name, layout_source_dest WHERE layout_source_dest.src = ? AND layout_source_dest.dest = plate_layout_name.id;");
+      pstmt.setInt(1, source_id);
+      ResultSet rs = pstmt.executeQuery();
+      
+ while (rs.next()) {   
+     combo_items.add(new ComboItem(rs.getInt(1), new String(rs.getString(2) + ";" + rs.getString(3) + ";" + rs.getString(4)  )));
+        // LOGGER.info("A plate set ID: " + rs.getInt(1));
+      }
+
+      rs.close();
+      pstmt.close();
+      output = combo_items.toArray(new ComboItem[combo_items.size()]);
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting plate types: " + sqle);
+    }
+    return (ComboItem[])output;
+  }
+
    
   public CustomTable getPlateLayout(int _plate_layout_name_id) {
       CustomTable table = null;;

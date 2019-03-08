@@ -26,6 +26,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+/**
+ * Called from DatabaseInserter.reformatPlateSet() which is called from  DatabaseManager.reformatPlateSet(table)
+ */
 public class DialogReformatPlateSet extends JDialog {
   static JButton button;
   static JLabel label;
@@ -63,7 +66,7 @@ public class DialogReformatPlateSet extends JDialog {
       int _num_samples,
       String _plate_type,
       String _plate_format,
-				int _plate_layout_id) {
+				int _plate_layout_name_id) {
     this.dmf = _dmf;
     this.session = dmf.getSession();
     owner = session.getUserName();
@@ -76,7 +79,7 @@ public class DialogReformatPlateSet extends JDialog {
     int old_num_plates = _num_plates;
     int old_num_samples = _num_samples;
     String old_plate_type =  _plate_type;
-    int old_plate_layout_id = _plate_layout_id; 
+    int old_plate_layout_id = _plate_layout_name_id; 
 
     switch(old_plate_format){
     case "96":
@@ -92,6 +95,10 @@ public class DialogReformatPlateSet extends JDialog {
 	break;
     }
 
+
+    //assemble old plate layout label
+    
+    
     int predicted_number_of_plates_int = (int)Math.ceil(old_num_samples/new_plate_format_id);
     String predicted_number_of_plates = String.valueOf(predicted_number_of_plates_int);
 	

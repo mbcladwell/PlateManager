@@ -550,7 +550,7 @@ public class DatabaseInserter {
 	switch(data.size()-1){
 	case 96:
 	    format = 96;
-	    ImportLayoutViewer ilv = new ImportLayoutViewer(dmf, dataObject);   
+	    // ImportLayoutViewer ilv = new ImportLayoutViewer(dmf, dataObject);   
 	    break;
 	case 384:
 	    format = 384;
