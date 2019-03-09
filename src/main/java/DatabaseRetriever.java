@@ -585,6 +585,41 @@ public class DatabaseRetriever {
     return (ComboItem[])output;
   }
 
+    /**
+     * Get the layout name and id for the plate set reformat dialog box
+     */
+  public ComboItem getPlateLayoutNameAndID(int _plate_layout_name_id) {
+    ComboItem output = null;
+    Array results = null;
+    LOGGER.info("plate_layout_name_id: " + _plate_layout_name_id);
+    // ArrayList<ComboItem> combo_items = new ArrayList<ComboItem>();
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+              "select id, sys_name, name, descr from plate_layout_name WHERE plate_layout_name.id = ?;");
+      pstmt.setInt(1, _plate_layout_name_id);
+
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      // while (rs.next()) {
+     //all_plate_ids.add(rs.getInt(1));
+     output =new ComboItem(rs.getInt(1), new String(rs.getString(2) + ";" + rs.getString(3)+";" +rs.getString(4)    ));
+        // LOGGER.info("A plate set ID: " + rs.getInt(1));
+     //}
+
+
+      rs.close();
+      pstmt.close();
+      //output = combo_items.toArray(new ComboItem[combo_items.size()]);
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting plate types: " + sqle);
+    }
+    return output;
+  }
+
+
+    
       public ComboItem[] getLayoutDestinationsForSourceID(int _source_id) {
     ComboItem[] output = null;
     Array results = null;

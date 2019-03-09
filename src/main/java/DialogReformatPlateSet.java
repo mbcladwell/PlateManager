@@ -66,7 +66,7 @@ public class DialogReformatPlateSet extends JDialog {
       int _num_samples,
       String _plate_type,
       String _plate_format,
-				int _plate_layout_name_id) {
+      int _plate_layout_name_id) {
     this.dmf = _dmf;
     this.session = dmf.getSession();
     owner = session.getUserName();
@@ -79,8 +79,8 @@ public class DialogReformatPlateSet extends JDialog {
     int old_num_plates = _num_plates;
     int old_num_samples = _num_samples;
     String old_plate_type =  _plate_type;
-    int old_plate_layout_id = _plate_layout_name_id; 
-
+    int old_plate_layout_name_id = _plate_layout_name_id;
+ 
     switch(old_plate_format){
     case "96":
 	new_plate_format = "384";
@@ -97,7 +97,8 @@ public class DialogReformatPlateSet extends JDialog {
 
 
     //assemble old plate layout label
-    
+    ComboItem old_plate_layout_name = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNameAndID(old_plate_layout_name_id);
+   
     
     int predicted_number_of_plates_int = (int)Math.ceil(old_num_samples/new_plate_format_id);
     String predicted_number_of_plates = String.valueOf(predicted_number_of_plates_int);
@@ -233,7 +234,7 @@ JLabel oldDescrLabel = new JLabel(old_descr, SwingConstants.RIGHT);
     c.gridy = 5;
     c.gridheight = 1;
     c.gridwidth = 1;
-    c.anchor = GridBagConstraints.LINE_END;
+    c.anchor = GridBagConstraints.LINE_START;
     pane2.add(label, c);
 
     label = new JLabel("Format:", SwingConstants.RIGHT);
@@ -253,7 +254,24 @@ JLabel oldDescrLabel = new JLabel(old_descr, SwingConstants.RIGHT);
     c.anchor = GridBagConstraints.LINE_START;
     pane2.add(label, c);
   
- 
+    label = new JLabel("Plate Layout:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 6;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane2.add(label, c);
+
+    label = new JLabel(old_plate_layout_name.toString() );
+
+    c.gridx = 1;
+    c.gridy = 6;
+    c.gridheight = 1;
+    c.gridwidth = 3;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane2.add(label, c);
+  
+    
 javax.swing.border.TitledBorder dest = BorderFactory.createTitledBorder("Destination Plate Set:");
     dest.setTitlePosition(javax.swing.border.TitledBorder.TOP);
 
