@@ -416,9 +416,12 @@ public class DatabaseManager {
 	    int plate_layout_name_id = this.getDatabaseRetriever().getPlateLayoutNameIDForPlateSetID((int)plate_set_id[0]);
 	    //LOGGER.info("plate_layout_name_id: " + plate_layout_name_id[0]);
 	    switch(format){
-	    case "96": this.getDatabaseInserter().reformatPlateSet(dmf, (int)plate_set_id[0], plate_set_sys_name[0], descr, num_plates, num_samples, plate_type, format, plate_layout_name_id);
+	    case "96":
+			DialogReformatPlateSet drps = new DialogReformatPlateSet( dmf, (int)plate_set_id[0], plate_set_sys_name[0], descr, num_plates, num_samples, plate_type, format, plate_layout_name_id);
+		
 		    break;
-	    case "384": this.getDatabaseInserter().reformatPlateSet(dmf, (int)plate_set_id[0], plate_set_sys_name[0], descr, num_plates, num_samples, plate_type, format, plate_layout_name_id);
+	    case "384":	 drps = new DialogReformatPlateSet( dmf, (int)plate_set_id[0], plate_set_sys_name[0], descr, num_plates, num_samples, plate_type, format, plate_layout_name_id);
+		
 		    break;
 	    case "1536":  JOptionPane.showMessageDialog(dmf,
     "1536 well plates can not be reformatted.",

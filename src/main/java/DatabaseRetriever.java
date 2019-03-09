@@ -801,6 +801,27 @@ int plate_layout_name_id = _plate_layout_name_id;
     return (ComboItem[])output;
   }
 
+    public int getNumberOfReplicatesForPlateLayout(int _selected_layout_id){
+	int selected_layout_id = _selected_layout_id;
+	int result = 0;
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement("SELECT  replicates FROM plate_layout_name WHERE plate_layout_name.id=?;");
+      pstmt.setInt(1, selected_layout_id);
+
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      result = rs.getInt(1);
+      LOGGER.info("number of replicates for layout name: " + result);
+      rs.close();
+      pstmt.close();
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting number of samples: " + sqle);
+    }
+    return result;
+	
+    }
 
     
 }

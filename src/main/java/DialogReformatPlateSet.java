@@ -29,25 +29,30 @@ import javax.swing.SwingConstants;
 /**
  * Called from DatabaseInserter.reformatPlateSet() which is called from  DatabaseManager.reformatPlateSet(table)
  */
-public class DialogReformatPlateSet extends JDialog {
+public class DialogReformatPlateSet extends JDialog implements ActionListener {
   static JButton button;
   static JLabel label;
   static JLabel Description;
+   public JLabel predictedNumberOfPlatesLabel;
   static JTextField nameField;
   static JLabel ownerLabel;
   static String owner;
   static JTextField descriptionField;
   static JTextField numberField;
-  static JComboBox<Integer> formatList;
-  static JComboBox<ComboItem> typeList;
-  static JComboBox<ComboItem> layoutList;
+    static JComboBox<Integer> formatList;
+    static JComboBox<ComboItem> typeList;
+    static JComboBox<ComboItem> layoutList;
   static JButton okButton;
-  static JButton cancelButton;
-  final Instant instant = Instant.now();
-  final DialogMainFrame dmf;
-  final Session session;
+    static JButton cancelButton;
+    final Instant instant = Instant.now();
+    final DialogMainFrame dmf;
+    final Session session;
   final DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-
+    public int predicted_number_of_plates_int;
+public int new_plate_format_id;
+    public int old_num_samples;
+    public int old_num_plates;
+    
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
 
@@ -73,11 +78,10 @@ public class DialogReformatPlateSet extends JDialog {
     //  HashMap<String, String> plate_set_num_plates = _plate_set_num_plates;
     String old_plate_format = _plate_format;
     String new_plate_format = _plate_format;
-    int new_plate_format_id = 0;
     String plate_set_sys_name = _plate_set_sys_name;
     String old_descr =_descr;
-    int old_num_plates = _num_plates;
-    int old_num_samples = _num_samples;
+    old_num_plates = _num_plates;
+    old_num_samples = _num_samples;
     String old_plate_type =  _plate_type;
     int old_plate_layout_name_id = _plate_layout_name_id;
  
@@ -100,7 +104,7 @@ public class DialogReformatPlateSet extends JDialog {
     ComboItem old_plate_layout_name = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNameAndID(old_plate_layout_name_id);
    
     
-    int predicted_number_of_plates_int = (int)Math.ceil(old_num_samples/new_plate_format_id);
+    predicted_number_of_plates_int = (int)(old_num_plates/4);
     String predicted_number_of_plates = String.valueOf(predicted_number_of_plates_int);
 	
 
@@ -317,13 +321,13 @@ javax.swing.border.TitledBorder dest = BorderFactory.createTitledBorder("Destina
     c.anchor = GridBagConstraints.LINE_END;
     pane3.add(label, c);
  
-    label = new JLabel(predicted_number_of_plates);
+    predictedNumberOfPlatesLabel = new JLabel(predicted_number_of_plates);
     c.gridx = 1;
     c.gridy = 4;
     c.gridheight = 1;
     c.gridwidth = 5;
     c.anchor = GridBagConstraints.LINE_START;
-    pane3.add(label, c);
+    pane3.add(predictedNumberOfPlatesLabel, c);
  
     label = new JLabel("New Plate Set Type:", SwingConstants.RIGHT);
     c.gridx = 0;
@@ -370,7 +374,7 @@ javax.swing.border.TitledBorder dest = BorderFactory.createTitledBorder("Destina
     c.anchor = GridBagConstraints.LINE_END;
     pane3.add(label, c);
  
-    ComboItem[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(new_plate_format_id);
+    ComboItem[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id);
 
     layoutList = new JComboBox<ComboItem>(layoutTypes);
     typeList.setSelectedIndex(0);
@@ -379,6 +383,7 @@ javax.swing.border.TitledBorder dest = BorderFactory.createTitledBorder("Destina
     c.gridheight = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_START;
+    layoutList.addActionListener(this);
     pane3.add(layoutList, c);
 
     JPanel pane4 = new JPanel(new GridBagLayout());
@@ -394,25 +399,7 @@ javax.swing.border.TitledBorder dest = BorderFactory.createTitledBorder("Destina
     c.gridy = 7;
     c.gridwidth = 2;
     c.gridheight = 1;
-    okButton.addActionListener(
-        (new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-	      /*
-            dmf.getDatabaseManager()
-                .getDatabaseInserter()
-                .groupPlateSetsIntoNewPlateSet(
-                    descriptionField.getText(),
-                    nameField.getText(),
-                    plate_set_num_plates,
-                    format,
-                    typeList.getSelectedItem().toString(),
-                    dmf.getSession().getProjectID(),
-                    plate_sys_names);
-*/
-            dispose();
-          }
-        }));
-
+    okButton.addActionListener(this);
     pane4.add(okButton, c);
 
     cancelButton = new JButton("Cancel");
@@ -443,4 +430,35 @@ javax.swing.border.TitledBorder dest = BorderFactory.createTitledBorder("Destina
         (Toolkit.getDefaultToolkit().getScreenSize().height) / 2 - getHeight() / 2);
     this.setVisible(true);
   }
+
+      public void actionPerformed(ActionEvent e) {
+
+    if (e.getSource() == okButton) {
+
+	dmf.getDatabaseManager()
+	    .getDatabaseInserter()
+	    .reformatPlateSet(
+			      dmf,
+			      nameField.getText(),
+			      descriptionField.getText(),
+			      new_plate_format_id,
+			      ((ComboItem)typeList.getSelectedItem()).getKey(),
+			      ((ComboItem)layoutList.getSelectedItem()).getKey());
+            dispose();
+
+
+    }
+      
+
+    if (e.getSource() == layoutList) {
+	
+	int selected_layout = ((ComboItem)layoutList.getSelectedItem()).getKey();
+	int number_of_sample_replicates = dmf.getDatabaseManager().getDatabaseRetriever().getNumberOfReplicatesForPlateLayout(selected_layout);
+	
+	predicted_number_of_plates_int = (int)(old_num_plates*number_of_sample_replicates)/4;
+     predictedNumberOfPlatesLabel.setText(String.valueOf(predicted_number_of_plates_int));
+	     
+  }
+      }
+
 }
