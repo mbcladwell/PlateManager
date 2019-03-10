@@ -620,16 +620,21 @@ public class DatabaseRetriever {
 
 
     
-      public ComboItem[] getLayoutDestinationsForSourceID(int _source_id) {
+    public ComboItem[] getLayoutDestinationsForSourceID(int _source_id, int  _source_reps, int _target_reps) {
     ComboItem[] output = null;
     Array results = null;
     int source_id = _source_id;
+    int source_reps = _source_reps;
+    int target_reps = _target_reps;
     ArrayList<ComboItem> combo_items = new ArrayList<ComboItem>();
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "select id, sys_name, name, descr FROM plate_layout_name, layout_source_dest WHERE layout_source_dest.src = ? AND layout_source_dest.dest = plate_layout_name.id;");
+              "select id, sys_name, name, descr FROM plate_layout_name, layout_source_dest WHERE layout_source_dest.src = ? AND layout_source_dest.dest = plate_layout_name.id AND plate_layout_name.replicates = ? AND plate_layout_name.targets = ?;");
       pstmt.setInt(1, source_id);
+      pstmt.setInt(2, source_reps);
+      pstmt.setInt(3, target_reps);
+      
       ResultSet rs = pstmt.executeQuery();
       
  while (rs.next()) {   
