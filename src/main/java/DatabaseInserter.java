@@ -165,16 +165,15 @@ public int insertPlateSet2(
       insertPs.setInt(3, _num_plates);
       insertPs.setInt(4, _plate_format_id);
       insertPs.setInt(5, _plate_type_id);
-      insertPs.setInt(6, _plate_layout_name_id);
-      insertPs.setInt(7, _project_id);
-      
+      insertPs.setInt(6, _project_id);
+      insertPs.setInt(7, _plate_layout_name_id);      
       insertPs.setBoolean(8, _withSamples);
 
       LOGGER.info(insertPs.toString());
       insertPs.execute();
       ResultSet resultSet = insertPs.getResultSet();
       resultSet.next();
-      new_plate_set_id = resultSet.getInt("new_plate_set");
+      new_plate_set_id = resultSet.getInt("new_plate_set2");
      
     } catch (SQLException sqle) {
 	LOGGER.warning("SQLE at inserting new plate set: " + sqle);
@@ -568,7 +567,7 @@ public int insertPlateSet2(
 	int old_plate_num = _old_plate_num;
 	int sample_reps = _sample_reps;
 
-	int new_plate_num = old_plate_num*sample_reps/4;
+	int new_plate_num = (int)Math.ceil(old_plate_num*sample_reps/4.0);
 	int new_plate_set_id = this.insertPlateSet2(descr, plate_set_name, new_plate_num, format_id, plate_type_id, session.getProjectID() , _plate_layout_name_id, false );
 	LOGGER.info("new_plate_set_id: " + new_plate_set_id);
 
