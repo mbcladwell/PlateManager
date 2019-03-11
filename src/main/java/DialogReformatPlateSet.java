@@ -28,18 +28,22 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 /**
- * Called from DatabaseInserter.reformatPlateSet() which is called from  DatabaseManager.reformatPlateSet(table)
+ * Called from  DatabaseManager.reformatPlateSet(table)
+ * Calls DatabaseInserter.reformatPlateSet()
+
  */
 public class DialogReformatPlateSet extends JDialog implements ActionListener {
   static JButton button;
   static JLabel label;
   static JLabel Description;
    public JLabel predictedNumberOfPlatesLabel;
+    public JLabel sourceLayoutLabel;
   static JTextField nameField;
   static JLabel ownerLabel;
   static String owner;
   static JTextField descriptionField;
   static JTextField numberField;
+    public ComboItem[] source_layout;
     static JComboBox<Integer> formatList;
     static JComboBox<ComboItem> typeList;
     static JComboBox<ComboItem> layoutList;
@@ -60,6 +64,7 @@ public int new_plate_format_id;
     private DefaultComboBoxModel<ComboItem> layout_names_list_model;
     private DefaultComboBoxModel<ComboItem> target_reps_list_model;
     public int old_plate_layout_name_id;
+    public int old_plate_set_id;
     
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
@@ -83,6 +88,7 @@ public int new_plate_format_id;
     this.dmf = _dmf;
     this.session = dmf.getSession();
     owner = session.getUserName();
+    int old_plate_set_id = _plate_set_id;
     //  HashMap<String, String> plate_set_num_plates = _plate_set_num_plates;
     String old_plate_format = _plate_format;
     String new_plate_format = _plate_format;
@@ -112,7 +118,7 @@ public int new_plate_format_id;
     ComboItem old_plate_layout_name = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNameAndID(old_plate_layout_name_id);
    
     
-    predicted_number_of_plates_int = (int)(old_num_plates/4);
+    predicted_number_of_plates_int = (int)Math.ceil(old_num_plates/4.0);
     String predicted_number_of_plates = String.valueOf(predicted_number_of_plates_int);
 	
 
@@ -425,20 +431,20 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
     c.anchor = GridBagConstraints.LINE_END;
     pane3.add(label, c);
  
-    ComboItem[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,1,1);
-    layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes );
+    source_layout = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,1,1);
+    //layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes );
 
     
-    layoutList = new JComboBox<ComboItem>();
-    layoutList.setModel(layout_names_list_model);
-    layoutList.setSelectedIndex(0);
+    sourceLayoutLabel = new JLabel(source_layout[0].toString());
+    //layoutList.setModel(layout_names_list_model);
+    //layoutList.setSelectedIndex(0);
     c.gridx = 1;
     c.gridy = 8;
     c.gridheight = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_START;
-    layoutList.addActionListener(this);
-    pane3.add(layoutList, c);
+    //layoutList.addActionListener(this);
+    pane3.add(sourceLayoutLabel, c);
 
     JPanel pane4 = new JPanel(new GridBagLayout());
 
@@ -491,13 +497,17 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
 
 	dmf.getDatabaseManager()
 	    .getDatabaseInserter()
-	    .reformatPlateSet(
+	    .reformatPlateSet(old_plate_set_id,
 			      dmf,
 			      nameField.getText(),
 			      descriptionField.getText(),
 			      new_plate_format_id,
 			      ((ComboItem)typeList.getSelectedItem()).getKey(),
-			      ((ComboItem)layoutList.getSelectedItem()).getKey());
+			      source_layout[0].getKey(),
+			      old_num_plates,
+			      ((ComboItem)sampleRepsList.getSelectedItem()).getKey()
+			      
+	    );
             dispose();
 
 
@@ -505,6 +515,9 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
 
      if (e.getSource() == sampleRepsList) {
 	 int number_of_sample_replicates = ((ComboItem)sampleRepsList.getSelectedItem()).getKey();
+	 predicted_number_of_plates_int = ((int)Math.ceil(old_num_plates/4.0))*number_of_sample_replicates;
+	 predictedNumberOfPlatesLabel.setText(String.valueOf(predicted_number_of_plates_int));
+
 	 switch(number_of_sample_replicates){
 	 case 1:
 	    
@@ -512,18 +525,20 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
 	      targetRepsList.setSelectedIndex(0);
 	      targetRepsList.setEnabled(true);
 	      	ComboItem[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,number_of_sample_replicates,((ComboItem)targetRepsList.getSelectedItem()).getKey());
-	      layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes  );
-	      layoutList.setModel(layout_names_list_model);
-	      layoutList.setSelectedIndex(0);
+		//layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes  );
+		//layoutList.setModel(layout_names_list_model);
+		//layoutList.setSelectedIndex(0);
+	      sourceLayoutLabel.setText(layoutTypes[0].toString());
 	     break;
 	 case 2:
 	    targetRepsList.setModel(new DefaultComboBoxModel<ComboItem>( new ComboItem[]{ new ComboItem(1,"1"), new ComboItem(2,"2")}  ));
 	      targetRepsList.setSelectedIndex(0);
 	      targetRepsList.setEnabled(true);
 	       layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,number_of_sample_replicates,((ComboItem)targetRepsList.getSelectedItem()).getKey());
-	      layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes );
-	      layoutList.setModel(layout_names_list_model);
-	      layoutList.setSelectedIndex(0);
+	       //layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes );
+	       //layoutList.setModel(layout_names_list_model);
+	       //layoutList.setSelectedIndex(0);
+	      sourceLayoutLabel.setText(layoutTypes[0].toString());
 	     break;
 	 case 4:
 	     targetRepsList.setModel(new DefaultComboBoxModel<ComboItem>( new ComboItem[]{ new ComboItem(1,"1")}  ));
@@ -531,9 +546,10 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
 	     targetRepsList.setSelectedIndex(0);
 	      targetRepsList.setEnabled(false);
 	       layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,number_of_sample_replicates,((ComboItem)targetRepsList.getSelectedItem()).getKey());
-	      layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes  );
-	      layoutList.setModel(layout_names_list_model);
-	      layoutList.setSelectedIndex(0);
+	       //layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes  );
+	       //layoutList.setModel(layout_names_list_model);
+	       //layoutList.setSelectedIndex(0);
+	      sourceLayoutLabel.setText(layoutTypes[0].toString());
 	     break;
 	     
 	 }
@@ -547,26 +563,29 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
 	 case 1:
 	    
 	      	ComboItem[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,((ComboItem)sampleRepsList.getSelectedItem()).getKey(),((ComboItem)targetRepsList.getSelectedItem()).getKey());
-	      layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes  );
-	      layoutList.setModel(layout_names_list_model);
-	      layoutList.setSelectedIndex(0);
+		//layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes  );
+		//layoutList.setModel(layout_names_list_model);
+		//layoutList.setSelectedIndex(0);
+	      sourceLayoutLabel.setText(layoutTypes[0].toString());
 	     break;
 	 case 2:
 	     layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,((ComboItem)sampleRepsList.getSelectedItem()).getKey(),((ComboItem)targetRepsList.getSelectedItem()).getKey());
-	      layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes );
-	      layoutList.setModel(layout_names_list_model);
-	      layoutList.setSelectedIndex(0);
+	     //layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes );
+	     // layoutList.setModel(layout_names_list_model);
+	     // layoutList.setSelectedIndex(0);
+	      sourceLayoutLabel.setText(layoutTypes[0].toString());
 	     break;
 	 case 4:
 	     layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,((ComboItem)sampleRepsList.getSelectedItem()).getKey(),((ComboItem)targetRepsList.getSelectedItem()).getKey());
-	      layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes  );
-	      layoutList.setModel(layout_names_list_model);
-	      layoutList.setSelectedIndex(0);
+	     //layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes  );
+	     // layoutList.setModel(layout_names_list_model);
+	     // layoutList.setSelectedIndex(0);
+	      sourceLayoutLabel.setText(layoutTypes[0].toString());
 	     break;
 
      }
 	 }
-	  
+	 /*
     if (e.getSource() == layoutList) {
 	
 	int selected_layout = ((ComboItem)layoutList.getSelectedItem()).getKey();
@@ -576,7 +595,7 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
 	predicted_number_of_plates_int = (int)(old_num_plates*number_of_sample_replicates)/4;
      predictedNumberOfPlatesLabel.setText(String.valueOf(predicted_number_of_plates_int));
 	     
-  }
+     }*/
       }
 
       }

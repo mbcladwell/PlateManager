@@ -28,7 +28,8 @@ public class DatabaseInserter {
   Connection conn;
   JTable table;
   Utilities utils;
-  private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    Session session;
+    private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   /** */
   public DatabaseInserter(DatabaseManager _dbm) {
@@ -37,6 +38,7 @@ public class DatabaseInserter {
     // this.dbr = dbm.getDatabaseRetriever();
     this.dmf = dbm.getDmf();
     this.utils = dmf.getUtilities();
+    this.session = dmf.getSession();
   }
 
   public void insertProject(String _name, String _description, int _pmuser_id) {
@@ -113,6 +115,7 @@ public class DatabaseInserter {
       String _plate_type_id,
       String _project_id,
       String _withSamples) {
+      int new_plate_set_id;
 
     try {
       String insertSql = "SELECT new_plate_set ( ?, ?, ?, ?, ?, ?, ?);";
@@ -128,12 +131,59 @@ public class DatabaseInserter {
 
       LOGGER.info(insertPs.toString());
       insertPs.executeUpdate();
-
+      //ResultSet resultSet = insertPs.getResultSet();
+      //resultSet.next();
+      //new_plate_set_id = resultSet.getInt("new_plate_set");
+     
     } catch (SQLException sqle) {
-
+	LOGGER.warning("SQLE at inserting new plate set: " + sqle);
     }
+    
   }
 
+    /**
+     * Modification of insertPlateSet using integers and returning ps_id
+     */
+public int insertPlateSet2(
+      String _description,
+      String _name,
+      int _num_plates,
+      int _plate_format_id,
+      int _plate_type_id,
+      int _project_id,
+      int _plate_layout_name_id,
+      boolean _withSamples) {
+    
+      int new_plate_set_id=0;
+
+    try {
+      String insertSql = "SELECT new_plate_set2 ( ?, ?, ?, ?, ?, ?, ?, ?);";
+      PreparedStatement insertPs =
+          conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+      insertPs.setString(1, _description);
+      insertPs.setString(2, _name);
+      insertPs.setInt(3, _num_plates);
+      insertPs.setInt(4, _plate_format_id);
+      insertPs.setInt(5, _plate_type_id);
+      insertPs.setInt(6, _plate_layout_name_id);
+      insertPs.setInt(7, _project_id);
+      
+      insertPs.setBoolean(8, _withSamples);
+
+      LOGGER.info(insertPs.toString());
+      insertPs.execute();
+      ResultSet resultSet = insertPs.getResultSet();
+      resultSet.next();
+      new_plate_set_id = resultSet.getInt("new_plate_set");
+     
+    } catch (SQLException sqle) {
+	LOGGER.warning("SQLE at inserting new plate set: " + sqle);
+    }
+    return new_plate_set_id;
+  }
+
+
+    
   /**
    * called from DialogGroupPlateSet; Performs the creation of a new plate set from existing plate
    * sets. The HashMap contains the pair plateset_sys_name:number of plates. A dedicated Postgres
@@ -504,17 +554,23 @@ public class DatabaseInserter {
 
      
     /**
-     * Called from DatabaseManager.reformatPlateSet(plate_set_id, format)
+     * Called from DialogReformatPlateSet OK action listener
      */
-    public void reformatPlateSet(DialogMainFrame _dmf,  String _plate_set_name,
-				 String _descr,  int _plate_type_id, int _format_id, int _plate_layout_name_id){
+    public void reformatPlateSet(int _old_plate_set_id, DialogMainFrame _dmf,  String _plate_set_name,
+				 String _descr, int _format_id, int _plate_type_id,  int _plate_layout_name_id, int _old_plate_num, int _sample_reps){
+	int old_plate_set_id = _old_plate_set_id;
 	DialogMainFrame dmf = _dmf;
 		String plate_set_name = _plate_set_name;
 	String descr = _descr;
 	int format_id = _format_id;
 	int plate_type_id= _plate_type_id;
 	int plate_layout_name_id = _plate_layout_name_id;
-	
+	int old_plate_num = _old_plate_num;
+	int sample_reps = _sample_reps;
+
+	int new_plate_num = old_plate_num*sample_reps/4;
+	int new_plate_set_id = this.insertPlateSet2(descr, plate_set_name, new_plate_num, format_id, plate_type_id, session.getProjectID() , _plate_layout_name_id, false );
+	LOGGER.info("new_plate_set_id: " + new_plate_set_id);
 
 }
     
