@@ -500,11 +500,11 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
 	    .reformatPlateSet(old_plate_set_id,
 			      dmf,
 			      nameField.getText(),
-			      descriptionField.getText(),
+			      old_num_plates,
+			      descriptionField.getText(),			      
 			      new_plate_format_id,
 			      ((ComboItem)typeList.getSelectedItem()).getKey(),
-			      source_layout[0].getKey(),
-			      old_num_plates,
+			      source_layout[0].getKey(),			      
 			      ((ComboItem)sampleRepsList.getSelectedItem()).getKey()
 			      
 	    );
