@@ -287,7 +287,11 @@ public class DatabaseManager {
       insertPs.setBoolean(8, true);
 
       // LOGGER.info(insertPs.toString());
-      insertPs.executeUpdate();
+      int rowsAffected   = insertPs.executeUpdate();
+       ResultSet rsKey = insertPs.getGeneratedKeys();
+       rsKey.next();
+       int new_ps_id = rsKey.getInt(1);
+       insertPs.close();
       //  SELECT new_plate_set ( 'descrip', 'myname', '10', '96', 'assay', 0, 't')
     } catch (SQLException sqle) {
       LOGGER.severe("Failed to create plate set: " + sqle);

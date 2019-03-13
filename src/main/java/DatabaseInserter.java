@@ -555,22 +555,55 @@ public int insertPlateSet2(
     /**
      * Called from DialogReformatPlateSet OK action listener
      */
-    public void reformatPlateSet(int _old_plate_set_id, DialogMainFrame _dmf,  String _plate_set_name,
-				 String _descr, int _format_id, int _plate_type_id,  int _plate_layout_name_id, int _old_plate_num, int _sample_reps){
-	int old_plate_set_id = _old_plate_set_id;
+    public void reformatPlateSet(int _source_plate_set_id, DialogMainFrame _dmf,  String _dest_plate_set_name, int _source_plate_num,
+				 String _dest_descr, int _dest_plate_format_id, int _dest_plate_type_id,  int _dest_plate_layout_name_id, int _n_reps_source){
+	int source_plate_set_id = _source_plate_set_id;
 	DialogMainFrame dmf = _dmf;
-		String plate_set_name = _plate_set_name;
-	String descr = _descr;
-	int format_id = _format_id;
-	int plate_type_id= _plate_type_id;
-	int plate_layout_name_id = _plate_layout_name_id;
-	int old_plate_num = _old_plate_num;
-	int sample_reps = _sample_reps;
+	String dest_plate_set_name = _dest_plate_set_name;
+	String dest_descr = _dest_descr;
+	int dest_plate_format_id = _dest_plate_format_id;
+	int dest_plate_type_id= _dest_plate_type_id;
+	int dest_plate_layout_name_id = _dest_plate_layout_name_id;
+	int source_plate_num = _source_plate_num;
+	int n_reps_source = _n_reps_source;
+       
+	int dest_plate_num = (int)Math.ceil(source_plate_num*n_reps_source/4.0);
+	int project_id = dbm.getSession().getProjectID();
+	int dest_plate_set_id=0;
 
-	int new_plate_num = (int)Math.ceil(old_plate_num*sample_reps/4.0);
-	int new_plate_set_id = this.insertPlateSet2(descr, plate_set_name, new_plate_num, format_id, plate_type_id, session.getProjectID() , _plate_layout_name_id, false );
-	LOGGER.info("new_plate_set_id: " + new_plate_set_id);
+      // method signature:  reformat_plate_set(source_plate_set_id INTEGER, source_num_plates INTEGER, n_reps_source INTEGER, dest_descr VARCHAR(30), dest_plate_set_name VARCHAR(30), dest_num_plates INTEGER, dest_plate_format_id INTEGER, dest_plate_type_id INTEGER, project_id INTEGER, dest_plate_layout_name_id INTEGER )
+      
+      
+    try {
+      String insertSql = "SELECT reformat_plate_set( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+      PreparedStatement insertPs =
+          conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+      insertPs.setInt(1, source_plate_set_id);
+	      insertPs.setInt(2, source_plate_num);
+      insertPs.setInt(3, n_reps_source);
+      
+      insertPs.setString(4, dest_descr);
+      insertPs.setString(5, dest_plate_set_name);
+      insertPs.setInt(6, dest_plate_num);
+      insertPs.setInt(7, dest_plate_format_id);
+      insertPs.setInt(8, dest_plate_type_id);
+      insertPs.setInt(9, project_id);
+      insertPs.setInt(10, dest_plate_layout_name_id);      
 
+      LOGGER.info(insertPs.toString());
+      insertPs.execute();
+      ResultSet resultSet = insertPs.getResultSet();
+      resultSet.next();
+      dest_plate_set_id = resultSet.getInt("reformat_plate_set");
+     
+    } catch (SQLException sqle) {
+	LOGGER.warning("SQLE at reformat plate set: " + sqle);
+    }
+      
+	
+	
+	LOGGER.info("new_(reformatted)plate_set_id: " + dest_plate_set_id);
+      
 }
     
     public void insertUser(String _name, String _tags, String _password, int _group){
