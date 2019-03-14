@@ -182,7 +182,7 @@ public class DatabaseManager {
       ResultSet rs = pstmt.executeQuery();
 
       CustomTable table = new CustomTable(dmf, buildTableModel(rs));
-       LOGGER.info("Got plate table ");
+      LOGGER.info("Got plate table " + table.getSelectedRowsAndHeaderAsStringArray().toString());
       rs.close();
       pstmt.close();
       return table;

@@ -63,12 +63,12 @@ public class PlatePanel extends JPanel {
     c.anchor = GridBagConstraints.LINE_END;
     textPanel.add(label, c);
 
-    LOGGER.info("table.getValueAt(1, 0)" + table.getValueAt(1, 0));
+    LOGGER.info("table.getValueAt(0, 0)" + table.getValueAt(0, 0));
 
     plateset_sys_name =
         dmf.getDatabaseManager()
             .getDatabaseRetriever()
-            .getPlateSetSysNameForPlateSysName((String) table.getValueAt(1, 0));
+            .getPlateSetSysNameForPlateSysName((String) table.getValueAt(0, 0));
     JLabel platesetLabel = new JLabel(plateset_sys_name, SwingConstants.LEFT);
     c.gridx = 1;
     c.gridy = 0;
