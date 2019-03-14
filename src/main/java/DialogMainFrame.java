@@ -98,8 +98,13 @@ public class DialogMainFrame extends JFrame {
   }
 
   public void showPlateTable(String _plate_set_sys_name) {
-    plate_card = new PlatePanel(this, dbm.getPlateTableData(_plate_set_sys_name));
-
+      CustomTable ct = dbm.getPlateTableData(_plate_set_sys_name);
+      LOGGER.info("CustomTable: " + ct);
+      LOGGER.info("valueAt: " + ct.getValueAt(1,0));
+      plate_card = new PlatePanel(this, ct);
+    LOGGER.info("_plate_set_sys_name: " + _plate_set_sys_name);
+    LOGGER.info("_plate card: " + plate_card);
+    
     cards.add(plate_card, PLATEPANEL);
     card_layout.show(cards, DialogMainFrame.PLATEPANEL);
   }

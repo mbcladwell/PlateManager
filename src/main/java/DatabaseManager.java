@@ -39,6 +39,7 @@ public class DatabaseManager {
    */
   public DatabaseManager(DialogMainFrame _dmf) {
     dmf = _dmf;
+
     try {
       Class.forName("org.postgresql.Driver");
 
@@ -176,18 +177,18 @@ public class DatabaseManager {
       PreparedStatement pstmt =
           conn.prepareStatement(
               "SELECT plate.plate_sys_name AS \"PlateID\", plate_plate_set.plate_order AS \"Order\",  plate_type.plate_type_name As \"Type\", plate_format.format AS \"Format\" FROM plate_set, plate, plate_type, plate_format, plate_plate_set WHERE plate_plate_set.plate_set_id = (select id from plate_set where plate_set_sys_name like ?) AND plate.plate_type_id = plate_type.id AND plate_plate_set.plate_id = plate.id AND plate_plate_set.plate_set_id = plate_set.id  AND plate_format.id = plate.plate_format_id ORDER BY plate_plate_set.plate_order DESC;");
-
       pstmt.setString(1, _plate_set_sys_name);
+      LOGGER.info("statement: " + pstmt.toString());
       ResultSet rs = pstmt.executeQuery();
 
       CustomTable table = new CustomTable(dmf, buildTableModel(rs));
-      // LOGGER.info("Got plate table ");
+       LOGGER.info("Got plate table ");
       rs.close();
       pstmt.close();
       return table;
 
     } catch (SQLException sqle) {
-
+	LOGGER.info("Exception in dbm.getPlateTableData: " + sqle);
     }
     return null;
   }
@@ -418,7 +419,7 @@ public class DatabaseManager {
 	    String plate_type = (String)tableModel.getValueAt(selection[0], 4);
 	    int num_samples = this.getDatabaseRetriever().getNumberOfSamplesForPlateSetID(plate_set_id[0]);
 	    int plate_layout_name_id = this.getDatabaseRetriever().getPlateLayoutNameIDForPlateSetID((int)plate_set_id[0]);
-	    //LOGGER.info("plate_layout_name_id: " + plate_layout_name_id[0]);
+	    LOGGER.info("plate_set_id[0]: " + plate_set_id[0]);
 	    switch(format){
 	    case "96":
 			DialogReformatPlateSet drps = new DialogReformatPlateSet( dmf, (int)plate_set_id[0], plate_set_sys_name[0], descr, num_plates, num_samples, plate_type, format, plate_layout_name_id);

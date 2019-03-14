@@ -88,7 +88,7 @@ public int new_plate_format_id;
     this.dmf = _dmf;
     this.session = dmf.getSession();
     owner = session.getUserName();
-    int old_plate_set_id = _plate_set_id;
+    old_plate_set_id = _plate_set_id;
     //  HashMap<String, String> plate_set_num_plates = _plate_set_num_plates;
     String old_plate_format = _plate_format;
     String new_plate_format = _plate_format;
@@ -508,6 +508,7 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
 			      ((ComboItem)sampleRepsList.getSelectedItem()).getKey()
 			      
 	    );
+	
             dispose();
 
 
@@ -515,7 +516,7 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
 
      if (e.getSource() == sampleRepsList) {
 	 int number_of_sample_replicates = ((ComboItem)sampleRepsList.getSelectedItem()).getKey();
-	 predicted_number_of_plates_int = ((int)Math.ceil(old_num_plates/4.0))*number_of_sample_replicates;
+	 predicted_number_of_plates_int = ((int)Math.ceil(old_num_plates*number_of_sample_replicates/4.0));
 	 predictedNumberOfPlatesLabel.setText(String.valueOf(predicted_number_of_plates_int));
 
 	 switch(number_of_sample_replicates){

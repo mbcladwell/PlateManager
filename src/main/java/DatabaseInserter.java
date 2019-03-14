@@ -595,7 +595,8 @@ public int insertPlateSet2(
       ResultSet resultSet = insertPs.getResultSet();
       resultSet.next();
       dest_plate_set_id = resultSet.getInt("reformat_plate_set");
-     
+      
+      dmf.showPlateSetTable(dmf.getSession().getProjectSysName());
     } catch (SQLException sqle) {
 	LOGGER.warning("SQLE at reformat plate set: " + sqle);
     }
