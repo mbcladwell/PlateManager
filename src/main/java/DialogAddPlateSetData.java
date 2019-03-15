@@ -76,6 +76,10 @@ public class DialogAddPlateSetData extends JDialog
 
     int plate_layout_name_id = dbm.getDatabaseRetriever().getPlateLayoutNameIDForPlateSetID(_plate_set_id );
     plate_layout = dbm.getDatabaseRetriever().getPlateLayoutNameAndID(plate_layout_name_id);
+    LOGGER.info("plate_layout_name_id: " + plate_layout_name_id);
+    LOGGER.info("plate_layout_name key: " + plate_layout.getKey());
+    LOGGER.info("plate_layout_name string: " + plate_layout.toString());
+    
     
     fileChooser = new JFileChooser();
 
@@ -299,7 +303,7 @@ public class DialogAddPlateSetData extends JDialog
           plate_set.toString(),
           format.getKey(),
           ((ComboItem)assayTypes.getSelectedItem()).getKey(),
-          ((ComboItem) plateLayouts.getSelectedItem()).getKey(),
+          plate_layout.getKey(),
           dmf.getUtilities().loadDataFile(fileField.getText()));
       dispose();
     }
