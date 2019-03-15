@@ -43,12 +43,12 @@ public class DialogAddPlateSetData extends JDialog
   private DatabaseRetriever dbr;
   private DatabaseInserter dbi;
 
-  private String plate_set_sys_name;
-  private String plate_set_id_string;
+  private ComboItem plate_set;
+   
   private String plate_set_description;
-  private String format;
-  private String plate_num;
-    private String plate_layout;
+    private ComboItem format;
+    private int plate_num;
+    private ComboItem plate_layout;
   private JFileChooser fileChooser;
 
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -56,16 +56,14 @@ public class DialogAddPlateSetData extends JDialog
   public DialogAddPlateSetData(
       DialogMainFrame _dmf,
       String _plate_set_sys_name,
-      String _plate_set_id_string,
-      String _format,
-      String _plate_num,
-      String _plate_layout) {
+      int _plate_set_id,
+      int _format_id,
+      int _plate_num) {
 
-    plate_set_sys_name = _plate_set_sys_name;
-    plate_set_id_string = _plate_set_id_string;
-    format = _format;
+    plate_set = new ComboItem(_plate_set_id, _plate_set_sys_name);
+    format = new ComboItem(_format_id, String.valueOf(_format_id));
     plate_num = _plate_num;
-    plate_layout = _plate_layout;
+   
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
     this.dmf = _dmf;
@@ -73,10 +71,12 @@ public class DialogAddPlateSetData extends JDialog
     this.dbr = dbm.getDatabaseRetriever();
     this.dbi = dbm.getDatabaseInserter();
 
-    LOGGER.info("plate_set_id_string: " + plate_set_id_string);
-    int plate_set_id = Integer.valueOf(plate_set_id_string);
-    plate_set_description = dbr.getDescriptionForPlateSet(plate_set_sys_name);
+    //LOGGER.info("plate_set_id: " + plate_set_id);
+    plate_set_description = dbr.getDescriptionForPlateSet(_plate_set_sys_name);
 
+    int plate_layout_name_id = dbm.getDatabaseRetriever().getPlateLayoutNameIDForPlateSetID(_plate_set_id );
+    plate_layout = dbm.getDatabaseRetriever().getPlateLayoutNameAndID(plate_layout_name_id);
+    
     fileChooser = new JFileChooser();
 
     JPanel pane = new JPanel(new GridBagLayout());
@@ -100,7 +100,7 @@ public class DialogAddPlateSetData extends JDialog
 
     pane.add(label, c);
 
-    label = new JLabel(plate_set_sys_name, SwingConstants.LEFT);
+    label = new JLabel(plate_set.toString(), SwingConstants.LEFT);
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 1;
     c.gridy = 0;
@@ -114,7 +114,7 @@ public class DialogAddPlateSetData extends JDialog
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    label = new JLabel(format, SwingConstants.LEFT);
+    label = new JLabel(format.toString(), SwingConstants.LEFT);
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 3;
     c.gridy = 0;
@@ -128,7 +128,7 @@ public class DialogAddPlateSetData extends JDialog
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    label = new JLabel(plate_num, SwingConstants.LEFT);
+    label = new JLabel(String.valueOf(plate_num), SwingConstants.LEFT);
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 5;
     c.gridy = 0;
@@ -203,7 +203,7 @@ public class DialogAddPlateSetData extends JDialog
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    label = new JLabel(plate_layout);
+    label = new JLabel(plate_layout.toString());
     c.gridx = 3;
     c.gridy = 5;
     c.gridwidth = 3;
@@ -296,10 +296,10 @@ public class DialogAddPlateSetData extends JDialog
       dbi.associateDataWithPlateSet(
           nameField.getText(),
           descrField.getText(),
-          plate_set_sys_name,
-          format,
-          (String) assayTypes.getSelectedItem(),
-          (String) plateLayouts.getSelectedItem(),
+          plate_set.toString(),
+          format.getKey(),
+          ((ComboItem)assayTypes.getSelectedItem()).getKey(),
+          ((ComboItem) plateLayouts.getSelectedItem()).getKey(),
           dmf.getUtilities().loadDataFile(fileField.getText()));
       dispose();
     }

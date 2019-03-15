@@ -1,12 +1,21 @@
 package pm;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.logging.*;
-import javax.help.*;
-import javax.swing.*;
-import javax.swing.JComponent.*;
+import java.awt.Desktop;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Logger;
+
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 
 public class MenuBarForPlateSet extends JMenuBar {
 
@@ -76,15 +85,14 @@ public class MenuBarForPlateSet extends JMenuBar {
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 	    if(!plate_set_table.getSelectionModel().isSelectionEmpty()){
-            Object[][] results = plate_set_table.getSelectedRowsAndHeaderAsStringArray();	    
-            String plate_set_sys_name = (String) results[1][0];
-            String plate_set_id_string = plate_set_sys_name.substring(3);
-            String format = (String) results[1][3];
-            String plate_num = (String) results[1][4];
-	    String plate_layout = (String)results[1][5];
-
-            new DialogAddPlateSetData(
-				      dmf, plate_set_sys_name, plate_set_id_string, format, plate_num, plate_layout);}
+		Object[][] results = plate_set_table.getSelectedRowsAndHeaderAsStringArray();	   
+		String plate_set_sys_name = (String) results[1][0];
+		int  plate_set_id = Integer.parseInt(plate_set_sys_name.substring(3));
+		int format_id = Integer.parseInt((String)results[1][2]);
+		int plate_num = Integer.parseInt((String)results[1][3]);
+		
+		new DialogAddPlateSetData(
+					  dmf, plate_set_sys_name, plate_set_id, format_id, plate_num);}
 	    else{
 	      JOptionPane.showMessageDialog(dmf, "Select a Plate Set to populate with data!");	      
 	    }

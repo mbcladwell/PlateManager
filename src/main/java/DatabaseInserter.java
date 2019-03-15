@@ -387,8 +387,8 @@ public int insertPlateSet2(
           nameField.getText(),
           descrField.getText(),
           plate_set_sys_name,
-          (String) assayTypes.getSelectedItem(),
-          (String) plateLayouts.getSelectedItem(),
+          (ComboItem) assayTypes.getSelectedItem().getKey(),
+          (ComboItem) plateLayouts.getSelectedItem().getKey(),
           dmf.getUtilities().loadDataFile(fileField.getText()));
   */
 
@@ -397,19 +397,19 @@ public int insertPlateSet2(
       String _assayName,
       String _descr,
       String _plate_set_sys_name,
-      String _format,
-      String _assayType,
-      String _plateLayouts,
+      int _format_id,
+      int _assay_type_id,
+      int _plate_layout_name_id,
       ArrayList<String[]> _table) {
 
     String assayName = _assayName;
     String descr = _descr;
-    String format = _format;
+    int format_id = _format_id;
     String[] plate_set_sys_name = new String[1];
     plate_set_sys_name[0] = _plate_set_sys_name;
 
-    String assay_type = _assayType;
-    String plate_layout = _plateLayouts;
+    int assay_type_id = _assay_type_id;
+    int plate_layout_name_id = _plate_layout_name_id;
     ArrayList<String[]> table = _table;
 
     // read in data file an populate temp_data with data;
@@ -450,14 +450,6 @@ public int insertPlateSet2(
         dbm.getDatabaseRetriever()
             .getIDsForSysNames(plate_set_sys_name, "plate_set", "plate_set_sys_name");
 
-    LOGGER.info("plate_set_id: " + plate_set_id);
-
-    int assay_type_id = dbm.getDatabaseRetriever().getAssayIDForAssayType(assay_type);
-    int plate_layout_name_id =
-        dbm.getDatabaseRetriever().getPlateLayoutIDForPlateLayoutName(plate_layout);
-    LOGGER.info("plate_layout: " + plate_layout);
-
-    LOGGER.info("plate_layout_name_id: " + plate_layout_name_id);
 
     int assay_run_id =
         createAssayRun(assayName, descr, assay_type_id, plate_set_id[0], plate_layout_name_id);
@@ -492,7 +484,7 @@ public int insertPlateSet2(
         "INSERT INTO assay_result  SELECT sample.id, temp_data.response, "
             + assay_run_id
             + " FROM temp_data, plate_plate_set, plate_set, plate, well,sample, well_sample, well_numbers WHERE temp_data.plate = plate_plate_set.plate_order AND plate_plate_set.plate_id = plate.id AND well.plate_id = plate.id AND well_sample.well_id = well.id AND well_sample.sample_id = sample.id AND plate_plate_set.plate_set_id = plate_set.id AND temp_data.well = well_numbers.by_col AND well_numbers.well_name = well.well_name AND well_numbers.plate_format = "
-            + format
+            + format_id
             + " AND plate_plate_set.plate_set_id = "
             + plate_set_id[0]
             + "  ORDER BY plate_plate_set.plate_order, well_numbers.by_col;";
