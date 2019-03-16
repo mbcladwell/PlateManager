@@ -828,5 +828,31 @@ int plate_layout_name_id = _plate_layout_name_id;
 	
     }
 
+    public CustomTable getDataForScatterPlot(int _assay_run_id){
+	CustomTable result;
+	int assay_run_id = _assay_run_id;
+	int plate_set_id = 0;
+	int plate_layout_name_id = 0;
+ try {
+      PreparedStatement pstmt =
+          conn.prepareStatement("SELECT  plate_set_id, plate_layout_name_id FROM assay_run, plate_layout, plate_layout_name WHERE assay_run.id=?;");
+      pstmt.setInt(1, selected_layout_id);
+
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      result = rs.getInt(1);
+      LOGGER.info("number of replicates for layout name: " + result);
+      rs.close();
+      pstmt.close();
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting number of samples: " + sqle);
+    }
+   	
+	
+
+	return result;
+    }
+
     
 }

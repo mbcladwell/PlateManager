@@ -96,8 +96,8 @@ public class ScatterPlot extends JFrame {
         int height = getHeight();
         setVisible(true);
         g.setColor(Color.black);
-        g.drawLine(0, height/2, width, height/2); // x-axis
-        g.drawLine(width/2, 0, width/2, height); // y-axis
+        g.drawLine(40, 0,  40, height-40); // y-axis
+        g.drawLine(40, height-40, width-40, height-40); // x-axis
         // Draw the axes above.
         int numLabelsX = 10;
 	int numLabelsY = 10;
