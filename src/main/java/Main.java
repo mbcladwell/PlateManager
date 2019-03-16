@@ -2,7 +2,8 @@ package pm;
 
 import java.sql.SQLException;
 
-/** */
+/**
+ */
 public class Main {
 
   public static void main(String[] args) throws SQLException {
@@ -10,6 +11,7 @@ public class Main {
     // new DialogMainFrame();
 
     DialogMainFrame dmf = new DialogMainFrame();
+    ScatterPlot sp = new ScatterPlot();
 
     //  LayoutViewer lv = new LayoutViewer(dmf);
     
