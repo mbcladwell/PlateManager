@@ -13,10 +13,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -24,32 +23,53 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+
 public class ScatterPlot extends JFrame {
   private List coords1 = new ArrayList();
   private List coords2 = new ArrayList();
  private JTextField labelsX = new JTextField("10", 6);
   private JTextField labelsY = new JTextField("10", 6);
   private JButton updateBtn = new JButton("Update");
-    
-  public ScatterPlot() {
+    private DatabaseRetriever dbr;
+    private DialogMainFrame dmf;
+    private ArrayList table;
+      private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
+  public ScatterPlot(DialogMainFrame _dmf) {
     super("ScatterPlot");
     setSize(800, 600);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setLayout(new BorderLayout());
+    this.dmf = _dmf;
+    table = dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(9);
 
-    // Below will be replaced with the imported coordinates.
+    // Array look like
+    //  plate, well, response, bkgrnd_sub,   norm,   norm_pos ,  well_type_id,  replicates, target 
+    // -,1,0.293825507,0.293825507,0.434007883,0.511445642,1,1,a
+    // class org.postgresql.jdbc.PgArray
 
-    for (int i = 0; i < 2501; i++) {
-      Random rand = new Random();
-      int j = rand.nextInt(401) - 200;
-      int k = rand.nextInt(401) - 200;
-      int l = rand.nextInt(401) - 200;
-      int m = rand.nextInt(401) - 200;
 
-      coords1.add(new Point2D.Float(j, k));
-      coords2.add(new Point2D.Float(l, m));
-      Collections.shuffle(coords1);
-      Collections.shuffle(coords2);
+    for (int i = 0; i < table.size(); i++) {
+	LOGGER.info("row: " +  (Object)table.get(i));
+	
+	/*
+	try{
+	    table.get(i).getArray(2,2));
+	LOGGER.info("row: " + row[3]);
+	
+	}catch(SQLException sqle){
+	    LOGGER.info("sqle: " + sqle);
+	    
+	}
+    	*/
+	//LOGGER.info("class: " + table.get(i).getClass());
+	//	LOGGER.info("1: " + row[1]);
+	//LOGGER.info("2: " + row[2]);
+	
+	// coords1.add(new Point2D.Float(j, k));
+	//coords2.add(new Point2D.Float(l, m));
+	//Collections.shuffle(coords1);
+	//Collections.shuffle(coords2);
     }
 
     // Above will be replaced with the imported coordinates.
@@ -156,8 +176,5 @@ public class ScatterPlot extends JFrame {
  
   }
 
-  public static void main(String[] args) {
-    new ScatterPlot();
-  }
  
 }
