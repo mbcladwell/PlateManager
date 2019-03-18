@@ -412,22 +412,34 @@ public int insertPlateSet2(
     int plate_layout_name_id = _plate_layout_name_id;
     ArrayList<String[]> table = _table;
 
-    // read in data file an populate temp_data with data;
+Integer[] plate_set_id =
+        dbm.getDatabaseRetriever()
+            .getIDsForSysNames(plate_set_sys_name, "plate_set", "plate_set_sys_name");
+
+
+    int assay_run_id =
+        createAssayRun(assayName, descr, assay_type_id, plate_set_id[0], plate_layout_name_id);
+
+
+    
+    // read in data file an populate assay_result with data;
     // only continue if successful
     // if (table.get(0)[0] == "plate" & table.get(0)[1] == "plate" & table.get(0)[2] == "plate") {
-    String sql_statement = new String("INSERT INTO temp_data (plate, well, response) VALUES ");
+    String sql_statement = new String("INSERT INTO assay_result (assay_run_id, plate, well, response) VALUES ");
 
     table.remove(0); // get rid of the header
     for (String[] row : table) {
       sql_statement =
           sql_statement
-              + "("
-              + Integer.parseInt(row[0])
-              + ", "
-              + Integer.parseInt(row[1])
-              + ", "
-              + Double.parseDouble(row[2])
-              + "), ";
+	  + "("
+	  + assay_run_id
+	  + ", "
+	  + Integer.parseInt(row[0])
+	  + ", "
+	  + Integer.parseInt(row[1])
+	  + ", "
+	  + Double.parseDouble(row[2])
+	  + "), ";
     }
 
     String insertSql = sql_statement.substring(0, sql_statement.length() - 2) + ";";
@@ -443,17 +455,8 @@ public int insertPlateSet2(
       return;
     }
 
-    // int plate_set_id =
-    // dbm.getDatabaseRetriever().getPlateSetIDForPlateSetSysName(plate_set_sys_name);
-
-    Integer[] plate_set_id =
-        dbm.getDatabaseRetriever()
-            .getIDsForSysNames(plate_set_sys_name, "plate_set", "plate_set_sys_name");
-
-
-    int assay_run_id =
-        createAssayRun(assayName, descr, assay_type_id, plate_set_id[0], plate_layout_name_id);
-
+    
+    
     /**
      * At this point data is in temp_data, and assay run has been created and the assay_run_id
      * returned. Now populate assay_result.
@@ -471,7 +474,10 @@ public int insertPlateSet2(
      * plate_plate_set.plate_order, well_numbers.by_col;
      */
     // table assay_result: sample_id, response, assay_run_id
-    // table temp_data: plate, well, response
+    // table temp_data: plate, well, response, bkgrnd_sub, norm, norm_pos
+    //                                plate is the plate number
+    //                                norm is normalized to max signal of unknowns
+    //                                norm_pos is normalised setting mean of positives to 1
     // table assay_run: id, plate_set_id, plate_layout_name_id
     // plate_layout:  plate_layout_name_id, well_by_col, well_type_id
     // plate:  id
@@ -480,14 +486,11 @@ public int insertPlateSet2(
     // well_sample:  well_id  sample_id
     // well_numbers: format  well_name  by_col
 
+
+    //here I need to call process_assay_run_data(_assay_run_id integer) to normalize and background subtract
+
     String sql1 =
-        "INSERT INTO assay_result  SELECT sample.id, temp_data.response, "
-            + assay_run_id
-            + " FROM temp_data, plate_plate_set, plate_set, plate, well,sample, well_sample, well_numbers WHERE temp_data.plate = plate_plate_set.plate_order AND plate_plate_set.plate_id = plate.id AND well.plate_id = plate.id AND well_sample.well_id = well.id AND well_sample.sample_id = sample.id AND plate_plate_set.plate_set_id = plate_set.id AND temp_data.well = well_numbers.by_col AND well_numbers.well_name = well.well_name AND well_numbers.plate_format = "
-            + format_id
-            + " AND plate_plate_set.plate_set_id = "
-            + plate_set_id[0]
-            + "  ORDER BY plate_plate_set.plate_order, well_numbers.by_col;";
+        "SELECT process_assay_run_data( " + assay_run_id + ");";
 
     LOGGER.info("insertSql: " + sql1);
     PreparedStatement insertPs2;
@@ -497,8 +500,10 @@ public int insertPlateSet2(
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
     }
+    
   }
 
+    
   public int createAssayRun(
       String _assayName,
       String _descr,
