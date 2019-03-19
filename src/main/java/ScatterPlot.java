@@ -1,20 +1,25 @@
 /*
  * ScatterPlot.java
  * http://forums.devshed.com/java-help-9/java-scatterplot-121767.html
-
+ *
+ * http://zetcode.com/java/postgresql/
  */
 package pm;
 
     import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
+import java.awt.geom.AffineTransform;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -22,7 +27,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
 
 public class ScatterPlot extends JFrame {
   private List coords1 = new ArrayList();
@@ -33,6 +37,13 @@ public class ScatterPlot extends JFrame {
     private DatabaseRetriever dbr;
     private DialogMainFrame dmf;
     private ArrayList table;
+ private   Set<Integer> plate_set = new HashSet<Integer>();
+   private Set<Integer> well_set = new HashSet<Integer>();
+private    List<Float> norm_list = new LinkedList<Float>();
+    private int format;
+    private Float max_response;
+    private int num_plates = 0;
+  
       private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public ScatterPlot(DialogMainFrame _dmf) {
@@ -42,113 +53,131 @@ public class ScatterPlot extends JFrame {
     this.setLayout(new BorderLayout());
     this.dmf = _dmf;
     table = dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(9);
-
+DecimalFormat df = new DecimalFormat("#####.##");
     // Array look like
     //  plate, well, response, bkgrnd_sub,   norm,   norm_pos ,  well_type_id,  replicates, target 
-    // -,1,0.293825507,0.293825507,0.434007883,0.511445642,1,1,a
+    // -,1,1,0.293825507,0.293825507,0.434007883,0.511445642,1,1,a
     // class org.postgresql.jdbc.PgArray
-
-
+    // cannot retrieve first element so first element is duplicated, start extracting at [1]
+    // set up some variable with data limits
+    
     for (int i = 0; i < table.size(); i++) {
-	LOGGER.info("row: " +  (Object)table.get(i));
-	
-	/*
-	try{
-	    table.get(i).getArray(2,2));
-	LOGGER.info("row: " + row[3]);
-	
-	}catch(SQLException sqle){
-	    LOGGER.info("sqle: " + sqle);
-	    
-	}
-    	*/
-	//LOGGER.info("class: " + table.get(i).getClass());
-	//	LOGGER.info("1: " + row[1]);
-	//LOGGER.info("2: " + row[2]);
-	
-	// coords1.add(new Point2D.Float(j, k));
-	//coords2.add(new Point2D.Float(l, m));
-	//Collections.shuffle(coords1);
-	//Collections.shuffle(coords2);
-    }
+	String[] holder = table.get(i).toString().split(",");
+	int plate = Integer.parseInt(holder[1]);
+	plate_set.add(Integer.parseInt(holder[1]));
+	int well = Integer.parseInt(holder[2]);
+	well_set.add(Integer.parseInt(holder[2]));
+	Float response = Float.parseFloat(holder[3]);
+	Float bkgrnd = Float.parseFloat(holder[4]);
+	Float norm = Float.parseFloat(holder[5]);
+	norm_list.add(Float.parseFloat(holder[5]));
+	Float normpos = Float.parseFloat(holder[6]);
+	int well_type_id = Integer.parseInt(holder[7]);
+	int replicates = Integer.parseInt(holder[8]);
+	String target = holder[9];
+    	}
 
-    // Above will be replaced with the imported coordinates.
+    format = well_set.size();
+    num_plates = plate_set.size();
+    max_response = Collections.max(norm_list);
 
     JPanel panel = new JPanel() {
-	    private float scaleX;
-	    private float scaleY;
-	    private float originX;
-	    private float originY;
-
+	      /*
 	    public String getToolTipText(MouseEvent event) {
-          int xPos = event.getX();   // the x, y coords pointed to
-          int yPos = event.getY();
-
-          return "("+(int)((xPos-originX)/scaleX)+","
-		+(int)((yPos-originY)/-scaleY)+")"; // return tooltip text
-      }
-	    
+		int xPos = event.getX();   // the x, y coords pointed to
+		int yPos = event.getY();	
+		return "("+(int)((xPos-originX)/scaleX)+","
+		    +(int)((yPos-originY)/-scaleY)+")"; // return tooltip text
+	    }
+	    */
       public void paintComponent(Graphics g) {
-        // Plot points below.
-        int wth = getWidth();
-        int hgt = getHeight();
-        for (Iterator i=coords1.iterator(); i.hasNext(); ) {
-          Point2D.Float pt = (Point2D.Float)i.next();
-          g.setColor(Color.blue);
-          g.fillOval((int)(pt.x + wth/2) - 2, (int)(-pt.y + hgt/2) - 2, 4, 4);
-        }
-        for (Iterator i = coords2.iterator(); i.hasNext(); ) {
-          Point2D.Float pt = (Point2D.Float)i.next();
-          g.setColor(Color.red);
-          //g.fillOval((int)pt.x + wth/2 - 2, hgt/2 - (int)pt.y - 2, 4, 4);
-	  //g.drawString("+", (int)pt.x + wth/2, hgt/2 - (int)pt.y);
-	  g.drawString("+", 100, 100);
-	  g.drawString("+", 200, 200);
-	  g.drawString("+", 300, 300);
-	  g.drawString("+", 400, 400);
+	  // Plot points below.
+	Font font = new Font(null, Font.PLAIN, 15);    
+	g.setFont(font);
+
+
+	  int wth = getWidth();
+	  int hgt = getHeight();
+	  int margin = 60;
 	  
+	    float originX = margin;
+	    float originY = getHeight() - margin;
+	
+	  float scaleX = (wth-margin)/format; 
+	  float scaleY = (hgt-margin)/max_response;  
+
 	  
-        }
-        // Plot points above.
+	  for (int i = 0; i < table.size(); i++) {
+	      String[] holder = table.get(i).toString().split(",");
+	      int plate = Integer.parseInt(holder[1]);
+	      int well = Integer.parseInt(holder[2]);
+	      //LOGGER.info("well: " + well);
+	      Float response = Float.parseFloat(holder[3]);
+	      Float bkgrnd = Float.parseFloat(holder[4]);
+	      Float norm = Float.parseFloat(holder[5]);
+	      Float normpos = Float.parseFloat(holder[6]);
+	      int well_type_id = Integer.parseInt(holder[7]);
+	      int replicates = Integer.parseInt(holder[8]);
+	      String target = holder[9];
+	      //set color based on well type
+	      switch(well_type_id){
+	      case 1: g.setColor(Color.black);
+		  break;
+	      case 2: g.setColor(Color.green);
+		  break;
+	      case 3: g.setColor(Color.red);
+		  //LOGGER.info("color set to red");
+	   	  
+		  break;
+	      case 4: g.setColor(Color.gray);
+		  break;
+	      }
 
-        // Draw the axes below.
-        int width = getWidth();
-        int height = getHeight();
-        setVisible(true);
-        g.setColor(Color.black);
-        g.drawLine(40, 0,  40, height-40); // y-axis
-        g.drawLine(40, height-40, width-40, height-40); // x-axis
-        // Draw the axes above.
-        int numLabelsX = 10;
-	int numLabelsY = 10;
+	      
+	      int xpt = Math.round(originX + scaleX*well);
+	      int ypt = Math.round(originY - scaleY*norm);
 
-        try {
-            numLabelsX = Integer.parseInt(labelsX.getText());
-        } catch(NumberFormatException nfe) { 
-            // invalid number entered - will remain as 10
-        } 
-        try {
-            numLabelsY = Integer.parseInt(labelsY.getText());
-        } catch(NumberFormatException nfe) { 
-            // invalid number entered - will remain as 10
-        } 
-        // can't have negative numbers of labels
-        if(numLabelsX <= 0)
-            numLabelsX = 1;
-        if(numLabelsY <= 0)
-            numLabelsY = 1;
-        // Label the axes below.
-        g.setColor(Color.black);
-        g.drawString("--20", width/2, height/2 +20);
-        g.drawString("-20", width/2, height/2 - 20);
-        g.drawString("-40", width/2, height/2 - 40);
-        // Label the axes above.
+	      g.drawString("X", xpt, ypt);
 
-        // Test geom below.
-        //g.drawOval(width/2 - 3, height/2 - 3, 6, 6);
-        // Test geom above.
+	      g.setColor(Color.black);
+	      g.drawLine(margin, 0,  margin, hgt-margin); // y-axis
+	      g.drawLine(margin, hgt-margin, wth-10, hgt-margin); // x-axis
+	      g.drawString("Well", Math.round(originX + (wth-margin)/2)  , Math.round(originY + margin/2 + 10) );
+	      
+	
+	switch(format){
+	case 96:
+	    for( int j = 10; j <100; j=j+10 ){  //X- axis
+		g.drawLine( Math.round(originX +scaleX*j), hgt-margin,   Math.round(originX +scaleX*j), hgt-margin+10);
+		g.drawString(String.valueOf(j),  Math.round(originX +scaleX*j - 10), hgt-margin+25 );
+	    }
+	    
+	    for(int k = 1; k <6; k++){ //Y axis
+		g.drawLine( Math.round(originX-10), Math.round(originY-k*((hgt-margin)/6)),   Math.round(originX), Math.round(originY-k*((hgt-margin)/6)));
+		g.drawString(String.valueOf(df.format((k*((hgt-margin)/6))/scaleY)),  Math.round(originX - 50), Math.round(originY-k*((hgt-margin)/6)) );
+	   	
+	    }   
+	    break;
+	case 384:
+	    break;
+	case 1536:
+	    break;	    
+	}
+
+
+	//	Graphics2D g2 = (Graphics2D) g;
+	AffineTransform affineTransform = new AffineTransform();
+	affineTransform.rotate(Math.toRadians(-90), 0, 0);
+	Font rotatedFont = font.deriveFont(affineTransform);
+	g.setFont(rotatedFont);
+	g.drawString("Response", Math.round(originX -40)  , Math.round(originY - hgt/2 + 40) );
+	g.setFont(font);
+	//g2.dispose();
+
+	  }
+	  
       }
-    };
+	};
     panel.setToolTipText("");
      getContentPane().add(panel, BorderLayout.CENTER);
      // setContentPane(panel);

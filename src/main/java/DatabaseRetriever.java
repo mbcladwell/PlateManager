@@ -834,14 +834,14 @@ int plate_layout_name_id = _plate_layout_name_id;
 	ArrayList result = new ArrayList();
  try {
       PreparedStatement pstmt =
-          conn.prepareStatement("SELECT  get_scatter_plot_data(?);");
+          conn.prepareStatement("SELECT get_scatter_plot_data(?);");
       pstmt.setInt(1, _assay_run_id);
 
       ResultSet rs = pstmt.executeQuery();
      
       while (rs.next()) {
-	  result.add( rs.getArray(1));}	 
-      
+	  result.add( rs.getArray("get_scatter_plot_data"));}
+	  //LOGGER.info("in dbi: " + rs.getArray("get_scatter_plot_data"));}
             rs.close();
       pstmt.close();
       
