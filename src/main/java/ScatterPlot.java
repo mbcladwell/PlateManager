@@ -40,10 +40,13 @@ public class ScatterPlot extends JFrame {
  private   Set<Integer> plate_set = new HashSet<Integer>();
    private Set<Integer> well_set = new HashSet<Integer>();
 private    List<Float> norm_list = new LinkedList<Float>();
+private    List<Float> bkgrnd_list = new LinkedList<Float>();
+    
     private int format;
     private Float max_response;
     private int num_plates = 0;
-  
+  private DecimalFormat df = new DecimalFormat("#####.##");
+    
       private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public ScatterPlot(DialogMainFrame _dmf) {
@@ -53,7 +56,7 @@ private    List<Float> norm_list = new LinkedList<Float>();
     this.setLayout(new BorderLayout());
     this.dmf = _dmf;
     table = dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(9);
-DecimalFormat df = new DecimalFormat("#####.##");
+
     // Array look like
     //  plate, well, response, bkgrnd_sub,   norm,   norm_pos ,  well_type_id,  replicates, target 
     // -,1,1,0.293825507,0.293825507,0.434007883,0.511445642,1,1,a
@@ -69,6 +72,8 @@ DecimalFormat df = new DecimalFormat("#####.##");
 	well_set.add(Integer.parseInt(holder[2]));
 	Float response = Float.parseFloat(holder[3]);
 	Float bkgrnd = Float.parseFloat(holder[4]);
+	bkgrnd_list.add(Float.parseFloat(holder[4]));
+	
 	Float norm = Float.parseFloat(holder[5]);
 	norm_list.add(Float.parseFloat(holder[5]));
 	Float normpos = Float.parseFloat(holder[6]);
@@ -80,7 +85,11 @@ DecimalFormat df = new DecimalFormat("#####.##");
     format = well_set.size();
     num_plates = plate_set.size();
     max_response = Collections.max(norm_list);
+    mean_bkgrnd = Collections.mean(bkgrnd_list);
+    stdev_bkgrnd = Collections.stdev(bkgrnd_list);
+    mean_3_sd = mean_bkgrnd + 3*(stdev_bkgrnd);
 
+    
     JPanel panel = new JPanel() {
 	      /*
 	    public String getToolTipText(MouseEvent event) {
@@ -92,7 +101,7 @@ DecimalFormat df = new DecimalFormat("#####.##");
 	    */
       public void paintComponent(Graphics g) {
 	  // Plot points below.
-	Font font = new Font(null, Font.PLAIN, 15);    
+	Font font = new Font(null, Font.PLAIN, 12);    
 	g.setFont(font);
 
 
@@ -105,7 +114,6 @@ DecimalFormat df = new DecimalFormat("#####.##");
 	
 	  float scaleX = (wth-margin)/format; 
 	  float scaleY = (hgt-margin)/max_response;  
-
 	  
 	  for (int i = 0; i < table.size(); i++) {
 	      String[] holder = table.get(i).toString().split(",");
@@ -139,10 +147,12 @@ DecimalFormat df = new DecimalFormat("#####.##");
 
 	      g.drawString("X", xpt, ypt);
 
+	      float threshold = mean_3_bkgrnd;;
 	      g.setColor(Color.black);
 	      g.drawLine(margin, 0,  margin, hgt-margin); // y-axis
 	      g.drawLine(margin, hgt-margin, wth-10, hgt-margin); // x-axis
 	      g.drawString("Well", Math.round(originX + (wth-margin)/2)  , Math.round(originY + margin/2 + 10) );
+	      g.drawLine(margin, Math.round(originY - scaleY*threshold) , wth-10, Math.round(originY - scaleY*threshold)); // hit threshold
 	      
 	
 	switch(format){
