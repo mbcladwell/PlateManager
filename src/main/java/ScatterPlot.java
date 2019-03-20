@@ -34,18 +34,18 @@ import javax.swing.JTextField;
 import com.google.common.math.Stats;
 
 public class ScatterPlot extends JFrame {
-  private List coords1 = new ArrayList();
-  private List coords2 = new ArrayList();
- private JTextField labelsX = new JTextField("10", 6);
-  private JTextField labelsY = new JTextField("10", 6);
-  private JButton updateBtn = new JButton("Update");
+    private List coords1 = new ArrayList();
+    private List coords2 = new ArrayList();
+    private JTextField labelsX = new JTextField("10", 6);
+    private JTextField labelsY = new JTextField("10", 6);
+    private JButton updateBtn = new JButton("Update");
     private DatabaseRetriever dbr;
     private DialogMainFrame dmf;
     private ArrayList table;
- private   Set<Integer> plate_set = new HashSet<Integer>();
-   private Set<Integer> well_set = new HashSet<Integer>();
-private    List<Float> norm_list = new LinkedList<Float>();
-private    List<Float> bkgrnd_list = new LinkedList<Float>();
+    private Set<Integer> plate_set = new HashSet<Integer>();
+    private Set<Integer> well_set = new HashSet<Integer>();
+    private List<Float> norm_list = new LinkedList<Float>();
+    private List<Float> bkgrnd_list = new LinkedList<Float>();
     
     private int format;
     private Float max_response;
@@ -177,36 +177,36 @@ private    List<Float> bkgrnd_list = new LinkedList<Float>();
 	      g.drawString("Well", Math.round(originX + (wth-margin)/2)  , Math.round(originY + margin/2 + 10) );
 	      
 	      //draw the axes ticks and labels
-	switch(format){
-	case 96:
-	    for( int j = 10; j <100; j=j+10 ){  //X- axis
-		g.drawLine( Math.round(originX +scaleX*j), hgt-margin,   Math.round(originX +scaleX*j), hgt-margin+10);
-		g.drawString(String.valueOf(j),  Math.round(originX +scaleX*j - 10), hgt-margin+25 );
-	    }
+	      switch(format){
+	      case 96:
+		  for( int j = 10; j <100; j=j+10 ){  //X- axis
+		      g.drawLine( Math.round(originX +scaleX*j), hgt-margin,   Math.round(originX +scaleX*j), hgt-margin+10);
+		      g.drawString(String.valueOf(j),  Math.round(originX +scaleX*j - 10), hgt-margin+25 );
+		  }
 	    
-	    for(int k = 1; k <6; k++){ //Y axis
-		g.drawLine( Math.round(originX-10), Math.round(originY-k*((hgt-margin)/6)),
-			    Math.round(originX), Math.round(originY-k*((hgt-margin)/6)));
-		g.drawString(String.valueOf(df.format((k*((hgt-margin)/6))/scaleY)),  Math.round(originX - 50),
-			     Math.round(originY-k*((hgt-margin)/6)) );
+		  for(int k = 1; k <6; k++){ //Y axis
+		      g.drawLine( Math.round(originX-10), Math.round(originY-k*((hgt-margin)/6)),
+				  Math.round(originX), Math.round(originY-k*((hgt-margin)/6)));
+		      g.drawString(String.valueOf(df.format((k*((hgt-margin)/6))/scaleY)),  Math.round(originX - 50),
+				   Math.round(originY-k*((hgt-margin)/6)) );
 	   	
-	    }   
-	    break;
-	case 384:
-	    break;    
-	case 1536:
-	    break;	    
-	}
+		  }   
+		  break;
+	      case 384:
+		  break;    
+	      case 1536:
+		  break;	    
+	      }
 
 
-	Graphics2D g2d = (Graphics2D) g.create();
-	AffineTransform affineTransform = new AffineTransform();
-	affineTransform.rotate(Math.toRadians(-90), 0, 0);
-	Font rotatedFont = font.deriveFont(affineTransform);
-	g2d.setFont(rotatedFont);
-	g2d.drawString("Response", Math.round(originX -40)  , Math.round(originY - hgt/2 + 40) );
-	g2d.setFont(font);
-	g2d.dispose();
+	      Graphics2D g2d = (Graphics2D) g.create();
+	      AffineTransform affineTransform = new AffineTransform();
+	      affineTransform.rotate(Math.toRadians(-90), 0, 0);
+	      Font rotatedFont = font.deriveFont(affineTransform);
+	      g2d.setFont(rotatedFont);
+	      g2d.drawString("Response", Math.round(originX -40)  , Math.round(originY - hgt/2 + 40) );
+	      g2d.setFont(font);
+	      g2d.dispose();
 
 	  }
 
