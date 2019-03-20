@@ -6,10 +6,13 @@
  */
 package pm;
 
-    import java.awt.BorderLayout;
+    import java.awt.BasicStroke;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
@@ -28,6 +31,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import com.google.common.math.Stats;
+
 public class ScatterPlot extends JFrame {
   private List coords1 = new ArrayList();
   private List coords2 = new ArrayList();
@@ -44,8 +49,23 @@ private    List<Float> bkgrnd_list = new LinkedList<Float>();
     
     private int format;
     private Float max_response;
+    private double min_response;
+    private double mean_bkgrnd;
+    private double stdev_bkgrnd;
+    private double threshold;
+    private double mean_3_sd;
+    private int margin = 60;
+    private int wth;
+    private int hgt;	  
+    private float originX;
+    private float originY;	
+    private float scaleX; 
+    private float scaleY;  
+
+
     private int num_plates = 0;
   private DecimalFormat df = new DecimalFormat("#####.##");
+    private JPanel panel;
     
       private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
@@ -85,12 +105,17 @@ private    List<Float> bkgrnd_list = new LinkedList<Float>();
     format = well_set.size();
     num_plates = plate_set.size();
     max_response = Collections.max(norm_list);
-    mean_bkgrnd = Collections.mean(bkgrnd_list);
-    stdev_bkgrnd = Collections.stdev(bkgrnd_list);
+    min_response = Collections.min(norm_list);
+    
+    mean_bkgrnd = Stats.meanOf(bkgrnd_list);
+    stdev_bkgrnd = Stats.of(bkgrnd_list).populationStandardDeviation();
     mean_3_sd = mean_bkgrnd + 3*(stdev_bkgrnd);
+	      threshold = mean_3_sd;
 
     
-    JPanel panel = new JPanel() {
+    panel = new JPanel() {
+	    
+	    
 	      /*
 	    public String getToolTipText(MouseEvent event) {
 		int xPos = event.getX();   // the x, y coords pointed to
@@ -105,15 +130,14 @@ private    List<Float> bkgrnd_list = new LinkedList<Float>();
 	g.setFont(font);
 
 
-	  int wth = getWidth();
-	  int hgt = getHeight();
-	  int margin = 60;
+	  wth = getWidth();
+	  hgt = getHeight();
 	  
-	    float originX = margin;
-	    float originY = getHeight() - margin;
+           originX = margin;
+	   originY = getHeight() - margin;
 	
-	  float scaleX = (wth-margin)/format; 
-	  float scaleY = (hgt-margin)/max_response;  
+	  scaleX = (wth-margin)/format; 
+	  scaleY = (hgt-margin)/max_response;  
 	  
 	  for (int i = 0; i < table.size(); i++) {
 	      String[] holder = table.get(i).toString().split(",");
@@ -147,14 +171,12 @@ private    List<Float> bkgrnd_list = new LinkedList<Float>();
 
 	      g.drawString("X", xpt, ypt);
 
-	      float threshold = mean_3_bkgrnd;;
 	      g.setColor(Color.black);
 	      g.drawLine(margin, 0,  margin, hgt-margin); // y-axis
 	      g.drawLine(margin, hgt-margin, wth-10, hgt-margin); // x-axis
 	      g.drawString("Well", Math.round(originX + (wth-margin)/2)  , Math.round(originY + margin/2 + 10) );
-	      g.drawLine(margin, Math.round(originY - scaleY*threshold) , wth-10, Math.round(originY - scaleY*threshold)); // hit threshold
 	      
-	
+	      //draw the axes ticks and labels
 	switch(format){
 	case 96:
 	    for( int j = 10; j <100; j=j+10 ){  //X- axis
@@ -163,32 +185,40 @@ private    List<Float> bkgrnd_list = new LinkedList<Float>();
 	    }
 	    
 	    for(int k = 1; k <6; k++){ //Y axis
-		g.drawLine( Math.round(originX-10), Math.round(originY-k*((hgt-margin)/6)),   Math.round(originX), Math.round(originY-k*((hgt-margin)/6)));
-		g.drawString(String.valueOf(df.format((k*((hgt-margin)/6))/scaleY)),  Math.round(originX - 50), Math.round(originY-k*((hgt-margin)/6)) );
+		g.drawLine( Math.round(originX-10), Math.round(originY-k*((hgt-margin)/6)),
+			    Math.round(originX), Math.round(originY-k*((hgt-margin)/6)));
+		g.drawString(String.valueOf(df.format((k*((hgt-margin)/6))/scaleY)),  Math.round(originX - 50),
+			     Math.round(originY-k*((hgt-margin)/6)) );
 	   	
 	    }   
 	    break;
 	case 384:
-	    break;
+	    break;    
 	case 1536:
 	    break;	    
 	}
 
 
-	//	Graphics2D g2 = (Graphics2D) g;
+	Graphics2D g2d = (Graphics2D) g.create();
 	AffineTransform affineTransform = new AffineTransform();
 	affineTransform.rotate(Math.toRadians(-90), 0, 0);
 	Font rotatedFont = font.deriveFont(affineTransform);
-	g.setFont(rotatedFont);
-	g.drawString("Response", Math.round(originX -40)  , Math.round(originY - hgt/2 + 40) );
-	g.setFont(font);
-	//g2.dispose();
+	g2d.setFont(rotatedFont);
+	g2d.drawString("Response", Math.round(originX -40)  , Math.round(originY - hgt/2 + 40) );
+	g2d.setFont(font);
+	g2d.dispose();
 
 	  }
+
+	  
 	  
       }
-	};
+
+
+	};  //removed semicolon here
     panel.setToolTipText("");
+    drawThreshold( margin, (int)Math.round(originY - scaleY*threshold) , wth-10, (int)Math.round(originY - scaleY*threshold), "mean(background + 3SD)"); // hit threshold
+
      getContentPane().add(panel, BorderLayout.CENTER);
      // setContentPane(panel);
 
@@ -204,16 +234,38 @@ private    List<Float> bkgrnd_list = new LinkedList<Float>();
     });
     lblEditPanel.add(updateBtn);
     getContentPane().add(lblEditPanel, BorderLayout.SOUTH);
-    
-    int width = getWidth();
-    int height = getHeight();
-    //setBounds(20, 20, width, height);
-   
+
+    ScatterPlotSlider slider = new ScatterPlotSlider(min_response, max_response, mean_3_sd, 100, this);
+    getContentPane().add(slider, BorderLayout.EAST);
 
     setVisible(true);
    
  
   }
 
- 
+	    public void drawThreshold( int x1, int y1, int x2, int y2, String label){
+
+		//creates a copy of the Graphics instance
+		Graphics2D g2d = (Graphics2D) panel.getGraphics().create();
+
+		//set the stroke of the copy, not the original 
+		Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0);
+		g2d.setStroke(dashed);
+		g2d.drawLine(x1, y1, x2, y2);
+		g2d.setColor(Color.blue);
+		g2d.drawString(label, x1+20  , y1-5 );
+
+		//gets rid of the copy
+		g2d.dispose();
+	    }
+  
+    
+    public void setThreshold(double _threshold){
+	this.threshold = _threshold;
+	this.repaint();
+	//drawThreshold()
+	
+	
+    }
+    
 }
