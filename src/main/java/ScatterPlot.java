@@ -12,6 +12,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,19 +29,17 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import com.google.common.math.Stats;
 
 public class ScatterPlot extends JFrame {
-    private List coords1 = new ArrayList();
-    private List coords2 = new ArrayList();
-    private JTextField labelsX = new JTextField("10", 6);
-    private JTextField labelsY = new JTextField("10", 6);
-    private JButton updateBtn = new JButton("Update");
+    private JButton genHitsBtn = new JButton("Generate hit list");
     private DatabaseRetriever dbr;
     private DialogMainFrame dmf;
     private ArrayList table;
@@ -46,7 +47,9 @@ public class ScatterPlot extends JFrame {
     private Set<Integer> well_set = new HashSet<Integer>();
     private List<Float> norm_list = new LinkedList<Float>();
     private List<Float> bkgrnd_list = new LinkedList<Float>();
-    
+        static JComboBox<ComboItem> algorithmList;
+    static JComboBox<ComboItem> responseList;
+    private JTextField thresholdField;
     private int format;
     private Float max_response;
     private double min_response;
@@ -54,18 +57,22 @@ public class ScatterPlot extends JFrame {
     private double stdev_bkgrnd;
     private double threshold;
     private double mean_3_sd;
+    private double mean_2_sd;
     private int margin = 60;
     private int wth;
     private int hgt;	  
     private float originX;
     private float originY;	
     private float scaleX; 
-    private float scaleY;  
+    private float scaleY;
+    private int num_hits=0;
 
 
     private int num_plates = 0;
-  private DecimalFormat df = new DecimalFormat("#####.##");
+  private DecimalFormat df = new DecimalFormat("#####.####");
+    // private DecimalFormat df2 = new DecimalFormat("##.####");
     private JPanel panel;
+    private JPanel panel2;
     
       private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
@@ -110,7 +117,9 @@ public class ScatterPlot extends JFrame {
     mean_bkgrnd = Stats.meanOf(bkgrnd_list);
     stdev_bkgrnd = Stats.of(bkgrnd_list).populationStandardDeviation();
     mean_3_sd = mean_bkgrnd + 3*(stdev_bkgrnd);
-	      threshold = mean_3_sd;
+    mean_2_sd = mean_bkgrnd + 2*(stdev_bkgrnd);
+    
+    threshold = mean_3_sd;
 
     
     panel = new JPanel() {
@@ -208,6 +217,26 @@ public class ScatterPlot extends JFrame {
 	      g2d.setFont(font);
 	      g2d.dispose();
 
+
+ 		Graphics2D g2db = (Graphics2D) g.create();
+
+		//set the stroke of the copy, not the original 
+		Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{9}, 0);
+		g2db.setStroke(dashed);
+		g2db.drawLine(margin, (int)Math.round(originY - scaleY*threshold) , wth-10, (int)Math.round(originY - scaleY*threshold));
+		if( threshold == mean_3_sd){
+		g2db.setColor(Color.blue);
+		g2db.drawString( "mean(background + 3SD)", margin+20  , (int)Math.round(originY - scaleY*threshold - 10)  );
+		}
+		if( threshold == mean_2_sd){
+		g2db.setColor(Color.blue);
+		g2db.drawString( "mean(background + 2SD)", margin+20  , (int)Math.round(originY - scaleY*threshold - 10)  );
+		}
+		//gets rid of the copy
+		g2db.dispose();
+
+
+	      
 	  }
 
 	  
@@ -217,23 +246,130 @@ public class ScatterPlot extends JFrame {
 
 	};  //removed semicolon here
     panel.setToolTipText("");
-    drawThreshold( margin, (int)Math.round(originY - scaleY*threshold) , wth-10, (int)Math.round(originY - scaleY*threshold), "mean(background + 3SD)"); // hit threshold
-
+  
      getContentPane().add(panel, BorderLayout.CENTER);
      // setContentPane(panel);
 
-    JPanel lblEditPanel = new JPanel();
-    lblEditPanel.add(new JLabel("Y-axis labels:"));
-    lblEditPanel.add(labelsY);
-    lblEditPanel.add(new JLabel("X-axis labels:"));
-    lblEditPanel.add(labelsX);
-    updateBtn.addActionListener(new ActionListener() { 
+     panel2 = new JPanel(new GridBagLayout());
+    GridBagConstraints c = new GridBagConstraints();
+
+JLabel label = new JLabel("Algorithm:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 0;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+        c.insets = new Insets(5, 5, 2, 2);
+    c.anchor = GridBagConstraints.LINE_END;
+    panel2.add(label, c);
+
+    
+    ComboItem[] algorithmTypes = new ComboItem[]{ new ComboItem(3,"mean + 3SD"), new ComboItem(2,"mean + 2SD")};
+    
+    algorithmList = new JComboBox<ComboItem>(algorithmTypes);
+    algorithmList.setSelectedIndex(0);
+    c.gridx = 1;
+    c.gridy = 0;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    panel2.add(algorithmList, c);
+    algorithmList.addActionListener(new ActionListener() { 
+        public void actionPerformed(ActionEvent evt) {
+	    switch(((ComboItem)algorithmList.getSelectedItem()).getKey()){
+	    case 3:
+	    threshold = mean_3_sd;
+	    thresholdField.setText(df.format(threshold));
+            repaint();
+		
+		break;
+	    case 2:
+	    threshold = mean_2_sd;
+            repaint();
+	    thresholdField.setText(df.format(threshold));
+		break;
+	    }
+        }
+    });
+
+
+    
+            label = new JLabel("Threshold:", SwingConstants.RIGHT);
+    c.gridx = 2;
+    c.gridy = 0;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    panel2.add(label, c);
+
+
+    thresholdField = new JTextField(Double.toString(threshold), 10);
+    c.gridx = 3;
+    c.gridy = 0;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    panel2.add(thresholdField, c);
+    thresholdField.addActionListener(new ActionListener() { 
+        public void actionPerformed(ActionEvent evt) {
+	    threshold = Double.valueOf(thresholdField.getText());	    
+            repaint();
+        }
+    });
+
+
+    
+    c.gridx = 4;
+    c.gridy = 0;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    panel2.add(genHitsBtn, c);
+    genHitsBtn.addActionListener(new ActionListener() { 
         public void actionPerformed(ActionEvent evt) {
             repaint();
         }
     });
-    lblEditPanel.add(updateBtn);
-    getContentPane().add(lblEditPanel, BorderLayout.SOUTH);
+
+ label = new JLabel("Response:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 1;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    panel2.add(label, c);
+
+    ComboItem[] responseTypes = new ComboItem[]{ new ComboItem(1,"norm"), new ComboItem(2,"norm_pos")};
+    
+    responseList = new JComboBox<ComboItem>(responseTypes);
+    responseList.setSelectedIndex(0);
+    c.gridx = 1;
+    c.gridy = 1;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    panel2.add(responseList, c);
+
+    
+     label = new JLabel("Number of hits:", SwingConstants.RIGHT);
+    c.gridx = 2;
+    c.gridy = 1;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    panel2.add(label, c);
+
+
+    JLabel  numHitsLabel = new JLabel(Integer.toString(num_hits), SwingConstants.RIGHT);
+    c.gridx = 3;
+    c.gridy = 1;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    panel2.add(numHitsLabel, c);
+
+
+
+    getContentPane().add(panel2, BorderLayout.SOUTH);
 
     ScatterPlotSlider slider = new ScatterPlotSlider(min_response, max_response, mean_3_sd, 100, this);
     getContentPane().add(slider, BorderLayout.EAST);
@@ -242,7 +378,7 @@ public class ScatterPlot extends JFrame {
    
  
   }
-
+    /*
 	    public void drawThreshold( int x1, int y1, int x2, int y2, String label){
 
 		//creates a copy of the Graphics instance
@@ -258,10 +394,12 @@ public class ScatterPlot extends JFrame {
 		//gets rid of the copy
 		g2d.dispose();
 	    }
-  
+    */
     
     public void setThreshold(double _threshold){
 	this.threshold = _threshold;
+        thresholdField.setText(df.format(threshold));
+
 	this.repaint();
 	//drawThreshold()
 	
