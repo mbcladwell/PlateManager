@@ -21,7 +21,6 @@ import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,6 +57,7 @@ public class ScatterPlot extends JFrame {
     private double threshold;
     private double mean_3_sd;
     private double mean_2_sd;
+    private double[][] sortedResponse;
     private int margin = 60;
     private int wth;
     private int hgt;	  
@@ -66,7 +66,11 @@ public class ScatterPlot extends JFrame {
     private float scaleX; 
     private float scaleY;
     private int num_hits=0;
-
+    private ResponseWrangler raw_response;
+    
+    private ResponseWrangler norm_response;
+    private ResponseWrangler norm_pos_response;
+    
 
     private int num_plates = 0;
   private DecimalFormat df = new DecimalFormat("#####.####");
@@ -84,55 +88,14 @@ public class ScatterPlot extends JFrame {
     this.dmf = _dmf;
     table = dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(9);
 
-    // Array look like
-    //  plate, well, response, bkgrnd_sub,   norm,   norm_pos ,  well_type_id,  replicates, target 
-    // -,1,1,0.293825507,0.293825507,0.434007883,0.511445642,1,1,a
-    // class org.postgresql.jdbc.PgArray
-    // cannot retrieve first element so first element is duplicated, start extracting at [1]
-    // set up some variable with data limits
-    
-    for (int i = 0; i < table.size(); i++) {
-	String[] holder = table.get(i).toString().split(",");
-	int plate = Integer.parseInt(holder[1]);
-	plate_set.add(Integer.parseInt(holder[1]));
-	int well = Integer.parseInt(holder[2]);
-	well_set.add(Integer.parseInt(holder[2]));
-	Float response = Float.parseFloat(holder[3]);
-	Float bkgrnd = Float.parseFloat(holder[4]);
-	bkgrnd_list.add(Float.parseFloat(holder[4]));
-	
-	Float norm = Float.parseFloat(holder[5]);
-	norm_list.add(Float.parseFloat(holder[5]));
-	Float normpos = Float.parseFloat(holder[6]);
-	int well_type_id = Integer.parseInt(holder[7]);
-	int replicates = Integer.parseInt(holder[8]);
-	String target = holder[9];
-    	}
-
-    format = well_set.size();
-    num_plates = plate_set.size();
-    max_response = Collections.max(norm_list);
-    min_response = Collections.min(norm_list);
-    
-    mean_bkgrnd = Stats.meanOf(bkgrnd_list);
-    stdev_bkgrnd = Stats.of(bkgrnd_list).populationStandardDeviation();
-    mean_3_sd = mean_bkgrnd + 3*(stdev_bkgrnd);
-    mean_2_sd = mean_bkgrnd + 2*(stdev_bkgrnd);
-    
-    threshold = mean_3_sd;
-
+    raw_response = new ResponseWrangler(table, ResponseWrangler.RAW)
+    norm_response = new ResponseWrangler(table, ResponseWrangler.NORM)
+    norm_pos_response = new ResponseWrangler(table, ResponseWrangler.NORM_POS)
+ 
     
     panel = new JPanel() {
 	    
 	    
-	      /*
-	    public String getToolTipText(MouseEvent event) {
-		int xPos = event.getX();   // the x, y coords pointed to
-		int yPos = event.getY();	
-		return "("+(int)((xPos-originX)/scaleX)+","
-		    +(int)((yPos-originY)/-scaleY)+")"; // return tooltip text
-	    }
-	    */
       public void paintComponent(Graphics g) {
 	  // Plot points below.
 	Font font = new Font(null, Font.PLAIN, 12);    
@@ -404,6 +367,23 @@ JLabel label = new JLabel("Algorithm:", SwingConstants.RIGHT);
 	//drawThreshold()
 	
 	
+    }
+
+    public void updateAllVariables(ResponseWrangler selected_response){
+
+	
+	format = selected_response.getFormat();
+ num_plates = selected_response.getNum_plates();
+    max_response = selected_response.getMax_response();
+    min_response = selected_response.getMin_response();
+    
+    mean_bkgrnd = selected_response.getMean_bkgrnd();
+    stdev_bkgrnd = Stats.of(bkgrnd_list).populationStandardDeviation();
+    mean_3_sd = selected_response.getMean_3_sd();
+    mean_2_sd = selected_response.getMean_2_sd();
+    sortedResponse = selected_response.getSortedResponse();
+    
+    repaint();	
     }
     
 }
