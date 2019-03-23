@@ -35,9 +35,9 @@ public class ResponseWrangler {
     private List<Float> bkgrnd_list = new LinkedList<Float>();
     private int num_data_points;
 
-    private final int RAW = 0;
-    private final int NORM = 1;
-    private final int NORM_POS = 2;
+    public static final int RAW = 0;
+    public static final int NORM = 1;
+    public static final int NORM_POS = 2;
       private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     
     
@@ -52,7 +52,7 @@ public class ResponseWrangler {
      *
      * double[][]  sortedResponse [response] [well] [type_id] [sample_id]
      */
-    public void ResponseWrangler(ArrayList<String> _table, int _desired_response){
+    public ResponseWrangler(ArrayList<String> _table, int _desired_response){
 	table = _table;
 
 	sortedResponse = new double[table.size()][4];

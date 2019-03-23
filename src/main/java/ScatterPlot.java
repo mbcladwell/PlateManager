@@ -88,9 +88,9 @@ public class ScatterPlot extends JFrame {
     this.dmf = _dmf;
     table = dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(9);
 
-    raw_response = new ResponseWrangler(table, ResponseWrangler.RAW)
-    norm_response = new ResponseWrangler(table, ResponseWrangler.NORM)
-    norm_pos_response = new ResponseWrangler(table, ResponseWrangler.NORM_POS)
+    raw_response = new ResponseWrangler(table, ResponseWrangler.RAW);
+    norm_response = new ResponseWrangler(table, ResponseWrangler.NORM);
+    norm_pos_response = new ResponseWrangler(table, ResponseWrangler.NORM_POS);
  
     
     panel = new JPanel() {
