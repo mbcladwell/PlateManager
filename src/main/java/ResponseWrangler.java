@@ -2,14 +2,13 @@ package pm;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.Arrays;
-import java.util.Comparator;
-
 import java.util.logging.Logger;
 
 import com.google.common.math.Stats;
@@ -54,16 +53,31 @@ public class ResponseWrangler {
      */
     public ResponseWrangler(ArrayList<String> _table, int _desired_response){
 	table = _table;
-
+	LOGGER.info("table.size(): " + table.size());
 	sortedResponse = new double[table.size()][4];
+      	ArrayList<String> holder3 = new ArrayList<String>(table);
+	Object[] holder4 = holder3.toArray();
+	LOGGER.info("holder4: " + holder4);
+	LOGGER.info("holder4: " + holder4[1]);
+	LOGGER.info("holder4: " + Arrays.asList(holder4[1]));
+	List test = Arrays.asList(holder4[1]);
+	LOGGER.info("holder4: " + ((String)test.get(0)).split(","));
+	//	ArrayList<String> row = new ArrayList<String>(holder4);
+	
+	
+	    
  
 	
     for (int i = 0; i < table.size(); i++) {
-	String[] holder = table.get(i).toString().split(",");
-	int plate = Integer.parseInt(holder[1]);
-	plate_set.add(Integer.parseInt(holder[1]));
-	int well = Integer.parseInt(holder[2]);
-	well_set.add(Integer.parseInt(holder[2]));
+      	//String[] holder = table.get(i).toString().split(",");
+	LOGGER.info("table: " + table.get(i));
+      	ArrayList<String> holder = new ArrayList<String>(table);
+	int plate = Integer.parseInt(holder.get(1));
+	LOGGER.info("plate: " + plate);
+	plate_set.add(Integer.parseInt(holder.get(1)));
+	int well = Integer.parseInt(holder.get(2));
+	well_set.add(Integer.parseInt(holder.get(2)));
+	/*
 	sortedResponse[i][1] = Double.parseDouble(holder[2]);
 	Float response = Float.parseFloat(holder[3]);
 	Float bkgrnd = Float.parseFloat(holder[4]);
@@ -95,7 +109,7 @@ public class ResponseWrangler {
 	    break;
 	}
 
-
+	*/
 	
     	}
 

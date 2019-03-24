@@ -86,7 +86,8 @@ public class ScatterPlot extends JFrame {
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setLayout(new BorderLayout());
     this.dmf = _dmf;
-    table = dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(9);
+    //need the assay run id
+    table = dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(10);
 
     raw_response = new ResponseWrangler(table, ResponseWrangler.RAW);
     norm_response = new ResponseWrangler(table, ResponseWrangler.NORM);

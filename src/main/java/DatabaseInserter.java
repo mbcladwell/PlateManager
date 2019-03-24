@@ -425,7 +425,7 @@ Integer[] plate_set_id =
     // read in data file an populate assay_result with data;
     // only continue if successful
     // if (table.get(0)[0] == "plate" & table.get(0)[1] == "plate" & table.get(0)[2] == "plate") {
-    String sql_statement = new String("INSERT INTO assay_result (assay_run_id, plate, well, response) VALUES ");
+    String sql_statement = new String("INSERT INTO assay_result (assay_run_id, plate_order, well, response) VALUES ");
 
     table.remove(0); // get rid of the header
     for (String[] row : table) {
