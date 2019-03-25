@@ -41,7 +41,7 @@ public class ScatterPlot extends JFrame {
     private JButton genHitsBtn = new JButton("Generate hit list");
     private DatabaseRetriever dbr;
     private DialogMainFrame dmf;
-    private ArrayList table;
+    private CustomTable table;
     private Set<Integer> plate_set = new HashSet<Integer>();
     private Set<Integer> well_set = new HashSet<Integer>();
     private List<Float> norm_list = new LinkedList<Float>();

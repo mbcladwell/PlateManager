@@ -828,10 +828,10 @@ int plate_layout_name_id = _plate_layout_name_id;
 	
     }
     
-    public ArrayList  getDataForScatterPlot(int _assay_run_id){
-	//CustomTable table;
+    public CustomTable  getDataForScatterPlot(int _assay_run_id){
+	CustomTable table;
 	int assay_run_id = _assay_run_id;
-	ArrayList result = new ArrayList();
+	//ArrayList result = new ArrayList();
  try {
       PreparedStatement pstmt =
           conn.prepareStatement("SELECT get_scatter_plot_data(?);");
@@ -839,20 +839,19 @@ int plate_layout_name_id = _plate_layout_name_id;
 
       ResultSet rs = pstmt.executeQuery();
      
-      while (rs.next()) {
-	  result.add( rs.getArray("get_scatter_plot_data"));}
-	  //LOGGER.info("in dbi: " + rs.getArray("get_scatter_plot_data"));}
-            rs.close();
+      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+	
+           rs.close();
       pstmt.close();
       
-      return result;
+    
     } catch (SQLException sqle) {
       LOGGER.severe("SQL exception getting number of samples: " + sqle);
     }
    	
 	
 
-	return null;
+	return table;
     }
 
     

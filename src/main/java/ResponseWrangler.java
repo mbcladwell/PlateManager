@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.swing.table.DefaultTableModel;
+
 import com.google.common.math.Stats;
 
 public class ResponseWrangler {
@@ -25,7 +27,7 @@ public class ResponseWrangler {
     private int format;
     private int num_plates;
     private int num_hits=0;
-    private ArrayList<String> table;
+    private CustomTable table;
     private double[][] sortedResponse;
   private DecimalFormat df = new DecimalFormat("#####.####");
         private Set<Integer> plate_set = new HashSet<Integer>();
@@ -51,32 +53,23 @@ public class ResponseWrangler {
      *
      * double[][]  sortedResponse [response] [well] [type_id] [sample_id]
      */
-    public ResponseWrangler(ArrayList<String> _table, int _desired_response){
+    public ResponseWrangler(CustomTable _table, int _desired_response){
 	table = _table;
-	LOGGER.info("table.size(): " + table.size());
-	sortedResponse = new double[table.size()][4];
-      	ArrayList<String> holder3 = new ArrayList<String>(table);
-	Object[] holder4 = holder3.toArray();
-	LOGGER.info("holder4: " + holder4);
-	LOGGER.info("holder4: " + holder4[1]);
-	LOGGER.info("holder4: " + Arrays.asList(holder4[1]));
-	List test = Arrays.asList(holder4[1]);
-	LOGGER.info("holder4: " + ((String)test.get(0)).split(","));
-	//	ArrayList<String> row = new ArrayList<String>(holder4);
+	DefaultTableModel dtm = (DefaultTableModel)table.getModel(table);
 	
-	
+	sortedResponse = new double[table.getRowCount()][4];
 	    
- 
+ for(int row = 0;row < table.getRowCount();row++) {
+
 	
-    for (int i = 0; i < table.size(); i++) {
       	//String[] holder = table.get(i).toString().split(",");
-	LOGGER.info("table: " + table.get(i));
-      	ArrayList<String> holder = new ArrayList<String>(table);
-	int plate = Integer.parseInt(holder.get(1));
-	LOGGER.info("plate: " + plate);
-	plate_set.add(Integer.parseInt(holder.get(1)));
-	int well = Integer.parseInt(holder.get(2));
-	well_set.add(Integer.parseInt(holder.get(2)));
+	LOGGER.info("table: " + table.getValueAt(i));
+  
+int plate = Integer.parseInt(table.getValueAt(row, 1));
+       
+plate_set.add(Integer.parseInt(table.getValueAt(row, 1)));
+	int well = Integer.parseInt(table.getValueAt(row, 2));
+		      well_set.add(Integer.parseInt(table.getValueAt(row, 2)));
 	/*
 	sortedResponse[i][1] = Double.parseDouble(holder[2]);
 	Float response = Float.parseFloat(holder[3]);
