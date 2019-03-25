@@ -834,7 +834,7 @@ int plate_layout_name_id = _plate_layout_name_id;
 	//ArrayList result = new ArrayList();
  try {
       PreparedStatement pstmt =
-          conn.prepareStatement("SELECT get_scatter_plot_data(?);");
+          conn.prepareStatement("SELECT * FROM get_scatter_plot_data(?);");
       pstmt.setInt(1, _assay_run_id);
 
       ResultSet rs = pstmt.executeQuery();
@@ -843,6 +843,7 @@ int plate_layout_name_id = _plate_layout_name_id;
 	
            rs.close();
       pstmt.close();
+	return table;
       
     
     } catch (SQLException sqle) {
@@ -851,7 +852,7 @@ int plate_layout_name_id = _plate_layout_name_id;
    	
 	
 
-	return table;
+	return null;
     }
 
     

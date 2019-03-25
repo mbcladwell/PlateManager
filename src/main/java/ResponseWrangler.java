@@ -1,7 +1,6 @@
 package pm;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,7 +16,7 @@ import com.google.common.math.Stats;
 
 public class ResponseWrangler {
 
-   private Float max_response;
+   private double max_response;
     private double min_response;
     private double mean_bkgrnd;
     private double stdev_bkgrnd;
@@ -55,7 +54,7 @@ public class ResponseWrangler {
      */
     public ResponseWrangler(CustomTable _table, int _desired_response){
 	table = _table;
-	DefaultTableModel dtm = (DefaultTableModel)table.getModel(table);
+	DefaultTableModel dtm = (DefaultTableModel)table.getModel();
 	
 	sortedResponse = new double[table.getRowCount()][4];
 	    
@@ -63,53 +62,55 @@ public class ResponseWrangler {
 
 	
       	//String[] holder = table.get(i).toString().split(",");
-	LOGGER.info("table: " + table.getValueAt(i));
+     LOGGER.info("table: " + dtm.getValueAt(row,1));
   
-int plate = Integer.parseInt(table.getValueAt(row, 1));
+     int plate = (int)dtm.getValueAt(row, 0);
        
-plate_set.add(Integer.parseInt(table.getValueAt(row, 1)));
-	int well = Integer.parseInt(table.getValueAt(row, 2));
-		      well_set.add(Integer.parseInt(table.getValueAt(row, 2)));
-	/*
-	sortedResponse[i][1] = Double.parseDouble(holder[2]);
-	Float response = Float.parseFloat(holder[3]);
-	Float bkgrnd = Float.parseFloat(holder[4]);
-	bkgrnd_list.add(Float.parseFloat(holder[4]));
+     plate_set.add((int)dtm.getValueAt(row, 0));
+int well = (int)dtm.getValueAt(row, 1);
+	well_set.add((int)dtm.getValueAt(row, 1));
 	
-	Float norm = Float.parseFloat(holder[5]);
-	Float normpos = Float.parseFloat(holder[6]);
-	int well_type_id = Integer.parseInt(holder[7]);
-	sortedResponse[i][2] = Double.parseDouble(holder[7]);
-	int replicates = Integer.parseInt(holder[8]);
-	String target = holder[9];
-	double sample_id = Integer.parseInt(holder[10]);
-	sortedResponse[i][3] = Double.parseDouble(holder[10]);
+	//sortedResponse[i][1] = Double.parseDouble(holder[2]);
+
+	Float response = (float)dtm.getValueAt(row, 2);
+	
+	Float bkgrnd = (float)dtm.getValueAt(row, 3);
+	bkgrnd_list.add((float)dtm.getValueAt(row, 3));
+	
+	Float norm = (float)dtm.getValueAt(row, 4);
+	Float normpos = (float)dtm.getValueAt(row, 5);
+	int well_type_id = (int)dtm.getValueAt(row, 6);
+	sortedResponse[row][2] = (int)dtm.getValueAt(row, 6);
+	String replicates = (String)dtm.getValueAt(row, 7);
+	String target = (String)dtm.getValueAt(row, 8);
+	int sample_id = (int)dtm.getValueAt(row, 9);
+	sortedResponse[row][3] = (int)dtm.getValueAt(row, 9);
 	
 
 	
 	switch(_desired_response){
 	case 0: //raw
-	    desired_response_list.add(Float.parseFloat(holder[3]));
-	sortedResponse[i][0] = Double.parseDouble(holder[3]);
+	    desired_response_list.add(response);
+	    sortedResponse[row][0] = response;
 	    break;
 	case 1: //norm
-	    desired_response_list.add(Float.parseFloat(holder[5]));
-	sortedResponse[i][0] = Double.parseDouble(holder[5]);
+	    desired_response_list.add(norm);
+	sortedResponse[row][0] = norm;
 	    break;
 	case 2: //normpos
-	    desired_response_list.add(Float.parseFloat(holder[6]));
-	sortedResponse[i][0] = Double.parseDouble(holder[6]);
+	    desired_response_list.add(normpos);
+	sortedResponse[row][0] = normpos;
 	    break;
 	}
 
-	*/
+       
 	
     	}
 
     format = well_set.size();
     num_plates = plate_set.size();
-    max_response = Collections.max(desired_response_list);
-    min_response = Collections.min(desired_response_list);
+    max_response = Double.valueOf(Collections.max(desired_response_list));
+    min_response = Double.valueOf(Collections.min(desired_response_list));
     num_data_points = desired_response_list.size();
     
     mean_bkgrnd = Stats.meanOf(bkgrnd_list);
@@ -118,7 +119,7 @@ plate_set.add(Integer.parseInt(table.getValueAt(row, 1)));
     mean_2_sd = mean_bkgrnd + 2*(stdev_bkgrnd);
     threshold = mean_3_sd;
 
-Arrays.sort(sortedResponse, new Comparator<double[]>() {
+    Arrays.sort(sortedResponse, new Comparator<double[]>() {
         @Override
         public int compare(double[] o1, double[] o2) {
             return Double.compare(o2[0], o1[0]);
@@ -144,7 +145,7 @@ LOGGER.info("sortedResponse: " + sortedResponse.toString());
     /**
 	 * @return the max_response
 	 */
-	public Float getMax_response() {
+	public double getMax_response() {
 		return max_response;
 	}
 
@@ -152,7 +153,7 @@ LOGGER.info("sortedResponse: " + sortedResponse.toString());
 	/**
 	 * @param max_response the max_response to set
 	 */
-	public void setMax_response(Float max_response) {
+	public void setMax_response(double max_response) {
 		this.max_response = max_response;
 	}
 
@@ -286,7 +287,7 @@ LOGGER.info("sortedResponse: " + sortedResponse.toString());
 	/**
 	 * @return the table
 	 */
-	public ArrayList getTable() {
+	public CustomTable getTable() {
 		return table;
 	}
 
@@ -294,7 +295,7 @@ LOGGER.info("sortedResponse: " + sortedResponse.toString());
 	/**
 	 * @param table the table to set
 	 */
-	public void setTable(ArrayList table) {
+	public void setTable(CustomTable table) {
 		this.table = table;
 	}
 

@@ -20,7 +20,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +33,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
 
 import com.google.common.math.Stats;
 
@@ -50,7 +50,7 @@ public class ScatterPlot extends JFrame {
     static JComboBox<ComboItem> responseList;
     private JTextField thresholdField;
     private int format;
-    private Float max_response;
+    private double max_response;
     private double min_response;
     private double mean_bkgrnd;
     private double stdev_bkgrnd;
@@ -61,11 +61,12 @@ public class ScatterPlot extends JFrame {
     private int margin = 60;
     private int wth;
     private int hgt;	  
-    private float originX;
-    private float originY;	
-    private float scaleX; 
-    private float scaleY;
+    private double originX;
+    private double originY;	
+    private double scaleX; 
+    private double scaleY;
     private int num_hits=0;
+    private DefaultTableModel dtm;
     private ResponseWrangler raw_response;
     
     private ResponseWrangler norm_response;
@@ -93,6 +94,7 @@ public class ScatterPlot extends JFrame {
     norm_response = new ResponseWrangler(table, ResponseWrangler.NORM);
     norm_pos_response = new ResponseWrangler(table, ResponseWrangler.NORM_POS);
  
+    dtm = (DefaultTableModel)table.getModel();
     
     panel = new JPanel() {
 	    
@@ -112,18 +114,20 @@ public class ScatterPlot extends JFrame {
 	  scaleX = (wth-margin)/format; 
 	  scaleY = (hgt-margin)/max_response;  
 	  
-	  for (int i = 0; i < table.size(); i++) {
-	      String[] holder = table.get(i).toString().split(",");
-	      int plate = Integer.parseInt(holder[1]);
-	      int well = Integer.parseInt(holder[2]);
-	      //LOGGER.info("well: " + well);
-	      Float response = Float.parseFloat(holder[3]);
-	      Float bkgrnd = Float.parseFloat(holder[4]);
-	      Float norm = Float.parseFloat(holder[5]);
-	      Float normpos = Float.parseFloat(holder[6]);
-	      int well_type_id = Integer.parseInt(holder[7]);
-	      int replicates = Integer.parseInt(holder[8]);
-	      String target = holder[9];
+	  for (int row = 0; row < dtm.getRowCount(); row++) {
+	          int plate = (int)dtm.getValueAt(row, 0);
+       
+     plate_set.add((int)dtm.getValueAt(row, 0));
+int well = (int)dtm.getValueAt(row, 1);
+	Float response = (float)dtm.getValueAt(row, 2);	
+	Float bkgrnd = (float)dtm.getValueAt(row, 3);
+	Float norm = (float)dtm.getValueAt(row, 4);
+	Float normpos = (float)dtm.getValueAt(row, 5);
+	int well_type_id = (int)dtm.getValueAt(row, 6);
+	String replicates = (String)dtm.getValueAt(row, 7);
+	String target = (String)dtm.getValueAt(row, 8);
+	int sample_id = (int)dtm.getValueAt(row, 9);
+
 	      //set color based on well type
 	      switch(well_type_id){
 	      case 1: g.setColor(Color.black);
@@ -139,8 +143,8 @@ public class ScatterPlot extends JFrame {
 	      }
 
 	      
-	      int xpt = Math.round(originX + scaleX*well);
-	      int ypt = Math.round(originY - scaleY*norm);
+	      int xpt = originX + scaleX*well;
+	      int ypt = Math.ceil(originY - scaleY*norm);
 
 	      g.drawString("X", xpt, ypt);
 

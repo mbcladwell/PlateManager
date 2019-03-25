@@ -35,7 +35,7 @@ public class CustomTable extends JTable {
     this.setRowSelectionAllowed(true);
 
     this.getColumnModel().getColumn(0).setMaxWidth(75);
-    this.getColumnModel().getColumn(1).setMaxWidth(150);
+    //this.getColumnModel().getColumn(1).setMaxWidth(150);
     //    this.getColumnModel().getColumn(2).setMaxWidth(100);
 
     this.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
