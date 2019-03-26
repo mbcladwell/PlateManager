@@ -31,8 +31,8 @@ public class ResponseWrangler {
   private DecimalFormat df = new DecimalFormat("#####.####");
         private Set<Integer> plate_set = new HashSet<Integer>();
     private Set<Integer> well_set = new HashSet<Integer>();
-    private List<Float> desired_response_list = new LinkedList<Float>();
-    private List<Float> bkgrnd_list = new LinkedList<Float>();
+    private List<Double> desired_response_list = new LinkedList<Double>();
+    private List<Double> bkgrnd_list = new LinkedList<Double>();
     private int num_data_points;
 
     public static final int RAW = 0;
@@ -57,37 +57,30 @@ public class ResponseWrangler {
 	DefaultTableModel dtm = (DefaultTableModel)table.getModel();
 	
 	sortedResponse = new double[table.getRowCount()][4];
+	for(int row = 0;row < table.getRowCount();row++) {
 	    
- for(int row = 0;row < table.getRowCount();row++) {
-
-	
-      	//String[] holder = table.get(i).toString().split(",");
-     LOGGER.info("table: " + dtm.getValueAt(row,1));
-  
-     int plate = (int)dtm.getValueAt(row, 0);
-       
-     plate_set.add((int)dtm.getValueAt(row, 0));
-int well = (int)dtm.getValueAt(row, 1);
-	well_set.add((int)dtm.getValueAt(row, 1));
-	
-	//sortedResponse[i][1] = Double.parseDouble(holder[2]);
-
-	Float response = (float)dtm.getValueAt(row, 2);
-	
-	Float bkgrnd = (float)dtm.getValueAt(row, 3);
-	bkgrnd_list.add((float)dtm.getValueAt(row, 3));
-	
-	Float norm = (float)dtm.getValueAt(row, 4);
-	Float normpos = (float)dtm.getValueAt(row, 5);
-	int well_type_id = (int)dtm.getValueAt(row, 6);
-	sortedResponse[row][2] = (int)dtm.getValueAt(row, 6);
-	String replicates = (String)dtm.getValueAt(row, 7);
-	String target = (String)dtm.getValueAt(row, 8);
-	int sample_id = (int)dtm.getValueAt(row, 9);
-	sortedResponse[row][3] = (int)dtm.getValueAt(row, 9);
-	
-
-	
+	    int plate = (int)dtm.getValueAt(row, 0);
+	    
+	    plate_set.add((int)dtm.getValueAt(row, 0));
+	    int well = (int)dtm.getValueAt(row, 1);
+	    well_set.add((int)dtm.getValueAt(row, 1));
+	    sortedResponse[row][1] = well;
+	    
+	    double response = Double.valueOf((float)dtm.getValueAt(row, 2));	
+	    Double bkgrnd = Double.valueOf((float)dtm.getValueAt(row, 3));
+	    bkgrnd_list.add(Double.valueOf((float)dtm.getValueAt(row, 3)));
+	    Double norm = Double.valueOf((float)dtm.getValueAt(row, 4));
+	    Double normpos = Double.valueOf((float)dtm.getValueAt(row, 5));
+	    int well_type_id = (int)dtm.getValueAt(row, 6);
+	    sortedResponse[row][2] = (int)dtm.getValueAt(row, 6);
+	    String replicates = (String)dtm.getValueAt(row, 7);
+	    String target = (String)dtm.getValueAt(row, 8);
+	    int sample_id = 0;
+	    if(dtm.getValueAt(row, 9) != null){
+		sample_id = (int)dtm.getValueAt(row, 9);
+	    }
+		sortedResponse[row][3] = sample_id;
+	  
 	switch(_desired_response){
 	case 0: //raw
 	    desired_response_list.add(response);
@@ -125,21 +118,36 @@ int well = (int)dtm.getValueAt(row, 1);
             return Double.compare(o2[0], o1[0]);
         }
     });
-
-LOGGER.info("sortedResponse: " + sortedResponse.toString());
-
-
+    /*
+    for(int i=0; i < sortedResponse.length; i++){
+	System.out.println("[" + i + "][0] " + sortedResponse[i][0] );
+	System.out.println("[" + i + "][1] " + sortedResponse[i][1]);
+	System.out.println("[" + i + "][2] " + sortedResponse[i][2]);
+	System.out.println("[" + i + "][3] " + sortedResponse[i][3]);
+	
+    }
+    */
     }
 
+    /**
+     * Sorted in descending order
+     */
     public int getHitsAboveThreshold(double _threshold){
-	int firstIndexGreaterThanThreshold=0;
+	int firstIndexLessThanThreshold=0;
+	int results = 0;
 	for(int i = 0; i < sortedResponse.length; i++){
-	    if(sortedResponse[i][0] > threshold){
-		firstIndexGreaterThanThreshold = i;
-		break;
+	    if(sortedResponse[i][0] < threshold){
+		firstIndexLessThanThreshold = i;
+		    results =  firstIndexLessThanThreshold -1;
+		    /*
+		    LOGGER.info("threshold: " + threshold);
+		    LOGGER.info("response: " + sortedResponse[i][0]);
+		    LOGGER.info("results: " + results);
+		*/
+		    break;
 	    }
 	}
-	return ( sortedResponse.length - firstIndexGreaterThanThreshold);
+	return results;
     }
     
     /**
@@ -369,7 +377,7 @@ LOGGER.info("sortedResponse: " + sortedResponse.toString());
 	/**
 	 * @return the bkgrnd_list
 	 */
-	public List<Float> getBkgrnd_list() {
+	public List<Double> getBkgrnd_list() {
 		return bkgrnd_list;
 	}
 
@@ -377,7 +385,7 @@ LOGGER.info("sortedResponse: " + sortedResponse.toString());
 	/**
 	 * @param bkgrnd_list the bkgrnd_list to set
 	 */
-	public void setBkgrnd_list(List<Float> bkgrnd_list) {
+	public void setBkgrnd_list(List<Double> bkgrnd_list) {
 		this.bkgrnd_list = bkgrnd_list;
 	}  
 
@@ -392,7 +400,7 @@ LOGGER.info("sortedResponse: " + sortedResponse.toString());
 	/**
 	 * @return the desired_response_list
 	 */
-	public List<Float> getDesired_response_list() {
+	public List<Double> getDesired_response_list() {
 		return desired_response_list;
 	}
 
@@ -400,7 +408,7 @@ LOGGER.info("sortedResponse: " + sortedResponse.toString());
 	/**
 	 * @param desired_response_list the desired_response_list to set
 	 */
-	public void setDesired_response_list(List<Float> desired_response_list) {
+	public void setDesired_response_list(List<Double> desired_response_list) {
 		this.desired_response_list = desired_response_list;
 	}
 
