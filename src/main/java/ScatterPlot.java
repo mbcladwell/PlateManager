@@ -69,33 +69,34 @@ public class ScatterPlot extends JFrame {
     public JLabel numHitsLabel;
     private ResponseWrangler norm_response;
     private ResponseWrangler norm_pos_response;
-    
+    private ScatterPlotSlider slider;
 
     private int num_plates = 0;
-  private DecimalFormat df = new DecimalFormat("#####.####");
+    private DecimalFormat df = new DecimalFormat("#####.####");
     // private DecimalFormat df2 = new DecimalFormat("##.####");
     private JPanel panel;
     private JPanel panel2;
     
-      private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-  public ScatterPlot(DialogMainFrame _dmf) {
-    super("ScatterPlot");
-    setSize(800, 600);
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    this.setLayout(new BorderLayout());
-    this.dmf = _dmf;
+    public ScatterPlot(DialogMainFrame _dmf) {
+	super("ScatterPlot");
+	setSize(800, 600);
+	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	this.setLayout(new BorderLayout());
+	this.dmf = _dmf;
     //need the assay run id
-    table = dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(10);
+	table = dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(10);
 	LOGGER.info("row count: " + table.getRowCount());	    
 
-    raw_response = new ResponseWrangler(table, ResponseWrangler.RAW);
-    norm_response = new ResponseWrangler(table, ResponseWrangler.NORM);
-    norm_pos_response = new ResponseWrangler(table, ResponseWrangler.NORM_POS);
+	raw_response = new ResponseWrangler(table, ResponseWrangler.RAW);
+	norm_response = new ResponseWrangler(table, ResponseWrangler.NORM);
+	norm_pos_response = new ResponseWrangler(table, ResponseWrangler.NORM_POS);
 
+    slider = new ScatterPlotSlider(min_response, max_response, mean_3_sd, 100, this);
 
-         panel2 = new JPanel(new GridBagLayout());
-    GridBagConstraints c = new GridBagConstraints();
+	panel2 = new JPanel(new GridBagLayout());
+	GridBagConstraints c = new GridBagConstraints();
 
     JLabel label = new JLabel("Algorithm:", SwingConstants.RIGHT);
     c.gridx = 0;
@@ -131,7 +132,7 @@ public class ScatterPlot extends JFrame {
 
 
     
-            label = new JLabel("Threshold:", SwingConstants.RIGHT);
+     label = new JLabel("Threshold:", SwingConstants.RIGHT);
     c.gridx = 2;
     c.gridy = 0;
     c.gridheight = 1;
@@ -220,12 +221,8 @@ public class ScatterPlot extends JFrame {
     c.anchor = GridBagConstraints.LINE_START;
     panel2.add(numHitsLabel, c);
 
-
-
     getContentPane().add(panel2, BorderLayout.SOUTH);
 
-    ScatterPlotSlider slider = new ScatterPlotSlider(min_response, max_response, mean_3_sd, 100, this);
-    getContentPane().add(slider, BorderLayout.EAST);
 
     updateAllVariables(norm_response);
 
@@ -337,22 +334,18 @@ public class ScatterPlot extends JFrame {
 		}
 		//gets rid of the copy
 		g2db.dispose();
-
-
 	      
 	  }
 
-	  
 	  
       }
 
 
 	};  //removed semicolon here
-    panel.setToolTipText("");
   
+    getContentPane().add(slider, BorderLayout.EAST);
      getContentPane().add(panel, BorderLayout.CENTER);
-     // setContentPane(panel);
-
+     
     setVisible(true);
    
  
@@ -361,6 +354,7 @@ public class ScatterPlot extends JFrame {
     public void setThreshold(double _threshold){
 	this.threshold = _threshold;
         thresholdField.setText(df.format(threshold));
+	slider.setDoubleValue(threshold);
 
 	this.repaint();
 	
@@ -380,7 +374,7 @@ public class ScatterPlot extends JFrame {
 	num_hits = selected_response.getHitsAboveThreshold(threshold);
 	LOGGER.info("num_hits: " + Integer.toString(num_hits));
 	LOGGER.info("num_hits: " + numHitsLabel);
-	
+	slider.setDoubleValue(threshold);
 	numHitsLabel.setText(Integer.toString(num_hits));
     
     repaint();	

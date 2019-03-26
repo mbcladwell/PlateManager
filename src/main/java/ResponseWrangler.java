@@ -118,6 +118,20 @@ public class ResponseWrangler {
             return Double.compare(o2[0], o1[0]);
         }
     });
+
+    if(_desired_response == 0){
+	System.out.println("max: " + max_response);
+	System.out.println("min: " + min_response);
+	System.out.println("bkrnd: " + mean_bkgrnd);
+	System.out.println("stdev: " + stdev_bkgrnd);
+	System.out.println("mean_3_sd: " + mean_3_sd);
+	System.out.println("mean_2_sd: " + mean_2_sd);
+	System.out.println("threshold: " + threshold);
+	System.out.println("" );
+
+
+	
+    }
     /*
     for(int i=0; i < sortedResponse.length; i++){
 	System.out.println("[" + i + "][0] " + sortedResponse[i][0] );

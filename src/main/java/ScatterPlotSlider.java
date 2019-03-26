@@ -76,7 +76,7 @@ public class ScatterPlotSlider extends JSlider implements ChangeListener{
 	    setDoubleValue(val);
 	    setOrientation(JSlider.VERTICAL);
 	    this.parent = _parent;
-	    setLabel("Current Value: " + val);
+	    //setLabel("Current Value: " + val);
 	    addChangeListener(this);
     }
     
