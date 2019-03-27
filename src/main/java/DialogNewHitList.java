@@ -148,10 +148,10 @@ public class DialogNewHitList extends JDialog {
     okButton.addActionListener(
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-	      dmf.getDatabaseInserter()
+	      dmf.getDatabaseManager().getDatabaseInserter()
 		  .insertHitList( nameField.getText(),
 				  descriptionField.getText(),
-				  num_plates,
+				  num_hits,
 				  assay_run_id,
 				  selected_response);
             dispose();
