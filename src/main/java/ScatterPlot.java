@@ -33,7 +33,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableModel;
 
 public class ScatterPlot extends JFrame {
     private JButton genHitsBtn = new JButton("Generate hit list");
@@ -64,11 +63,13 @@ public class ScatterPlot extends JFrame {
     private double scaleX; 
     private double scaleY;
     private int num_hits=0;
-    private DefaultTableModel dtm;
+    //private DefaultTableModel dtm;
     private ResponseWrangler raw_response;
     public JLabel numHitsLabel;
     private ResponseWrangler norm_response;
     private ResponseWrangler norm_pos_response;
+    private ResponseWrangler selected_response;
+    private int assay_run_id;
     private ScatterPlotSlider slider;
 
     private int num_plates = 0;
@@ -76,25 +77,31 @@ public class ScatterPlot extends JFrame {
     // private DecimalFormat df2 = new DecimalFormat("##.####");
     private JPanel panel;
     private JPanel panel2;
+    private JPanel panel3;
     
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-    public ScatterPlot(DialogMainFrame _dmf) {
+    public ScatterPlot(DialogMainFrame _dmf, int _assay_run_id) {
 	super("ScatterPlot");
 	setSize(800, 600);
 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	this.setLayout(new BorderLayout());
 	this.dmf = _dmf;
+	assay_run_id = _assay_run_id;
     //need the assay run id
-	table = dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(10);
-	LOGGER.info("row count: " + table.getRowCount());	    
+	table = dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(assay_run_id);
+	//LOGGER.info("row count: " + table.getRowCount());	    
 
 	raw_response = new ResponseWrangler(table, ResponseWrangler.RAW);
 	norm_response = new ResponseWrangler(table, ResponseWrangler.NORM);
 	norm_pos_response = new ResponseWrangler(table, ResponseWrangler.NORM_POS);
 
-    slider = new ScatterPlotSlider(min_response, max_response, mean_3_sd, 100, this);
+	selected_response = norm_response;
+	threshold = selected_response.getThreshold();
+	updateAllVariables();
+	slider = new ScatterPlotSlider(min_response, max_response, threshold, 100, this);
 
+    
 	panel2 = new JPanel(new GridBagLayout());
 	GridBagConstraints c = new GridBagConstraints();
 
@@ -155,7 +162,6 @@ public class ScatterPlot extends JFrame {
         }
     });
 
-
     
     c.gridx = 4;
     c.gridy = 0;
@@ -165,7 +171,7 @@ public class ScatterPlot extends JFrame {
     panel2.add(genHitsBtn, c);
     genHitsBtn.addActionListener(new ActionListener() { 
         public void actionPerformed(ActionEvent evt) {
-            repaint();
+            new DialogNewHitList(dmf, assay_run_id, sortedResponse, num_hits);
         }
     });
 
@@ -180,7 +186,7 @@ public class ScatterPlot extends JFrame {
     ComboItem[] responseTypes = new ComboItem[]{ new ComboItem(1,"raw"), new ComboItem(2,"norm"), new ComboItem(3,"norm_pos")};
     
     responseList = new JComboBox<ComboItem>(responseTypes);
-    responseList.setSelectedIndex(0);
+    responseList.setSelectedIndex(1);
     c.gridx = 1;
     c.gridy = 1;
     c.gridheight = 1;
@@ -191,13 +197,16 @@ public class ScatterPlot extends JFrame {
         public void actionPerformed(ActionEvent evt) {
 	    switch(((ComboItem)responseList.getSelectedItem()).getKey()){
 	    case 1:
-		updateAllVariables(raw_response);
+		selected_response = raw_response;
+		updateAllVariables();
 		break;
 	    case 2:
-		updateAllVariables(norm_response);
+		selected_response = norm_response;
+		updateAllVariables();
 		break;
 	    case 3:
-		updateAllVariables(norm_pos_response);
+		selected_response = norm_pos_response;
+		updateAllVariables();
 		break;
 	    }
         }
@@ -213,7 +222,7 @@ public class ScatterPlot extends JFrame {
     panel2.add(label, c);
 
 
-    numHitsLabel = new JLabel("");
+    numHitsLabel = new JLabel(String.valueOf(num_hits));
     c.gridx = 3;
     c.gridy = 1;
     c.gridheight = 1;
@@ -223,11 +232,52 @@ public class ScatterPlot extends JFrame {
 
     getContentPane().add(panel2, BorderLayout.SOUTH);
 
+	panel3 = new JPanel(new GridBagLayout());
 
-    updateAllVariables(norm_response);
+     label = new JLabel("Legend:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 0;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    panel3.add(label, c);
 
-    
-    dtm = (DefaultTableModel)table.getModel();
+         label = new JLabel("positive", SwingConstants.RIGHT);
+	 label.setForeground(Color.green);
+    c.gridx = 1;
+    c.gridy = 0;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    panel3.add(label, c);
+
+         label = new JLabel("negative", SwingConstants.RIGHT);
+	 label.setForeground(Color.red);
+    c.gridx = 2;
+    c.gridy = 0;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    panel3.add(label, c);
+
+         label = new JLabel("unknown", SwingConstants.RIGHT);
+    c.gridx = 3;
+    c.gridy = 0;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    panel3.add(label, c);
+
+         label = new JLabel("blank", SwingConstants.RIGHT);
+	 label.setForeground(Color.gray);
+    c.gridx = 4;
+    c.gridy = 0;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    panel3.add(label, c);
+
+  getContentPane().add(panel3, BorderLayout.NORTH);
     
     panel = new JPanel() {
 	    
@@ -246,23 +296,13 @@ public class ScatterPlot extends JFrame {
 	
 	  scaleX = (wth-margin)/format; 
 	  scaleY = (hgt-margin)/max_response;  
+	  //    double[][]  sortedResponse [response] [well] [type_id] [sample_id]
 	  
-	  for (int row = 0; row < dtm.getRowCount(); row++) {
-	      int plate = (int)dtm.getValueAt(row, 0);
-	      plate_set.add((int)dtm.getValueAt(row, 0));
-	      int well = (int)dtm.getValueAt(row, 1);
-	      Double response = Double.valueOf((float)dtm.getValueAt(row, 2));	
-	      Double bkgrnd = Double.valueOf((float)dtm.getValueAt(row, 3));
-	      Double norm = Double.valueOf((float)dtm.getValueAt(row, 4));
-	      Double normpos = Double.valueOf((float)dtm.getValueAt(row, 5));
-	      int well_type_id = (int)dtm.getValueAt(row, 6);
-	      String replicates = (String)dtm.getValueAt(row, 7);
-	      String target = (String)dtm.getValueAt(row, 8);
-	      int sample_id = 0;
-	      if(dtm.getValueAt(row, 9) != null) sample_id = (int)dtm.getValueAt(row, 9);   
+	  for (int i = 0; i < sortedResponse.length; i++) {
+	     
 
 	      //set color based on well type
-	      switch(well_type_id){
+	      switch((int)Math.round(sortedResponse[i][2])){
 	      case 1: g.setColor(Color.black);
 		  break;
 	      case 2: g.setColor(Color.green);
@@ -276,8 +316,8 @@ public class ScatterPlot extends JFrame {
 	      }
 
 	      
-	      int xpt = (int)Math.round(originX + scaleX*well);
-	      int ypt = (int)Math.round(originY - scaleY*norm);
+	      int xpt = (int)Math.round(originX + scaleX*sortedResponse[i][1]);
+	      int ypt = (int)Math.round(originY - scaleY*sortedResponse[i][0]);
 
 	      g.drawString("X", xpt, ypt);
 
@@ -355,12 +395,12 @@ public class ScatterPlot extends JFrame {
 	this.threshold = _threshold;
         thresholdField.setText(df.format(threshold));
 	slider.setDoubleValue(threshold);
-
+	numHitsLabel.setText(String.valueOf(selected_response.getHitsAboveThreshold(threshold)));
 	this.repaint();
 	
     }
 
-    public void updateAllVariables(ResponseWrangler selected_response){
+    public void updateAllVariables(){
 	
 	format = selected_response.getFormat();
 	num_plates = selected_response.getNum_plates();
@@ -372,12 +412,13 @@ public class ScatterPlot extends JFrame {
 	mean_2_sd = selected_response.getMean_2_sd();
 	sortedResponse = selected_response.getSortedResponse();
 	num_hits = selected_response.getHitsAboveThreshold(threshold);
-	LOGGER.info("num_hits: " + Integer.toString(num_hits));
-	LOGGER.info("num_hits: " + numHitsLabel);
-	slider.setDoubleValue(threshold);
-	numHitsLabel.setText(Integer.toString(num_hits));
-    
-    repaint();	
+	//	LOGGER.info("num_hits: " + Integer.toString(num_hits));
+	//	    slider.setDoubleMinimum(min_response);
+	//    slider.setDoubleMaximum(max_response);
+	//    slider.setDoubleValue(threshold);
+
+	//numHitsLabel.setText(Integer.toString(num_hits));
+	repaint();
     }
     
 }

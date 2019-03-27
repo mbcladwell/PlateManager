@@ -661,4 +661,40 @@ Integer[] plate_set_id =
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
     }
     }
+
+      public void insertHitList(String _name,
+				String _description,
+				int _num_hits,
+				int  _assay_run_id,
+				double[][] sorted_response) {
+	  
+      int new_hit_list_id;
+      int[] hit_list = new int[_num_hits];
+      for(int i = 0; i < _num_hits; i++){
+	  hit_list[i] = (int)Math.round(sorted_response[i][3]);
+      }
+      
+      
+    try {
+      String insertSql = "SELECT new_hit_list ( ?, ?, ?, ?, ?);";
+      PreparedStatement insertPs =
+          conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+      insertPs.setString(1, _name);
+      insertPs.setString(2, _description);
+      insertPs.setInt(3, _num_hits);
+      insertPs.setInt(4, _assay_run_id);
+      insertPs.setArray(5, conn.createArrayOf("INTEGER", (hit_list.toArray())));
+   
+      LOGGER.info(insertPs.toString());
+      insertPs.executeUpdate();
+      //ResultSet resultSet = insertPs.getResultSet();
+      //resultSet.next();
+      //new_plate_set_id = resultSet.getInt("new_plate_set");
+     
+    } catch (SQLException sqle) {
+	LOGGER.warning("SQLE at inserting new plate set: " + sqle);
+    }
+    
+  }
+
 }

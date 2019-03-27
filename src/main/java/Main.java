@@ -11,7 +11,7 @@ public class Main {
     // new DialogMainFrame();
 
     DialogMainFrame dmf = new DialogMainFrame();
-    ScatterPlot sp = new ScatterPlot(dmf);
+    ScatterPlot sp = new ScatterPlot(dmf, 10);
 
     //  LayoutViewer lv = new LayoutViewer(dmf);
     

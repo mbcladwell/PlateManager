@@ -99,7 +99,7 @@ public class ScatterPlotSlider extends JSlider implements ChangeListener{
      * @param s		The specified title for the slider.
      */
     public void setLabel(String s) {
-    	border.setTitle(s);
+	//	border.setTitle(s);
     }
     
 	//========================================
@@ -173,7 +173,7 @@ public class ScatterPlotSlider extends JSlider implements ChangeListener{
     	ScatterPlotSlider slider = (ScatterPlotSlider)e.getSource();
     	if (!slider.getValueIsAdjusting()) {
     		setToolTipText(Double.toString(slider.getDoubleValue()));   		
-    		slider.setLabel("Current Value: "+slider.getDoubleValue());
+    		//slider.setLabel("Current Value: "+slider.getDoubleValue());
 		parent.setThreshold(slider.getDoubleValue());
     	}
     }

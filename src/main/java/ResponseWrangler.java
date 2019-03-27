@@ -27,7 +27,7 @@ public class ResponseWrangler {
     private int num_plates;
     private int num_hits=0;
     private CustomTable table;
-    private double[][] sortedResponse;
+    private double[][] sorted_response;
   private DecimalFormat df = new DecimalFormat("#####.####");
         private Set<Integer> plate_set = new HashSet<Integer>();
     private Set<Integer> well_set = new HashSet<Integer>();
@@ -50,13 +50,13 @@ public class ResponseWrangler {
      * cannot retrieve first element so first element is duplicated, start extracting at [1]
      * set up some variable with data limits
      *
-     * double[][]  sortedResponse [response] [well] [type_id] [sample_id]
+     * double[][]  sorted_response [response] [well] [type_id] [sample_id]
      */
     public ResponseWrangler(CustomTable _table, int _desired_response){
 	table = _table;
 	DefaultTableModel dtm = (DefaultTableModel)table.getModel();
 	
-	sortedResponse = new double[table.getRowCount()][4];
+	sorted_response = new double[table.getRowCount()][4];
 	for(int row = 0;row < table.getRowCount();row++) {
 	    
 	    int plate = (int)dtm.getValueAt(row, 0);
@@ -64,7 +64,7 @@ public class ResponseWrangler {
 	    plate_set.add((int)dtm.getValueAt(row, 0));
 	    int well = (int)dtm.getValueAt(row, 1);
 	    well_set.add((int)dtm.getValueAt(row, 1));
-	    sortedResponse[row][1] = well;
+	    sorted_response[row][1] = well;
 	    
 	    double response = Double.valueOf((float)dtm.getValueAt(row, 2));	
 	    Double bkgrnd = Double.valueOf((float)dtm.getValueAt(row, 3));
@@ -72,27 +72,27 @@ public class ResponseWrangler {
 	    Double norm = Double.valueOf((float)dtm.getValueAt(row, 4));
 	    Double normpos = Double.valueOf((float)dtm.getValueAt(row, 5));
 	    int well_type_id = (int)dtm.getValueAt(row, 6);
-	    sortedResponse[row][2] = (int)dtm.getValueAt(row, 6);
+	    sorted_response[row][2] = (int)dtm.getValueAt(row, 6);
 	    String replicates = (String)dtm.getValueAt(row, 7);
 	    String target = (String)dtm.getValueAt(row, 8);
 	    int sample_id = 0;
 	    if(dtm.getValueAt(row, 9) != null){
 		sample_id = (int)dtm.getValueAt(row, 9);
 	    }
-		sortedResponse[row][3] = sample_id;
+		sorted_response[row][3] = sample_id;
 	  
 	switch(_desired_response){
 	case 0: //raw
 	    desired_response_list.add(response);
-	    sortedResponse[row][0] = response;
+	    sorted_response[row][0] = response;
 	    break;
 	case 1: //norm
 	    desired_response_list.add(norm);
-	sortedResponse[row][0] = norm;
+	sorted_response[row][0] = norm;
 	    break;
 	case 2: //normpos
 	    desired_response_list.add(normpos);
-	sortedResponse[row][0] = normpos;
+	sorted_response[row][0] = normpos;
 	    break;
 	}
 
@@ -112,13 +112,13 @@ public class ResponseWrangler {
     mean_2_sd = mean_bkgrnd + 2*(stdev_bkgrnd);
     threshold = mean_3_sd;
 
-    Arrays.sort(sortedResponse, new Comparator<double[]>() {
+    Arrays.sort(sorted_response, new Comparator<double[]>() {
         @Override
         public int compare(double[] o1, double[] o2) {
             return Double.compare(o2[0], o1[0]);
         }
     });
-
+    /*
     if(_desired_response == 0){
 	System.out.println("max: " + max_response);
 	System.out.println("min: " + min_response);
@@ -129,36 +129,30 @@ public class ResponseWrangler {
 	System.out.println("threshold: " + threshold);
 	System.out.println("" );
 
-
-	
-    }
-    /*
-    for(int i=0; i < sortedResponse.length; i++){
-	System.out.println("[" + i + "][0] " + sortedResponse[i][0] );
-	System.out.println("[" + i + "][1] " + sortedResponse[i][1]);
-	System.out.println("[" + i + "][2] " + sortedResponse[i][2]);
-	System.out.println("[" + i + "][3] " + sortedResponse[i][3]);
+    for(int i=0; i < sorted_response.length; i++){
+	System.out.println("[" + i + "][0] " + sorted_response[i][0] );
+	System.out.println("[" + i + "][1] " + sorted_response[i][1]);
+	System.out.println("[" + i + "][2] " + sorted_response[i][2]);
+	System.out.println("[" + i + "][3] " + sorted_response[i][3]);
 	
     }
     */
+	
+    
     }
 
     /**
      * Sorted in descending order
+     * double[][]  sorted_response [response] [well] [type_id] [sample_id]
      */
     public int getHitsAboveThreshold(double _threshold){
-	int firstIndexLessThanThreshold=0;
+	double threshold = _threshold;
 	int results = 0;
-	for(int i = 0; i < sortedResponse.length; i++){
-	    if(sortedResponse[i][0] < threshold){
-		firstIndexLessThanThreshold = i;
-		    results =  firstIndexLessThanThreshold -1;
-		    /*
-		    LOGGER.info("threshold: " + threshold);
-		    LOGGER.info("response: " + sortedResponse[i][0]);
-		    LOGGER.info("results: " + results);
-		*/
-		    break;
+	for(int i = 0; i < sorted_response.length; i++){
+	    if(sorted_response[i][0] > threshold){
+		if(sorted_response[i][2] == 1){ //an "unknown" (i.e. not a control)
+		    results++;   
+		}
 	    }
 	}
 	return results;
@@ -323,18 +317,18 @@ public class ResponseWrangler {
 
 
 	/**
-	 * @return the sortedResponse
+	 * @return the sorted_response
 	 */
 	public double[][] getSortedResponse() {
-		return sortedResponse;
+		return sorted_response;
 	}
 
 
 	/**
-	 * @param sortedResponse the sortedResponse to set
+	 * @param sorted_response the sorted_response to set
 	 */
-	public void setSortedResponse(double[][] sortedResponse) {
-		this.sortedResponse = sortedResponse;
+	public void setSortedResponse(double[][] sorted_response) {
+		this.sorted_response = sorted_response;
 	}
 
 
