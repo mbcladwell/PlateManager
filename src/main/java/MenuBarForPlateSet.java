@@ -131,6 +131,15 @@ public class MenuBarForPlateSet extends JMenuBar {
         });
     utilitiesMenu.add(menuItem);
 
+  menuItem = new JMenuItem("View Assay Runs", KeyEvent.VK_A);
+     menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.ALT_MASK));
+    menuItem.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+	      AssayRunViewer arv = new AssayRunViewer(dmf);
+          }
+        });
+    utilitiesMenu.add(menuItem);
 
     
     JButton downbutton = new JButton();
