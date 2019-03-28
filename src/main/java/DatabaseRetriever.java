@@ -849,11 +849,34 @@ int plate_layout_name_id = _plate_layout_name_id;
     } catch (SQLException sqle) {
       LOGGER.severe("SQL exception getting number of samples: " + sqle);
     }
-   	
-	
-
-	return null;
+ 
+ return null;
     }
 
+
+  public CustomTable getAssayRuns(int _project_id) {
+      CustomTable table = null;;
+int project_id = _project_id;
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+
+				"SELECT assay_run.assay_run_sys_name AS \"Sys-Name\", assay_run.assay_run_name AS \"Name\", assay_run.descr AS \"Description\", assay_type.assay_type_name AS \"Assay Type\", plate_set.plate_set_sys_name  FROM assay_run, plate_set, assay_type WHERE assay_run.assay_type_id=assay_type.id AND assay_run.plate_set_id= plate_set.ID AND plate_set.project_id=?;");
+
+      pstmt.setInt(1, project_id);
+      ResultSet rs = pstmt.executeQuery();
+
+      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+       LOGGER.info("Got assay run table " + table);
+      rs.close();
+      pstmt.close();
+    
+
+    } catch (SQLException sqle) {
+ LOGGER.severe("Failed to retrieve plate_layout table: " + sqle);
+    }
+    return table;
+  }
+   
     
 }

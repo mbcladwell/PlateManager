@@ -1,16 +1,12 @@
 package pm;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -18,9 +14,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 
 public class AssayRunViewer extends JDialog implements java.awt.event.ActionListener {
   static JButton button;
@@ -41,14 +34,9 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
   private static final long serialVersionUID = 1L;
-  private MyModel tableModel;
     private ComboItem [] layoutNames;
     private Object[][] gridData;
     
-    private DefaultComboBoxModel<ComboItem> layout_names_list_model;
-     private static final long serialVersionUID = 1L;
-
-
     
   public AssayRunViewer(DialogMainFrame _dmf) {
     this.setTitle("Assay Run Viewer");
@@ -95,11 +83,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     public void actionPerformed(ActionEvent e) {
 
     if (e.getSource() == formatList) {
-       layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames((int)formatList.getSelectedItem());
-       layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
-       layoutList.setModel(layout_names_list_model );
-       layoutList.setSelectedIndex(-1);
-	
+    	
     }
 
     if (e.getSource() == layoutList) {
@@ -107,7 +91,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 	    int plate_layout_id  = ((ComboItem)layoutList.getSelectedItem()).getKey();
 	    //  String selected = (String)layoutList.getSelectedItem();
 	    // int plate_layout_id  = dmf.getDatabaseManager().getDatabaseRetriever().getIDforLayoutName(selected);
-	    this.refreshTable(plate_layout_id); 
+	    //	    this.refreshTable(plate_layout_id); 
 	}
     }
   }
