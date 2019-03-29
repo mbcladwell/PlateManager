@@ -52,11 +52,13 @@ public class CustomTable extends JTable {
     String[][] results = new String[rowCount + 1][colCount];
     for (int i = 0; i < colCount; i++) {
       results[0][i] = this.getColumnName(i);
+	LOGGER.info("ij: " + results[0][i]);
     }
 
     for (int i = 1; i <= rowCount; i++) {
       for (int j = 0; j < colCount; j++) {
-        results[i][j] = tableModel.getValueAt(selectedRows.get(i - 1), j).toString();
+        results[i][j] = tableModel.getValueAt(selectedRows.get(i-1), j).toString();
+	LOGGER.info("ij: " + i + " " + j);
       }
     }
     return results;

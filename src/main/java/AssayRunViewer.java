@@ -1,9 +1,8 @@
 package pm;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
-
 import java.awt.GridBagConstraints;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
@@ -13,11 +12,10 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.table.*;
-import javax.swing.JOptionPane;
 
 
 
@@ -144,8 +142,12 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 
         if (e.getSource() == viewAssayRun) {
     	    if(!table.getSelectionModel().isSelectionEmpty()){
-		Object[][] results = table.getSelectedRowsAndHeaderAsStringArray();	   
-		String assay_run_sys_name = (String) results[1][0];
+		 LOGGER.info("in view assay run; project_id: " + project_id);
+		String[][] results = table.getSelectedRowsAndHeaderAsStringArray();
+		for(int i = 0; i < 10; i++){
+		    LOGGER.info(results[i][0]);
+		}
+		String assay_run_sys_name = results[1][0];
 		int  assay_run_id = Integer.parseInt(assay_run_sys_name.substring(3));
 		
 		new ScatterPlot(dmf, assay_run_id);}
