@@ -81,6 +81,34 @@ public class DatabaseRetriever {
     return dummy;
   }
 
+    public ComboItem[] getAllProjects(){
+	    ComboItem[] results = null;
+    ArrayList<ComboItem> combo_items = new ArrayList<ComboItem>();
+ 
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement("SELECT id, project_sys_name from project;");
+
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next()) {
+     //all_plate_ids.add(rs.getInt(1));
+	combo_items.add(new ComboItem(rs.getInt(1), rs.getString(2)));
+        // LOGGER.info("A plate set ID: " + rs.getInt(1));
+      }
+
+      // LOGGER.info("Description: " + results);
+      rs.close();
+      pstmt.close();
+      results = combo_items.toArray(new ComboItem[combo_items.size()]);
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting plate types: " + sqle);
+    }
+    return results;
+
+    }
+
+    
   /**
    * ******************************************************************
    *
@@ -861,7 +889,7 @@ int project_id = _project_id;
       PreparedStatement pstmt =
           conn.prepareStatement(
 
-				"SELECT assay_run.assay_run_sys_name AS \"Sys-Name\", assay_run.assay_run_name AS \"Name\", assay_run.descr AS \"Description\", assay_type.assay_type_name AS \"Assay Type\", plate_set.plate_set_sys_name  FROM assay_run, plate_set, assay_type WHERE assay_run.assay_type_id=assay_type.id AND assay_run.plate_set_id= plate_set.ID AND plate_set.project_id=?;");
+				"SELECT assay_run.assay_run_sys_name AS \"Assay Run\", assay_run.assay_run_name AS \"Name\", assay_run.descr AS \"Description\", assay_type.assay_type_name AS \"Assay Type\", plate_set.plate_set_sys_name AS \"Plate Set\"  FROM assay_run, plate_set, assay_type WHERE assay_run.assay_type_id=assay_type.id AND assay_run.plate_set_id= plate_set.ID AND plate_set.project_id=?;");
 
       pstmt.setInt(1, project_id);
       ResultSet rs = pstmt.executeQuery();
@@ -878,5 +906,28 @@ int project_id = _project_id;
     return table;
   }
    
+  public CustomTable getHitLists(int _project_id) {
+      CustomTable table = null;;
+int project_id = _project_id;
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+      "SELECT hit_list.hitlist_sys_name AS \"Hit List\", hit_list.hitlist_name AS \"Name\", hit_list.descr AS \"Description\", assay_run.assay_run_sys_name AS \"Assay Run\", plate_set.plate_set_sys_name AS \"Plate Set\"  FROM assay_run, plate_set, hit_list WHERE hit_list.assay_run_id= assay_run.id AND assay_run.plate_set_id= plate_set.ID AND plate_set.project_id=?;");
+
+      
+      pstmt.setInt(1, project_id);
+      ResultSet rs = pstmt.executeQuery();
+
+      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+       LOGGER.info("Got assay run table " + table);
+      rs.close();
+      pstmt.close();
+    
+
+    } catch (SQLException sqle) {
+ LOGGER.severe("Failed to retrieve plate_layout table: " + sqle);
+    }
+    return table;
+  }
     
 }

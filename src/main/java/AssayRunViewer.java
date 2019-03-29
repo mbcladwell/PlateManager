@@ -1,6 +1,8 @@
 package pm;
 
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
+
 import java.awt.GridBagConstraints;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -14,49 +16,104 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.*;
+import javax.swing.JOptionPane;
+
+
 
 public class AssayRunViewer extends JDialog implements java.awt.event.ActionListener {
-  static JButton button;
+  static JButton exportAssayRun;
+  static JButton viewAssayRun;
+  static JButton exportHitList;
+  static JButton viewHitList;
+  static JButton closeButton;
+    
   static JLabel label;
-  static JComboBox<Integer> formatList;
-  static JComboBox<String> displayList;
-  static JComboBox<ComboItem> layoutList;
-  static JButton okButton;
-  static JButton cancelButton;
+  static JComboBox<ComboItem> projectList;
   final DialogMainFrame dmf;
-  final Session session;
+    final Session session;
+    private int project_id;
     private String owner;
-  private JTable table;
+  private CustomTable table;
+  private CustomTable table2;
   private JScrollPane scrollPane;
+    private JScrollPane scrollPane2;
     private  JPanel parentPane;
     private  JPanel pane1;
     private  JPanel pane2;
-  private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private JPanel arButtons;
+    private JPanel hlButtons;
+    
+    private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
   private static final long serialVersionUID = 1L;
-    private ComboItem [] layoutNames;
-    private Object[][] gridData;
     
     
   public AssayRunViewer(DialogMainFrame _dmf) {
     this.setTitle("Assay Run Viewer");
     this.dmf = _dmf;
     this.session = dmf.getSession();
+    project_id = session.getProjectID();
     owner = session.getUserName();
 
     parentPane = new JPanel(new BorderLayout());
-    
+
     pane1 = new JPanel(new BorderLayout());
     pane1.setBorder(BorderFactory.createRaisedBevelBorder());
     javax.swing.border.TitledBorder pane1Border = BorderFactory.createTitledBorder("Assay Runs:");
     pane1Border.setTitlePosition(javax.swing.border.TitledBorder.TOP);
     pane1.setBorder(pane1Border);
 
+    table = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRuns(session.getProjectID());
+
+    scrollPane = new JScrollPane(table);
+    table.setFillsViewportHeight(true);
+    pane1.add(scrollPane, BorderLayout.CENTER);
+
+    GridLayout buttonLayout = new GridLayout(1,4,5,5);
+    projectList = new JComboBox(dmf.getDatabaseManager().getDatabaseRetriever().getAllProjects());
+    projectList.addActionListener(this);
+    exportAssayRun = new JButton("Export");
+    exportAssayRun.addActionListener(this);
+    viewAssayRun = new JButton("View");
+    viewAssayRun.addActionListener(this);
+    arButtons = new JPanel(buttonLayout);
+    arButtons.add(projectList);
+    arButtons.add(exportAssayRun);
+    arButtons.add(viewAssayRun);
+    pane1.add(arButtons, BorderLayout.SOUTH);
+    
+    
+    
+    
+    
+
     pane2  = new JPanel(new BorderLayout());
     pane2.setBorder(BorderFactory.createRaisedBevelBorder());
     javax.swing.border.TitledBorder pane2Border = BorderFactory.createTitledBorder("Hit Lists:");
     pane2Border.setTitlePosition(javax.swing.border.TitledBorder.TOP);
-    pane2.setBorder(pane1Border);
+    pane2.setBorder(pane2Border);
+
+    table2 = dmf.getDatabaseManager().getDatabaseRetriever().getHitLists(session.getProjectID());
+
+    scrollPane2 = new JScrollPane(table2);
+    table2.setFillsViewportHeight(true);
+    pane2.add(scrollPane2, BorderLayout.CENTER);
+
+    hlButtons = new JPanel(buttonLayout);
+    closeButton = new JButton("Close");
+    closeButton.addActionListener(this);
+   
+    exportHitList = new JButton("Export");
+    exportHitList.addActionListener(this);
+   viewHitList = new JButton("View");
+     viewHitList.addActionListener(this);
+   hlButtons.add(closeButton);
+    
+    hlButtons.add(exportHitList);
+    hlButtons.add(viewHitList);
+    pane2.add(hlButtons, BorderLayout.SOUTH);
+
 
     this.getContentPane().add(parentPane, BorderLayout.CENTER);
     parentPane.add(pane1, BorderLayout.NORTH);
@@ -78,23 +135,54 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     this.setVisible(true);
   }
 
-    private void addToDB() {}
-
+   
     public void actionPerformed(ActionEvent e) {
-
-    if (e.getSource() == formatList) {
+	
+    if (e.getSource() == exportAssayRun) {
     	
     }
 
-    if (e.getSource() == layoutList) {
-	if(layoutList.getSelectedIndex() > -1){
-	    int plate_layout_id  = ((ComboItem)layoutList.getSelectedItem()).getKey();
-	    //  String selected = (String)layoutList.getSelectedItem();
-	    // int plate_layout_id  = dmf.getDatabaseManager().getDatabaseRetriever().getIDforLayoutName(selected);
-	    //	    this.refreshTable(plate_layout_id); 
-	}
+        if (e.getSource() == viewAssayRun) {
+    	    if(!table.getSelectionModel().isSelectionEmpty()){
+		Object[][] results = table.getSelectedRowsAndHeaderAsStringArray();	   
+		String assay_run_sys_name = (String) results[1][0];
+		int  assay_run_id = Integer.parseInt(assay_run_sys_name.substring(3));
+		
+		new ScatterPlot(dmf, assay_run_id);}
+	    else{
+	      JOptionPane.showMessageDialog(dmf, "Select an Assay Run!");	      
+	    }
+	
     }
+    if (e.getSource() == exportHitList) {
+    	
+    }
+    if (e.getSource() == viewHitList) {
+    	
+    }
+        if (e.getSource() == closeButton) {
+	    AssayRunViewer.this.dispose();
+    }
+
+
+    if (e.getSource() == projectList) {
+	if(projectList.getSelectedIndex() > -1){
+	    project_id  = ((ComboItem)projectList.getSelectedItem()).getKey();
+	    this.refreshTables(); 
+	}
+    }  
   }
 
+    public void refreshTables(){
+       
+	CustomTable arTable = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRuns(project_id);
+	TableModel arModel = arTable.getModel();
+	table.setModel(arModel);
+	//LOGGER.info("project: " + project_id);
+	CustomTable hlTable = dmf.getDatabaseManager().getDatabaseRetriever().getHitLists(project_id);
+	TableModel hlModel = hlTable.getModel();
+	table2.setModel(hlModel);
+	
+    }
   
 }
