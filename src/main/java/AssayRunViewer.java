@@ -14,6 +14,8 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTable;
+
 import javax.swing.JScrollPane;
 import javax.swing.table.*;
 
@@ -32,8 +34,8 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     final Session session;
     private int project_id;
     private String owner;
-  private CustomTable table;
-  private CustomTable table2;
+  private JTable table;
+  private JTable table2;
   private JScrollPane scrollPane;
     private JScrollPane scrollPane2;
     private  JPanel parentPane;
@@ -70,6 +72,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 
     GridLayout buttonLayout = new GridLayout(1,4,5,5);
     projectList = new JComboBox(dmf.getDatabaseManager().getDatabaseRetriever().getAllProjects());
+    projectList.setSelectedIndex(9);
     projectList.addActionListener(this);
     exportAssayRun = new JButton("Export");
     exportAssayRun.addActionListener(this);
@@ -116,14 +119,8 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     this.getContentPane().add(parentPane, BorderLayout.CENTER);
     parentPane.add(pane1, BorderLayout.NORTH);
     parentPane.add(pane2, BorderLayout.SOUTH);
-
     
-
     GridBagConstraints c = new GridBagConstraints();
-    
-
-  
-   
    
     
     this.pack();
@@ -142,15 +139,12 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 
         if (e.getSource() == viewAssayRun) {
     	    if(!table.getSelectionModel().isSelectionEmpty()){
-		 LOGGER.info("in view assay run; project_id: " + project_id);
-		String[][] results = table.getSelectedRowsAndHeaderAsStringArray();
-		for(int i = 0; i < 10; i++){
-		    LOGGER.info(results[i][0]);
-		}
-		String assay_run_sys_name = results[1][0];
-		int  assay_run_id = Integer.parseInt(assay_run_sys_name.substring(3));
-		
-		new ScatterPlot(dmf, assay_run_id);}
+		 
+		 TableModel arModel = table.getModel();
+		 int row = table.getSelectedRow();
+		 String assay_run_sys_name =  table.getModel().getValueAt(row, 0).toString();
+		 int  assay_run_id = Integer.parseInt(assay_run_sys_name.substring(3));
+		 new ScatterPlot(dmf, assay_run_id);}
 	    else{
 	      JOptionPane.showMessageDialog(dmf, "Select an Assay Run!");	      
 	    }
@@ -179,12 +173,16 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
        
 	CustomTable arTable = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRuns(project_id);
 	TableModel arModel = arTable.getModel();
-	table.setModel(arModel);
-	//LOGGER.info("project: " + project_id);
+	table.setModel(arModel);	
+
+		//LOGGER.info("project: " + project_id);
 	CustomTable hlTable = dmf.getDatabaseManager().getDatabaseRetriever().getHitLists(project_id);
 	TableModel hlModel = hlTable.getModel();
 	table2.setModel(hlModel);
 	
     }
-  
+
+ 
+
+ 
 }

@@ -327,8 +327,10 @@ public class ScatterPlot extends JFrame {
 	      g.drawString("Well", (int)Math.round(originX + (wth-margin)/2)  , (int)Math.round(originY + margin/2 + 10) );
 	      
 	      //draw the axes ticks and labels
+	      /*
 	      switch(format){
 	      case 96:
+		  */
 		  for( int j = 10; j <100; j=j+10 ){  //X- axis
 		      g.drawLine( (int)Math.round(originX +scaleX*j), hgt-margin,   (int)Math.round(originX +scaleX*j), hgt-margin+10);
 		      g.drawString(String.valueOf(j),  (int)Math.round(originX +scaleX*j - 10), hgt-margin+25 );
@@ -340,14 +342,15 @@ public class ScatterPlot extends JFrame {
 		      g.drawString(String.valueOf(df.format((k*((hgt-margin)/6))/scaleY)),  (int)Math.round(originX - 50),
 				   (int)Math.round(originY-k*((hgt-margin)/6)) );
 	   	
-		  }   
+		  }
+		  /*		  
 		  break;
 	      case 384:
 		  break;    
 	      case 1536:
 		  break;	    
 	      }
-
+		  */
 	      //draw "Response" on the Y axis
 	      Graphics2D g2d = (Graphics2D) g.create();
 	      AffineTransform affineTransform = new AffineTransform();

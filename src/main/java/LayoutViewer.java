@@ -222,6 +222,9 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 	    case "negative":
 		c.setBackground(java.awt.Color.RED);
 		break;
+	    case "edge":
+		c.setBackground(java.awt.Color.LIGHTBLUE);
+		break;
 		
 	    }
 	    
