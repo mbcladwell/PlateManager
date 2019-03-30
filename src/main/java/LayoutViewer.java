@@ -22,6 +22,12 @@ import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
+/**
+ * parentPane BorderLayout
+ * 
+ */
+
+
 public class LayoutViewer extends JDialog implements java.awt.event.ActionListener {
   static JButton button;
   static JLabel label;
@@ -34,9 +40,18 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
   final Session session;
     private String owner;
   private JTable table;
+  private JTable sourceTable;
+  private JTable destTable;
+    
   private JScrollPane scrollPane;
+  private JScrollPane sourceScrollPane;
+  private JScrollPane destScrollPane;
+    
+    private  JPanel parentPane;
+    private  JPanel pane2;
     private  JPanel pane3;
     private  JPanel pane4;
+    private  JPanel pane5;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
   private static final long serialVersionUID = 1L;
@@ -58,36 +73,18 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);
     layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
     
-    JPanel parentPane = new JPanel(new BorderLayout());
+    parentPane = new JPanel(new BorderLayout());
     parentPane.setBorder(BorderFactory.createRaisedBevelBorder());
 
-        JPanel pane3  = new JPanel(new GridBagLayout());
-    pane3.setBorder(BorderFactory.createRaisedBevelBorder());
-
+ 
     GridBagConstraints c = new GridBagConstraints();
     this.setTitle("Plate Layout Viewer");
     // c.gridwidth = 2;
 
-    javax.swing.border.TitledBorder layoutBorder = BorderFactory.createTitledBorder("Source:");
-    layoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
-    pane3.setBorder(layoutBorder);
-
-  
-
-    layoutList = new JComboBox<ComboItem>();
-//formatList.setSelectedIndex(0);
-    c.gridx = 1;
-    c.gridy = 1;
-    c.gridheight = 1;
-    c.anchor = GridBagConstraints.CENTER;
-    layoutList.setModel(layout_names_list_model );
-    layoutList.addActionListener(this);
-    pane3.add(layoutList, c);
-
-    javax.swing.border.TitledBorder destLayoutBorder = BorderFactory.createTitledBorder("Destination: ");
-
+////////////////////////////////////////////////////////////
+    //Pane 2
     
-            JPanel pane2 = new JPanel(new GridBagLayout());
+    JPanel pane2 = new JPanel(new GridBagLayout());
     pane2.setBorder(BorderFactory.createRaisedBevelBorder());
 
     
@@ -132,16 +129,63 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     pane2.add(displayList, c);
  
 
-  
+
+    ////////////////////////////////////////////////////////////
+    //Pane 3
+    pane3  = new JPanel(new BorderLayout());
+    pane3.setBorder(BorderFactory.createRaisedBevelBorder());
+   javax.swing.border.TitledBorder sourceLayoutBorder = BorderFactory.createTitledBorder("Source:");
+    sourceLayoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
+    pane3.setBorder(sourceLayoutBorder);
+    sourceTable = dmf.getDatabaseManager().getDatabaseRetriever().getSourceForLayout();
+
+    sourceScrollPane = new JScrollPane(sourceTable);
+    sourceTable.setFillsViewportHeight(true);
+    pane3.add( sourceScrollPane, BorderLayout.WEST);
+
+
     
-    pane4 = new JPanel(new BorderLayout());
+    
+    ////////////////////////////////////////////////////////////
+    //Pane 4
+  
+     pane4 = new JPanel(new BorderLayout());
     pane4.setBorder(BorderFactory.createRaisedBevelBorder());
+      javax.swing.border.TitledBorder destLayoutBorder = BorderFactory.createTitledBorder("Destination: ");
+
+    destLayoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
+    pane4.setBorder(destLayoutBorder);
+    destTable = dmf.getDatabaseManager().getDatabaseRetriever().getDestForLayout();
+
+    destScrollPane = new JScrollPane(destTable);
+    destTable.setFillsViewportHeight(true);
+    pane4.add( destScrollPane, BorderLayout.EAST);
+
+
+   ////////////////////////////////////////////////////////////
+    //Pane 5
+
+     pane5 = new JPanel(new BorderLayout());
+    pane5.setBorder(BorderFactory.createRaisedBevelBorder());
+      javax.swing.border.TitledBorder layoutBorder = BorderFactory.createTitledBorder("Layout: ");
+
+    layoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
+    pane5.setBorder(layoutBorder);
+    destTable = dmf.getDatabaseManager().getDatabaseRetriever().getDestForLayout();
+
+    destScrollPane = new JScrollPane(destTable);
+    destTable.setFillsViewportHeight(true);
+    pane3.add( destScrollPane, BorderLayout.EAST);
+
+    
+    
     this.refreshTable(1);
    
     this.getContentPane().add(parentPane, BorderLayout.CENTER);
-    parentPane.add(pane3, BorderLayout.CENTER);
     parentPane.add(pane2, BorderLayout.NORTH);
-    parentPane.add(pane4, BorderLayout.SOUTH);
+    parentPane.add(pane3, BorderLayout.WEST);
+    parentPane.add(pane4, BorderLayout.EAST);
+    parentPane.add(pane5, BorderLayout.SOUTH);
     
     this.pack();
     this.setLocation(
@@ -172,7 +216,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     }
   }
     public void refreshTable(int _plate_layout_id){
-	pane4.removeAll();
+	pane5.removeAll();
 	CustomTable  table2 = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayout(_plate_layout_id);
 	gridData =  dmf.getUtilities().getPlateLayoutGrid(table2);
 	tableModel = new MyModel(gridData);
@@ -188,10 +232,10 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 	scrollPane.setRowHeaderView(rowTable);
 	scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
 			     rowTable.getTableHeader());
-	pane4.add(scrollPane, BorderLayout.CENTER);
+	pane5.add(scrollPane, BorderLayout.CENTER);
 	table.setFillsViewportHeight(true);
-	pane4.revalidate();
-	pane4.repaint();
+	pane5.revalidate();
+	pane5.repaint();
 	
     
     }
@@ -223,7 +267,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 		c.setBackground(java.awt.Color.RED);
 		break;
 	    case "edge":
-		c.setBackground(java.awt.Color.LIGHTBLUE);
+		c.setBackground(new java.awt.Color(51,204,255)); //LIGHT_BLUE
 		break;
 		
 	    }

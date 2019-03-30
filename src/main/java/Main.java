@@ -13,8 +13,8 @@ public class Main {
     DialogMainFrame dmf = new DialogMainFrame();
     //ScatterPlot sp = new ScatterPlot(dmf, 1);
 
-     AssayRunViewer lv = new AssayRunViewer(dmf);
-    
+    // AssayRunViewer lv = new AssayRunViewer(dmf);
+    LayoutViewer lv = new LayoutViewer(dmf);
     // DialogReformatPlateSet drps = new DialogReformatPlateSet(dmf, 16, "PS-16","description 1", 20,6000,"assay", "96");
 
     //    DatabaseInserter dbi = new DatabaseInserter(dmf.getDatabaseManager());

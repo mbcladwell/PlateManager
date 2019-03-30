@@ -929,5 +929,52 @@ int project_id = _project_id;
     }
     return table;
   }
+
+  public CustomTable getSourceForLayout() {
+      CustomTable table = null;;
+
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+     
+      "select sys_name AS \"ID\",plate_format_id AS \"Format\", NAME AS \"Description\", descr AS \"Reps\",   use_edge AS \"Edge\", num_controls AS \"Controls\", control_loc AS \"Location\" from plate_layout_name where source_dest = 'source';");
+ 
+      ResultSet rs = pstmt.executeQuery();
+
+      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+       LOGGER.info("Got layout sources table " + table);
+      rs.close();
+      pstmt.close();
+    
+
+    } catch (SQLException sqle) {
+ LOGGER.severe("Failed to retrieve plate_layout sources table: " + sqle);
+    }
+    return table;
+  }
+
+      public CustomTable getDestForLayout() {
+      CustomTable table = null;;
+
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+     
+      "select sys_name AS \"ID\",plate_format_id AS \"Format\", NAME AS \"Description\", descr AS \"Reps\",   use_edge AS \"Edge\", num_controls AS \"Controls\", control_loc AS \"Location\" from plate_layout_name where source_dest = 'source';");
+ 
+      ResultSet rs = pstmt.executeQuery();
+
+      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+       LOGGER.info("Got layout sources table " + table);
+      rs.close();
+      pstmt.close();
+    
+
+    } catch (SQLException sqle) {
+ LOGGER.severe("Failed to retrieve plate_layout sources table: " + sqle);
+    }
+    return table;
+  }
+
     
 }
