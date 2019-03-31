@@ -930,15 +930,20 @@ int project_id = _project_id;
     return table;
   }
 
-  public CustomTable getSourceForLayout() {
+    /**
+     * Get the source data for LayoutViewer
+     */
+  public CustomTable getSourceForLayout(int _format) {
+      int format = _format;
       CustomTable table = null;;
 
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
      
-      "select sys_name AS \"ID\",plate_format_id AS \"Format\", NAME AS \"Description\", descr AS \"Reps\",   use_edge AS \"Edge\", num_controls AS \"Controls\", control_loc AS \"Location\" from plate_layout_name where source_dest = 'source';");
+      "select sys_name AS \"ID\",plate_format_id AS \"Format\", NAME AS \"Description\", descr AS \"Reps\",   use_edge AS \"Edge\", num_controls AS \"Controls\", control_loc AS \"Location\" from plate_layout_name WHERE source_dest = 'source' AND plate_format_id=?;");
  
+      pstmt.setInt(1, format);
       ResultSet rs = pstmt.executeQuery();
 
       table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
@@ -953,15 +958,16 @@ int project_id = _project_id;
     return table;
   }
 
-      public CustomTable getDestForLayout() {
-      CustomTable table = null;;
+      public CustomTable getDestForLayout(int _source_layout_id) {
+	  int source_layout_id = _source_layout_id;
+      CustomTable table = null;
 
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-     
-      "select sys_name AS \"ID\",plate_format_id AS \"Format\", NAME AS \"Description\", descr AS \"Reps\",   use_edge AS \"Edge\", num_controls AS \"Controls\", control_loc AS \"Location\" from plate_layout_name where source_dest = 'source';");
+"select plate_layout_name.sys_name AS \"ID\",plate_layout_name.plate_format_id AS \"Format\", plate_layout_name.name AS \"Description\", plate_layout_name.descr AS \"Reps\",   plate_layout_name.use_edge AS \"Edge\", plate_layout_name.num_controls AS \"Controls\", plate_layout_name.control_loc AS \"Location\" from plate_layout_name, layout_source_dest WHERE layout_source_dest.src= ? AND layout_source_dest.dest = plate_layout_name.id;");
  
+      pstmt.setInt(1, source_layout_id);
       ResultSet rs = pstmt.executeQuery();
 
       table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));

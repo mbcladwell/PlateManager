@@ -21,19 +21,24 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.event.*;
+import javax.swing.table.TableModel;
 
 /**
- * parentPane BorderLayout
- * 
+ * parentPane BorderLayout holds other panes
+ * pane2 GridBagLayout holds dropdowns
+ * pane3  BorderLayout holds source table
+ * pane4  BorderLayout holds destination table
+ * pane5 BorderLayout holds layout table
  */
 
 
-public class LayoutViewer extends JDialog implements java.awt.event.ActionListener {
+public class LayoutViewer extends JDialog implements java.awt.event.ActionListener, TableModelListener {
   static JButton button;
   static JLabel label;
   static JComboBox<Integer> formatList;
   static JComboBox<String> displayList;
-  static JComboBox<ComboItem> layoutList;
+    //static JComboBox<ComboItem> layoutList;
   static JButton okButton;
   static JButton cancelButton;
   final DialogMainFrame dmf;
@@ -59,7 +64,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     private ComboItem [] layoutNames;
     private Object[][] gridData;
     
-    private DefaultComboBoxModel<ComboItem> layout_names_list_model;
+    // private DefaultComboBoxModel<ComboItem> layout_names_list_model;
 
 
     
@@ -67,17 +72,12 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     this.dmf = _dmf;
     this.session = dmf.getSession();
     owner = session.getUserName();
-    // Create and set up the window.
-    // JFrame frame = new JFrame("Add Project");
-    // this.em = em;
-    layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);
-    layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
+    //layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);
+    //    layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
     
     parentPane = new JPanel(new BorderLayout());
     parentPane.setBorder(BorderFactory.createRaisedBevelBorder());
-
  
-    GridBagConstraints c = new GridBagConstraints();
     this.setTitle("Plate Layout Viewer");
     // c.gridwidth = 2;
 
@@ -86,6 +86,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     
     JPanel pane2 = new JPanel(new GridBagLayout());
     pane2.setBorder(BorderFactory.createRaisedBevelBorder());
+    GridBagConstraints c = new GridBagConstraints();
 
     
     label = new JLabel("Format:", SwingConstants.RIGHT);
@@ -137,11 +138,11 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
    javax.swing.border.TitledBorder sourceLayoutBorder = BorderFactory.createTitledBorder("Source:");
     sourceLayoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
     pane3.setBorder(sourceLayoutBorder);
-    sourceTable = dmf.getDatabaseManager().getDatabaseRetriever().getSourceForLayout();
-
+    sourceTable = dmf.getDatabaseManager().getDatabaseRetriever().getSourceForLayout(96);
+    sourceTable.getModel().addTableModelListener(this);
     sourceScrollPane = new JScrollPane(sourceTable);
     sourceTable.setFillsViewportHeight(true);
-    pane3.add( sourceScrollPane, BorderLayout.WEST);
+    pane3.add( sourceScrollPane, BorderLayout.CENTER);
 
 
     
@@ -155,11 +156,10 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 
     destLayoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
     pane4.setBorder(destLayoutBorder);
-    destTable = dmf.getDatabaseManager().getDatabaseRetriever().getDestForLayout();
-
+    destTable = dmf.getDatabaseManager().getDatabaseRetriever().getDestForLayout(1);
     destScrollPane = new JScrollPane(destTable);
     destTable.setFillsViewportHeight(true);
-    pane4.add( destScrollPane, BorderLayout.EAST);
+    pane4.add( destScrollPane, BorderLayout.CENTER);
 
 
    ////////////////////////////////////////////////////////////
@@ -170,16 +170,9 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
       javax.swing.border.TitledBorder layoutBorder = BorderFactory.createTitledBorder("Layout: ");
 
     layoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
-    pane5.setBorder(layoutBorder);
-    destTable = dmf.getDatabaseManager().getDatabaseRetriever().getDestForLayout();
-
-    destScrollPane = new JScrollPane(destTable);
-    destTable.setFillsViewportHeight(true);
-    pane3.add( destScrollPane, BorderLayout.EAST);
-
+    pane5.setBorder(layoutBorder);    
     
-    
-    this.refreshTable(1);
+    this.refreshLayoutTable(1);
    
     this.getContentPane().add(parentPane, BorderLayout.CENTER);
     parentPane.add(pane2, BorderLayout.NORTH);
@@ -194,28 +187,42 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     this.setVisible(true);
   }
 
-    private void addToDB() {}
 
     public void actionPerformed(ActionEvent e) {
 
     if (e.getSource() == formatList) {
-       layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames((int)formatList.getSelectedItem());
-       layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
-       layoutList.setModel(layout_names_list_model );
-       layoutList.setSelectedIndex(-1);
-	
+      
+	sourceTable.setModel(dmf.getDatabaseManager()
+			     .getDatabaseRetriever()
+			     .getSourceForLayout((int)formatList.getSelectedItem()).getModel());
+      
+ 	
+    }
+    
     }
 
-    if (e.getSource() == layoutList) {
-	if(layoutList.getSelectedIndex() > -1){
-	    int plate_layout_id  = ((ComboItem)layoutList.getSelectedItem()).getKey();
-	    //  String selected = (String)layoutList.getSelectedItem();
-	    // int plate_layout_id  = dmf.getDatabaseManager().getDatabaseRetriever().getIDforLayoutName(selected);
-	    this.refreshTable(plate_layout_id); 
-	}
-    }
-  }
-    public void refreshTable(int _plate_layout_id){
+     public void tableChanged(TableModelEvent e) {
+	 LOGGER.info("source: " + e);
+	 if (e.getSource() == sourceTable) {
+	     int row = sourceTable.getSelectedRows();
+	     //int column = e.getColumn();
+	     TableModel model = sourceTable.getModel();
+	     //String columnName = model.getColumnName(column);
+	     int source_layout_id = Integer.parseInt(((String)model.getValueAt(row, 0)).substring(3));
+	     LOGGER.info("source_layout_id: " + source_layout_id);
+	     	destTable.setModel(dmf.getDatabaseManager()
+			     .getDatabaseRetriever()
+				   .getDestForLayout(source_layout_id).getModel());
+	 }
+ 
+
+	 
+    
+     }
+
+
+    
+    public void refreshLayoutTable(int _plate_layout_id){
 	pane5.removeAll();
 	CustomTable  table2 = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayout(_plate_layout_id);
 	gridData =  dmf.getUtilities().getPlateLayoutGrid(table2);
