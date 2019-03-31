@@ -10,7 +10,6 @@ import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -18,11 +17,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.event.*;
-import javax.swing.table.TableModel;
 
 /**
  * parentPane BorderLayout holds other panes
@@ -33,7 +34,7 @@ import javax.swing.table.TableModel;
  */
 
 
-public class LayoutViewer extends JDialog implements java.awt.event.ActionListener, TableModelListener {
+public class LayoutViewer extends JDialog implements java.awt.event.ActionListener {
   static JButton button;
   static JLabel label;
   static JComboBox<Integer> formatList;
@@ -118,7 +119,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     c.insets = new Insets(5, 5, 2, 2);
     pane2.add(label, c);
  
-    String[] displayOptions = {"samples", "replicates"};
+    String[] displayOptions = {"samples", "sample replicates", "target replicates"};
 
     displayList = new JComboBox<String>(displayOptions);
     displayList.setSelectedIndex(0);
@@ -129,7 +130,13 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     displayList.addActionListener(this);
     pane2.add(displayList, c);
  
-
+    JButton helpButton = new JButton("Layout Help");
+    c.gridx = 4;
+    c.gridy = 1;
+    c.gridheight = 1;
+    helpButton.addActionListener(this);
+    pane2.add(helpButton, c);
+    
 
     ////////////////////////////////////////////////////////////
     //Pane 3
@@ -139,7 +146,24 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     sourceLayoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
     pane3.setBorder(sourceLayoutBorder);
     sourceTable = dmf.getDatabaseManager().getDatabaseRetriever().getSourceForLayout(96);
-    sourceTable.getModel().addTableModelListener(this);
+    sourceTable.getSelectionModel().addListSelectionListener(						     
+	  new ListSelectionListener() {
+	      public void valueChanged(ListSelectionEvent e) {
+		  ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+		  if(!e.getValueIsAdjusting() & sourceTable.getSelectedRow()>=0){
+		   	LOGGER.info("source: " + e);
+			int row = sourceTable.getSelectedRow();
+			
+			int source_layout_id = Integer.parseInt(( (String)sourceTable.getModel().getValueAt(row,0)).substring(4));
+			LOGGER.info("source_layout_id: " + source_layout_id);
+			destTable.setModel(dmf.getDatabaseManager()
+					   .getDatabaseRetriever()
+					   .getDestForLayout(source_layout_id).getModel());
+						refreshLayoutTable(source_layout_id);
+
+		  }
+	      }
+	  });
     sourceScrollPane = new JScrollPane(sourceTable);
     sourceTable.setFillsViewportHeight(true);
     pane3.add( sourceScrollPane, BorderLayout.CENTER);
@@ -157,6 +181,20 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     destLayoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
     pane4.setBorder(destLayoutBorder);
     destTable = dmf.getDatabaseManager().getDatabaseRetriever().getDestForLayout(1);
+    destTable.getSelectionModel().addListSelectionListener(						     
+	  new ListSelectionListener() {
+	      public void valueChanged(ListSelectionEvent e) {
+		  if(!e.getValueIsAdjusting() & destTable.getSelectedRow()>=0){
+		  ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+		   	LOGGER.info("dest source: " + e);
+			int row = destTable.getSelectedRow();
+			
+			int dest_layout_id = Integer.parseInt(( (String)destTable.getModel().getValueAt(row,0)).substring(4));
+			LOGGER.info("dest_source_layout_id: " + dest_layout_id);
+			refreshLayoutTable(dest_layout_id);
+		  }
+	      }
+	  });
     destScrollPane = new JScrollPane(destTable);
     destTable.setFillsViewportHeight(true);
     pane4.add( destScrollPane, BorderLayout.CENTER);
@@ -200,15 +238,15 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     }
     
     }
-
+    /*
      public void tableChanged(TableModelEvent e) {
 	 LOGGER.info("source: " + e);
 	 if (e.getSource() == sourceTable) {
-	     int row = sourceTable.getSelectedRows();
+	     int[] row = sourceTable.getSelectedRows();
 	     //int column = e.getColumn();
-	     TableModel model = sourceTable.getModel();
+	     DefaultTableModel model = (DefaultTableModel)sourceTable.getModel();
 	     //String columnName = model.getColumnName(column);
-	     int source_layout_id = Integer.parseInt(((String)model.getValueAt(row, 0)).substring(3));
+	     int source_layout_id = Integer.parseInt(((String)model.getValueAt(row[0], 0)).substring(3));
 	     LOGGER.info("source_layout_id: " + source_layout_id);
 	     	destTable.setModel(dmf.getDatabaseManager()
 			     .getDatabaseRetriever()
@@ -219,12 +257,25 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 	 
     
      }
-
+    */
 
     
     public void refreshLayoutTable(int _plate_layout_id){
 	pane5.removeAll();
-	CustomTable  table2 = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayout(_plate_layout_id);
+	CustomTable  table2 = null;
+	switch(displayList.getSelectedIndex()){
+	case 0:
+	table2 = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayout(_plate_layout_id);
+	    break;
+	case 1:
+	table2 = dmf.getDatabaseManager().getDatabaseRetriever().getSampleReplicatesLayout(_plate_layout_id);
+	    break;
+	case 2:
+	table2 = dmf.getDatabaseManager().getDatabaseRetriever().getTargetReplicatesLayout(_plate_layout_id);
+	    break;
+
+	    
+	}
 	gridData =  dmf.getUtilities().getPlateLayoutGrid(table2);
 	tableModel = new MyModel(gridData);
 	
@@ -276,7 +327,30 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 	    case "edge":
 		c.setBackground(new java.awt.Color(51,204,255)); //LIGHT_BLUE
 		break;
-		
+	    case "1":
+		c.setBackground(java.awt.Color.BLACK);
+		break;
+	    case "2":
+		c.setBackground(java.awt.Color.WHITE);
+		break;
+	    case "3":
+		c.setBackground(java.awt.Color.BLUE);
+		break;
+	    case "4":
+		c.setBackground(new java.awt.Color(51,204,255));
+		break;
+	    case "a":
+		c.setBackground(java.awt.Color.BLACK);
+		break;
+	    case "b":
+		c.setBackground(java.awt.Color.WHITE);
+		break;
+	    case "c":
+		c.setBackground(java.awt.Color.BLUE);
+		break;
+	    case "d":
+		c.setBackground(new java.awt.Color(51,204,255));
+		break;
 	    }
 	    
             return c;

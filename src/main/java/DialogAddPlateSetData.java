@@ -8,12 +8,15 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -29,6 +32,8 @@ public class DialogAddPlateSetData extends JDialog
   static JLabel label;
   static JComboBox<ComboItem> assayTypes;
   static JComboBox<ComboItem> plateLayouts;
+  static JComboBox<ComboItem> algorithmList;
+    
   static JTextField fileField;
   static JTextField nameField;
   static JTextField descrField;
@@ -50,7 +55,8 @@ public class DialogAddPlateSetData extends JDialog
     private int plate_num;
     private ComboItem plate_layout;
   private JFileChooser fileChooser;
-
+    private JCheckBox checkBox;
+    
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public DialogAddPlateSetData(
@@ -246,6 +252,31 @@ public class DialogAddPlateSetData extends JDialog
     fileField.getDocument().addDocumentListener(this);
     pane.add(fileField, c);
 
+    checkBox=new JCheckBox("Auto-identify hits using algorithm:");
+    c.gridx = 1;
+    c.gridy = 7;
+    c.gridwidth = 2;
+    c.gridheight = 1;
+    pane.add(checkBox, c);
+    checkBox.addItemListener(new ItemListener() {
+    public void itemStateChanged(ItemEvent e) {
+        if(e.getStateChange()==ItemEvent.SELECTED){
+            algorithmList.setEnabled(true);
+        }else if(e.getStateChange()==ItemEvent.DESELECTED){
+            algorithmList.setEnabled(false);
+        }
+    }
+	});
+
+    ComboItem[] algorithmTypes = new ComboItem[]{ new ComboItem(3,"mean + 3SD"), new ComboItem(2,"mean + 2SD")};
+    algorithmList = new JComboBox<ComboItem>(algorithmTypes);
+   
+    c.gridx = 3;
+    c.gridy = 7;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane.add(algorithmList, c);
+    algorithmList.setEnabled(false);
+    
     okButton = new JButton("OK");
     okButton.setMnemonic(KeyEvent.VK_O);
     okButton.setActionCommand("ok");
@@ -253,7 +284,7 @@ public class DialogAddPlateSetData extends JDialog
     okButton.setForeground(Color.GREEN);
     c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 1;
-    c.gridy = 7;
+    c.gridy = 8;
     c.gridwidth = 1;
     c.gridheight = 1;
     pane.add(okButton, c);
@@ -266,7 +297,7 @@ public class DialogAddPlateSetData extends JDialog
     cancelButton.setEnabled(true);
     cancelButton.setForeground(Color.RED);
     c.gridx = 2;
-    c.gridy = 7;
+    c.gridy = 8;
     pane.add(cancelButton, c);
     cancelButton.addActionListener(
         (new ActionListener() {
