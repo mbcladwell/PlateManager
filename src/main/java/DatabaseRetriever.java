@@ -904,7 +904,11 @@ int plate_layout_name_id = _plate_layout_name_id;
     return result;
 	
     }
-    
+
+    /**
+     * Called from Scatterplot.java
+     * Called from DatabaseInserter.associateDataWithPlateSet()
+     */
     public CustomTable  getDataForScatterPlot(int _assay_run_id){
 	CustomTable table;
 	int assay_run_id = _assay_run_id;

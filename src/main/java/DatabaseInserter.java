@@ -389,7 +389,9 @@ public int insertPlateSet2(
           plate_set_sys_name,
           (ComboItem) assayTypes.getSelectedItem().getKey(),
           (ComboItem) plateLayouts.getSelectedItem().getKey(),
-          dmf.getUtilities().loadDataFile(fileField.getText()));
+          dmf.getUtilities().loadDataFile(fileField.getText()),
+          checkBox.isSelected()
+          (ComboItem) algoritmList.getSelectedItem().getKey());
   */
 
   /** Called from DialogAddPlateSetData */
@@ -400,7 +402,10 @@ public int insertPlateSet2(
       int _format_id,
       int _assay_type_id,
       int _plate_layout_name_id,
-      ArrayList<String[]> _table) {
+      ArrayList<String[]> _table,
+      boolean _auto_select_hits,
+      int _hit_selection_algorithm,
+      int _top_n_number) {
 
     String assayName = _assayName;
     String descr = _descr;
@@ -411,6 +416,9 @@ public int insertPlateSet2(
     int assay_type_id = _assay_type_id;
     int plate_layout_name_id = _plate_layout_name_id;
     ArrayList<String[]> table = _table;
+    boolean auto_select_hits = _auto_select_hits;
+    int hit_selection_algorithm = _hit_selection_algorithm;
+    int top_n_number = _top_n_number;
 
 Integer[] plate_set_id =
         dbm.getDatabaseRetriever()
@@ -458,8 +466,6 @@ Integer[] plate_set_id =
     
     
     /**
-     * At this point data is in temp_data, and assay run has been created and the assay_run_id
-     * returned. Now populate assay_result.
      *
      * <p>Diagnostic query
      *
@@ -488,7 +494,8 @@ Integer[] plate_set_id =
 
 
     //here I need to call process_assay_run_data(_assay_run_id integer) to normalize and background subtract
-
+    //normalized data is in existing columns in assay_result
+    
     String sql1 =
         "SELECT process_assay_run_data( " + assay_run_id + ");";
 
@@ -500,6 +507,39 @@ Integer[] plate_set_id =
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
     }
+
+    //Now I need to select hits if requested by user.  I have the assay_run_id, and the algorithm for hit selection.
+    // stored procedure: new_hit_list(_name VARCHAR, _descr VARCHAR, _num_hits INTEGER, _assay_run_id INTEGER, hit_list integer[])
+    // DialogNewHitList(DialogMainFrame _dmf, int  _assay_run_id, double[][] _selected_response, int _num_hits)
+    // table = dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(assay_run_id);
+    // 	norm_response = new ResponseWrangler(table, ResponseWrangler.NORM);
+   //    double[][]  sortedResponse [response] [well] [type_id] [sample_id];
+    // selected_response.getHitsAboveThreshold(threshold))
+ 
+    
+    if(auto_select_hits){
+
+	ResponseWrangler rw = new ResponseWrangler(dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(assay_run_id),ResponseWrangler.NORM);
+	double[][] sorted_response = rw.getSortedResponse();
+	int number_of_hits = 0;
+       
+	
+	switch(hit_selection_algorithm){
+	case 1: //Top N
+	    number_of_hits = top_n_number;
+	    break;
+	case 2: // mean(background) + 2SD
+    
+	    number_of_hits =  rw.getHitsAboveThreshold(rw.getMean_2_sd() );
+	    break;
+	case 3:  // mean(background) + 3SD
+	    number_of_hits =  rw.getHitsAboveThreshold(rw.getMean_3_sd() );
+	    break;	    	    
+	}
+	DialogNewHitList dnhl = new DialogNewHitList(dmf, assay_run_id, sorted_response, number_of_hits);
+	
+    }
+  
     
   }
 

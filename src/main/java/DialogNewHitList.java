@@ -23,6 +23,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+/**
+ * Called from: DatabaseInserter.associatedDataWithPlateSet()
+ * Called from: ScatterPlot genHits Button
+ */
 public class DialogNewHitList extends JDialog {
   static JButton button;
   static JLabel label;

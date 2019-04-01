@@ -12,7 +12,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
-
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import javax.swing.JOptionPane;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -30,6 +32,7 @@ public class DialogAddPlateSetData extends JDialog
     implements java.awt.event.ActionListener, javax.swing.event.DocumentListener {
   static JButton button;
   static JLabel label;
+  static JLabel nLabel;
   static JComboBox<ComboItem> assayTypes;
   static JComboBox<ComboItem> plateLayouts;
   static JComboBox<ComboItem> algorithmList;
@@ -38,6 +41,8 @@ public class DialogAddPlateSetData extends JDialog
   static JTextField nameField;
   static JTextField descrField;
   static JTextField layoutField;
+  static JTextField nField;
+    
   static JButton okButton;
 
   static JButton select;
@@ -218,8 +223,8 @@ public class DialogAddPlateSetData extends JDialog
     c.gridy = 5;
     c.gridwidth = 3;
     c.gridheight = 1;
-    c.fill = GridBagConstraints.HORIZONTAL;
-    // c.anchor = GridBagConstraints.LINE_START;
+    //c.fill = GridBagConstraints.HORIZONTAL;
+    c.anchor = GridBagConstraints.LINE_START;
     pane.add(label, c);
     /*
     plateLayouts = new JComboBox<ComboItem>(dbr.getPlateLayoutNames(dbr.getPlateFormatID(format)));
@@ -253,7 +258,7 @@ public class DialogAddPlateSetData extends JDialog
     pane.add(fileField, c);
 
     checkBox=new JCheckBox("Auto-identify hits using algorithm:");
-    c.gridx = 1;
+    c.gridx = 0;
     c.gridy = 7;
     c.gridwidth = 2;
     c.gridheight = 1;
@@ -268,14 +273,86 @@ public class DialogAddPlateSetData extends JDialog
     }
 	});
 
-    ComboItem[] algorithmTypes = new ComboItem[]{ new ComboItem(3,"mean + 3SD"), new ComboItem(2,"mean + 2SD")};
+    ComboItem[] algorithmTypes = new ComboItem[]{ new ComboItem(3,"mean(background) + 3SD"), new ComboItem(2,"mean(background) + 2SD"), new ComboItem(1,"Top N")};
     algorithmList = new JComboBox<ComboItem>(algorithmTypes);
    
-    c.gridx = 3;
+    c.gridx = 2;
     c.gridy = 7;
+    c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(algorithmList, c);
     algorithmList.setEnabled(false);
+    algorithmList.addActionListener(new ActionListener(){
+	    public void actionPerformed(ActionEvent e){
+	    switch(((ComboItem)algorithmList.getSelectedItem()).getKey()){
+	    case 1:
+		nField.setEnabled(true);
+		nLabel.setForeground(Color.BLACK);
+		
+		break;
+	    case 2:
+		nField.setEnabled(false);
+		nLabel.setForeground(Color.GRAY);
+		break;
+	    case 3:
+		nField.setEnabled(false);
+		nLabel.setForeground(Color.GRAY);
+		break;		
+	    }
+	    }
+	});
+
+
+    nLabel = new JLabel("N:");
+    c.gridx = 3;
+    c.gridy = 7;
+    c.gridwidth = 1;
+    c.gridheight = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    nLabel.setForeground(Color.GRAY);
+
+    pane.add(nLabel, c);
+
+    
+    nField = new JTextField(5);
+    c.gridx = 4;
+    c.gridy = 7;
+    c.gridwidth = 1;
+    c.gridheight = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    nField.setEnabled(false);
+    //nField.getDocument().addDocumentListener(this);
+    pane.add(nField, c);
+
+    
+    JButton helpButton = new JButton("Help");
+    helpButton.setMnemonic(KeyEvent.VK_H);
+    helpButton.setActionCommand("help");
+    c.fill = GridBagConstraints.NONE;
+    c.gridx = 5;
+    c.gridy = 7;
+    c.gridwidth = 1;
+    c.gridheight = 1;
+    pane.add(helpButton, c);
+      try {
+      ImageIcon help =
+          new ImageIcon(this.getClass().getResource("/toolbarButtonGraphics/general/Help16.gif"));
+      helpButton.setIcon(help);
+    } catch (Exception ex) {
+      System.out.println("Can't find help icon: " + ex);
+    }
+    helpButton.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+    
+          }
+        });
+    helpButton.setSize(10, 10);
+    //; helpButton.setPreferredSize(new Dimension(5, 20));
+    // helpButton.setBounds(new Rectangle(
+    //             getLocation(), getPreferredSize()));
+    //helpButton.setMargin(new Insets(1, -40, 1, -100)); //(top, left, bottom, right)
+
     
     okButton = new JButton("OK");
     okButton.setMnemonic(KeyEvent.VK_O);
@@ -326,8 +403,22 @@ public class DialogAddPlateSetData extends JDialog
   }
 
   public void actionPerformed(ActionEvent e) {
+      int top_n_number = 0;
 
     if (e.getSource() == okButton) {
+	if(((ComboItem)algorithmList.getSelectedItem()).getKey()==1){  //If Top N is the algorithm
+	    try{
+		top_n_number = Integer.parseInt(nField.getText());
+	    }catch(NumberFormatException nfe){
+		JOptionPane.showMessageDialog(dmf,
+			      "Invalid number of hits.",
+			      "Number Format Exception",
+			      JOptionPane.ERROR_MESSAGE);
+		return;
+	    }
+	    
+	}
+	
       dbi.associateDataWithPlateSet(
           nameField.getText(),
           descrField.getText(),
@@ -335,7 +426,10 @@ public class DialogAddPlateSetData extends JDialog
           format.getKey(),
           ((ComboItem)assayTypes.getSelectedItem()).getKey(),
           plate_layout.getKey(),
-          dmf.getUtilities().loadDataFile(fileField.getText()));
+          dmf.getUtilities().loadDataFile(fileField.getText()),
+	  checkBox.isSelected(),
+	  ((ComboItem)algorithmList.getSelectedItem()).getKey(),
+	  top_n_number);
       dispose();
     }
 

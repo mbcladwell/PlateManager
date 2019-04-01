@@ -43,7 +43,7 @@ public class ResponseWrangler {
     
     /**
      * 
-     *	 Array look like
+     *	 Array looks like
      * plate, well, response, bkgrnd_sub,   norm,   norm_pos ,  well_type_id,  replicates, target 
      * -,1,1,0.293825507,0.293825507,0.434007883,0.511445642,1,1,a
      * class org.postgresql.jdbc.PgArray
@@ -396,9 +396,6 @@ public class ResponseWrangler {
 	public void setBkgrnd_list(List<Double> bkgrnd_list) {
 		this.bkgrnd_list = bkgrnd_list;
 	}  
-
-	
-  
 
 
 	/**
