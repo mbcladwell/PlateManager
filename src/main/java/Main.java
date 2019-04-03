@@ -11,8 +11,8 @@ public class Main {
     // new DialogMainFrame();
 
     DialogMainFrame dmf = new DialogMainFrame();
-    //ScatterPlot sp = new ScatterPlot(dmf, 1);
-    DialogAddPlateSetData dapsd = new DialogAddPlateSetData(dmf, "name", 10, 1536, 20);
+    ScatterPlot sp = new ScatterPlot(dmf, 10);
+    //DialogAddPlateSetData dapsd = new DialogAddPlateSetData(dmf, "name", 10, 1536, 20);
     // AssayRunViewer lv = new AssayRunViewer(dmf);
     //LayoutViewer lv = new LayoutViewer(dmf);
     // DialogReformatPlateSet drps = new DialogReformatPlateSet(dmf, 16, "PS-16","description 1", 20,6000,"assay", "96");

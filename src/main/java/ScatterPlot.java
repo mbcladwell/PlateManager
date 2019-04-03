@@ -294,7 +294,7 @@ public class ScatterPlot extends JFrame {
            originX = margin;
 	   originY = getHeight() - margin;
 	
-	  scaleX = (wth-margin)/format; 
+	  scaleX = (wth-margin)/Double.valueOf(format);
 	  scaleY = (hgt-margin)/max_response;  
 	  //    double[][]  sortedResponse [response] [well] [type_id] [sample_id]
 	  
@@ -309,15 +309,17 @@ public class ScatterPlot extends JFrame {
 		  break;
 	      case 3: g.setColor(Color.red);
 		  //LOGGER.info("color set to red");
-	   	  
 		  break;
 	      case 4: g.setColor(Color.gray);
+		  break;
+	      case 5: g.setColor(Color.blue);
 		  break;
 	      }
 
 	      
 	      int xpt = (int)Math.round(originX + scaleX*sortedResponse[i][1]);
 	      int ypt = (int)Math.round(originY - scaleY*sortedResponse[i][0]);
+	      // LOGGER.info("scaleX: " + scaleX + " response: " + sortedResponse[i][0] + " xpt: " + xpt);
 
 	      g.drawString("X", xpt, ypt);
 
@@ -327,15 +329,31 @@ public class ScatterPlot extends JFrame {
 	      g.drawString("Well", (int)Math.round(originX + (wth-margin)/2)  , (int)Math.round(originY + margin/2 + 10) );
 	      
 	      //draw the axes ticks and labels
-	      /*
+	      
 	      switch(format){
-	      case 96:
-		  */
+	      case 96:		  
 		  for( int j = 10; j <100; j=j+10 ){  //X- axis
 		      g.drawLine( (int)Math.round(originX +scaleX*j), hgt-margin,   (int)Math.round(originX +scaleX*j), hgt-margin+10);
 		      g.drawString(String.valueOf(j),  (int)Math.round(originX +scaleX*j - 10), hgt-margin+25 );
-		  }
-	    
+		  }		  
+		  break;
+	      case 384:
+		  for( int j = 50; j <=400; j=j+50 ){  //X- axis
+		      g.drawLine( (int)Math.round(originX +scaleX*j), hgt-margin,   (int)Math.round(originX +scaleX*j), hgt-margin+10);
+		      g.drawString(String.valueOf(j),  (int)Math.round(originX +scaleX*j - 10), hgt-margin+25 );
+		  }		  
+		  
+		  break;    
+	      case 1536:
+		  for( int j = 155; j <1550; j=j+155 ){  //X- axis
+		      g.drawLine( (int)Math.round(originX +scaleX*j), hgt-margin,   (int)Math.round(originX +scaleX*j), hgt-margin+10);
+		      g.drawString(String.valueOf(j),  (int)Math.round(originX +scaleX*j - 10), hgt-margin+25 );
+		  }		  
+
+		  
+		  break;	    
+	      }
+
 		  for(int k = 1; k <6; k++){ //Y axis
 		      g.drawLine( (int)Math.round(originX-10), (int)Math.round(originY-k*((hgt-margin)/6)),
 				  (int)Math.round(originX), (int)Math.round(originY-k*((hgt-margin)/6)));
@@ -343,14 +361,8 @@ public class ScatterPlot extends JFrame {
 				   (int)Math.round(originY-k*((hgt-margin)/6)) );
 	   	
 		  }
-		  /*		  
-		  break;
-	      case 384:
-		  break;    
-	      case 1536:
-		  break;	    
-	      }
-		  */
+
+	      
 	      //draw "Response" on the Y axis
 	      Graphics2D g2d = (Graphics2D) g.create();
 	      AffineTransform affineTransform = new AffineTransform();
@@ -415,6 +427,11 @@ public class ScatterPlot extends JFrame {
 	mean_2_sd = selected_response.getMean_2_sd();
 	sortedResponse = selected_response.getSortedResponse();
 	num_hits = selected_response.getHitsAboveThreshold(threshold);
+	LOGGER.info("max " + max_response);
+	LOGGER.info("mean_bkgrnd " + mean_bkgrnd);
+	LOGGER.info("mean_3_sd " + mean_3_sd);
+	LOGGER.info("num_hits " + num_hits);
+	
 	//	LOGGER.info("num_hits: " + Integer.toString(num_hits));
 	//	    slider.setDoubleMinimum(min_response);
 	//    slider.setDoubleMaximum(max_response);

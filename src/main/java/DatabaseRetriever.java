@@ -948,7 +948,7 @@ int project_id = _project_id;
       ResultSet rs = pstmt.executeQuery();
 
       table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
-       LOGGER.info("Got assay run table " + table);
+      //LOGGER.info("Got assay run table " + table);
       rs.close();
       pstmt.close();
     
@@ -965,14 +965,14 @@ int project_id = _project_id;
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-      "SELECT hit_list.hitlist_sys_name AS \"Hit List\", hit_list.hitlist_name AS \"Name\", hit_list.descr AS \"Description\", assay_run.assay_run_sys_name AS \"Assay Run\", plate_set.plate_set_sys_name AS \"Plate Set\"  FROM assay_run, plate_set, hit_list WHERE hit_list.assay_run_id= assay_run.id AND assay_run.plate_set_id= plate_set.ID AND plate_set.project_id=?;");
+      "SELECT hit_list.hitlist_sys_name AS \"Hit List\", hit_list.hitlist_name AS \"Name\", hit_list.descr AS \"Description\", assay_run.assay_run_sys_name AS \"Assay Run\", hit_list.n AS \"Count\"  FROM assay_run, plate_set, hit_list WHERE hit_list.assay_run_id= assay_run.id AND assay_run.plate_set_id= plate_set.ID AND plate_set.project_id=?;");
 
       
       pstmt.setInt(1, project_id);
       ResultSet rs = pstmt.executeQuery();
 
       table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
-       LOGGER.info("Got assay run table " + table);
+      //LOGGER.info("Got assay run table " + table);
       rs.close();
       pstmt.close();
     

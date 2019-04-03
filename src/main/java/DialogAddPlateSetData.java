@@ -286,30 +286,36 @@ public class DialogAddPlateSetData extends JDialog
 	    public void actionPerformed(ActionEvent e){
 	    switch(((ComboItem)algorithmList.getSelectedItem()).getKey()){
 	    case 1:
-		nField.setEnabled(true);
-		nLabel.setForeground(Color.BLACK);
+		nLabel.setVisible(true);
+		nField.setVisible(true);
+		DialogAddPlateSetData.this.revalidate();
+		DialogAddPlateSetData.this.repaint();
 		
 		break;
 	    case 2:
-		nField.setEnabled(false);
-		nLabel.setForeground(Color.GRAY);
+		nLabel.setVisible(false);
+		nField.setVisible(false);
+		DialogAddPlateSetData.this.revalidate();
+		DialogAddPlateSetData.this.repaint();
 		break;
 	    case 3:
-		nField.setEnabled(false);
-		nLabel.setForeground(Color.GRAY);
+		nLabel.setVisible(false);
+		nField.setVisible(false);
+		DialogAddPlateSetData.this.revalidate();
+		DialogAddPlateSetData.this.repaint();
 		break;		
 	    }
 	    }
 	});
 
 
-    nLabel = new JLabel("N:");
+    nLabel = new JLabel("N:", SwingConstants.RIGHT);
     c.gridx = 3;
     c.gridy = 7;
     c.gridwidth = 1;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_END;
-    nLabel.setForeground(Color.GRAY);
+    nLabel.setVisible(false);
 
     pane.add(nLabel, c);
 
@@ -320,7 +326,7 @@ public class DialogAddPlateSetData extends JDialog
     c.gridwidth = 1;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_START;
-    nField.setEnabled(false);
+    nField.setVisible(false);
     //nField.getDocument().addDocumentListener(this);
     pane.add(nField, c);
 

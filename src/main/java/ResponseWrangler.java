@@ -32,7 +32,8 @@ public class ResponseWrangler {
         private Set<Integer> plate_set = new HashSet<Integer>();
     private Set<Integer> well_set = new HashSet<Integer>();
     private List<Double> desired_response_list = new LinkedList<Double>();
-    private List<Double> bkgrnd_list = new LinkedList<Double>();
+    private List<Double> blank_list = new LinkedList<Double>();
+    private List<Double> neg_list = new LinkedList<Double>();
     private int num_data_points;
 
     public static final int RAW = 0;
@@ -45,9 +46,8 @@ public class ResponseWrangler {
      * 
      *	 Array looks like
      * plate, well, response, bkgrnd_sub,   norm,   norm_pos ,  well_type_id,  replicates, target 
-     * -,1,1,0.293825507,0.293825507,0.434007883,0.511445642,1,1,a
+     * 1,1,0.293825507,0.293825507,0.434007883,0.511445642,1,1,a
      * class org.postgresql.jdbc.PgArray
-     * cannot retrieve first element so first element is duplicated, start extracting at [1]
      * set up some variable with data limits
      *
      * double[][]  sorted_response [response] [well] [type_id] [sample_id]
@@ -68,7 +68,6 @@ public class ResponseWrangler {
 	    
 	    double response = Double.valueOf((float)dtm.getValueAt(row, 2));	
 	    Double bkgrnd = Double.valueOf((float)dtm.getValueAt(row, 3));
-	    bkgrnd_list.add(Double.valueOf((float)dtm.getValueAt(row, 3)));
 	    Double norm = Double.valueOf((float)dtm.getValueAt(row, 4));
 	    Double normpos = Double.valueOf((float)dtm.getValueAt(row, 5));
 	    int well_type_id = (int)dtm.getValueAt(row, 6);
@@ -85,14 +84,32 @@ public class ResponseWrangler {
 	case 0: //raw
 	    desired_response_list.add(response);
 	    sorted_response[row][0] = response;
+	    if(well_type_id==4){  //if it is a blank
+		blank_list.add(Double.valueOf((float)dtm.getValueAt(row, 2)));
+	    }
+	    if(well_type_id==3){  //if it is a negative control
+		neg_list.add(Double.valueOf((float)dtm.getValueAt(row, 2)));
+	    }
 	    break;
 	case 1: //norm
 	    desired_response_list.add(norm);
 	sorted_response[row][0] = norm;
+	    if(well_type_id==4){  //if it is a blank
+		blank_list.add(Double.valueOf((float)dtm.getValueAt(row, 4)));
+	    }
+	    if(well_type_id==3){  //if it is a negative control
+		neg_list.add(Double.valueOf((float)dtm.getValueAt(row, 4)));
+	    }
 	    break;
 	case 2: //normpos
 	    desired_response_list.add(normpos);
 	sorted_response[row][0] = normpos;
+	    if(well_type_id==4){  //if it is a blank
+		blank_list.add(Double.valueOf((float)dtm.getValueAt(row, 5)));
+	    }
+	    if(well_type_id==3){  //if it is a negative control
+		neg_list.add(Double.valueOf((float)dtm.getValueAt(row, 5)));
+	    }
 	    break;
 	}
 
@@ -106,8 +123,8 @@ public class ResponseWrangler {
     min_response = Double.valueOf(Collections.min(desired_response_list));
     num_data_points = desired_response_list.size();
     
-    mean_bkgrnd = Stats.meanOf(bkgrnd_list);
-    stdev_bkgrnd = Stats.of(bkgrnd_list).populationStandardDeviation();
+    mean_bkgrnd = Stats.meanOf(blank_list);
+    stdev_bkgrnd = Stats.of(blank_list).populationStandardDeviation();
     mean_3_sd = mean_bkgrnd + 3*(stdev_bkgrnd);
     mean_2_sd = mean_bkgrnd + 2*(stdev_bkgrnd);
     threshold = mean_3_sd;
@@ -372,30 +389,14 @@ public class ResponseWrangler {
 	}
 
 
-	/**
-	 * @param well_set the well_set to set
-	 */
-	public void setWell_set(Set<Integer> well_set) {
-		this.well_set = well_set;
-	}
-
-
 
 
 	/**
 	 * @return the bkgrnd_list
 	 */
-	public List<Double> getBkgrnd_list() {
-		return bkgrnd_list;
+	public List<Double> getBlank_list() {
+		return blank_list;
 	}
-
-
-	/**
-	 * @param bkgrnd_list the bkgrnd_list to set
-	 */
-	public void setBkgrnd_list(List<Double> bkgrnd_list) {
-		this.bkgrnd_list = bkgrnd_list;
-	}  
 
 
 	/**
