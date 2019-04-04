@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 public class ViewerMenu extends JMenu{
     DialogMainFrame dmf;
@@ -29,25 +30,16 @@ public class ViewerMenu extends JMenu{
         });
     this.add(menuItem);
 
-    menuItem = new JMenuItem("License", KeyEvent.VK_L);
+  menuItem = new JMenuItem("Assay Runs/Hit Lists", KeyEvent.VK_A);
+     menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            new bllm.DialogLicenseManager(
-                "My Application", "./license.ser", "nszpx5U5Kt6d91JB3CW31n3SiNjSUzcZ");
+	      AssayRunViewer arv = new AssayRunViewer(dmf);
           }
         });
     this.add(menuItem);
 
-    menuItem = new JMenuItem("About LIMS*Nucleus", KeyEvent.VK_A);
-    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
-
-    menuItem.addActionListener(
-        new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            new DialogHelpAbout();
-          }
-        });
-    this.add(menuItem);
+   
   }
 }

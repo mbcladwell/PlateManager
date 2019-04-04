@@ -983,6 +983,35 @@ int project_id = _project_id;
     return table;
   }
 
+    public CustomTable getHitListsForAssayRun(int _assay_run_id) {
+      CustomTable table = null;;
+int assay_run_id = _assay_run_id;
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+      "SELECT hit_list.hitlist_sys_name AS \"Hit List\", hit_list.hitlist_name AS \"Name\", hit_list.descr AS \"Description\", assay_run.assay_run_sys_name AS \"Assay Run\", hit_list.n AS \"Count\"  FROM assay_run, plate_set, hit_list WHERE hit_list.assay_run_id= assay_run.id AND assay_run.plate_set_id= plate_set.ID AND assay_run.id=?;");
+
+      
+      pstmt.setInt(1, assay_run_id);
+      ResultSet rs = pstmt.executeQuery();
+
+      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+      //LOGGER.info("Got assay run table " + table);
+      rs.close();
+      pstmt.close();
+    
+
+    } catch (SQLException sqle) {
+ LOGGER.severe("Failed to retrieve plate_layout table: " + sqle);
+    }
+    return table;
+  }
+
+
+
+
+
+    
     /**
      * Get the source data for LayoutViewer
      */

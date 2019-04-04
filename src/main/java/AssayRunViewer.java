@@ -1,13 +1,12 @@
 package pm;
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
-
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -17,11 +16,12 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTable;
-
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.*;
-
 
 
 public class AssayRunViewer extends JDialog implements java.awt.event.ActionListener {
@@ -29,7 +29,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
   static JButton viewAssayRun;
   static JButton exportHitList;
   static JButton viewHitList;
-  static JButton closeButton;
+  static JButton refreshHitListsButton;
     
   static JLabel label;
   static JComboBox<ComboItem> projectList;
@@ -53,7 +53,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     
     
   public AssayRunViewer(DialogMainFrame _dmf) {
-    this.setTitle("Assay Run || Hit Listx Viewer");
+    this.setTitle("Assay Run || Hit List Viewer");
     this.dmf = _dmf;
     this.session = dmf.getSession();
     project_id = session.getProjectID();
@@ -68,7 +68,29 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     assay_runs_pane.setBorder(assay_runs_pane_border);
 
     assay_runs_table = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRuns(session.getProjectID());
+  assay_runs_table.getSelectionModel().addListSelectionListener(						     
+	  new ListSelectionListener() {
+	      public void valueChanged(ListSelectionEvent e) {
+		  ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+		  if(!e.getValueIsAdjusting() & assay_runs_table.getSelectedRow()>=0){
+		      //LOGGER.info("source: " + e);
+			int row = assay_runs_table.getSelectedRow();
+			int assay_run_id = Integer.parseInt(( (String)assay_runs_table.getModel().getValueAt(row,0)).substring(3));
 
+			//LOGGER.info("source_layout_id: " + source_layout_id);
+			hit_lists_table.setModel(dmf.getDatabaseManager()
+					   .getDatabaseRetriever()
+						.getHitListsForAssayRun(assay_run_id).getModel());
+			//
+			//refreshLayoutTable(source_layout_id);
+
+		  }
+	      }
+	  });
+
+
+
+    
     assay_runs_scroll_pane = new JScrollPane(assay_runs_table);
     assay_runs_table.setFillsViewportHeight(true);
     assay_runs_pane.add(assay_runs_scroll_pane, BorderLayout.CENTER);
@@ -111,14 +133,14 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     hit_lists_pane.add(hit_lists_scroll_pane, BorderLayout.CENTER);
 
     hlButtons = new JPanel(buttonLayout);
-    closeButton = new JButton("Close");
-    closeButton.addActionListener(this);
+    refreshHitListsButton = new JButton("Refresh List");
+    refreshHitListsButton.addActionListener(this);
    
     exportHitList = new JButton("Export");
     exportHitList.addActionListener(this);
    viewHitList = new JButton("View");
      viewHitList.addActionListener(this);
-   hlButtons.add(closeButton);
+   hlButtons.add(refreshHitListsButton);
     
     hlButtons.add(exportHitList);
     hlButtons.add(viewHitList);
@@ -186,8 +208,8 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 
 	
     }
-        if (e.getSource() == closeButton) {
-	    AssayRunViewer.this.dispose();
+        if (e.getSource() == refreshHitListsButton) {
+	    refreshHitListsTable();
     }
 
 
@@ -212,7 +234,15 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 	
     }
 
- 
+    public void refreshHitListsTable(){
+	int selected_project_id = ((ComboItem)projectList.getSelectedItem()).getKey();
+	CustomTable hlTable = dmf.getDatabaseManager().getDatabaseRetriever().getHitLists(selected_project_id);
+	TableModel hlModel = hlTable.getModel();
+	hit_lists_table.setModel(hlModel);
+
+
+    }
+	
 
  
 }
