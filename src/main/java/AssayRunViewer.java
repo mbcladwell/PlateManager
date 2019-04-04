@@ -1,4 +1,7 @@
 package pm;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -34,13 +37,13 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     final Session session;
     private int project_id;
     private String owner;
-  private JTable table;
-  private JTable table2;
-  private JScrollPane scrollPane;
-    private JScrollPane scrollPane2;
-    private  JPanel parentPane;
-    private  JPanel pane1;
-    private  JPanel pane2;
+  private CustomTable assay_runs_table;
+  private CustomTable hit_lists_table;
+  private JScrollPane assay_runs_scroll_pane;
+    private JScrollPane hit_lists_scroll_pane;
+    private  JPanel parent_pane;
+    private  JPanel assay_runs_pane;
+    private  JPanel hit_lists_pane;
     private JPanel arButtons;
     private JPanel hlButtons;
     
@@ -50,56 +53,62 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     
     
   public AssayRunViewer(DialogMainFrame _dmf) {
-    this.setTitle("Assay Run Viewer");
+    this.setTitle("Assay Run || Hit Listx Viewer");
     this.dmf = _dmf;
     this.session = dmf.getSession();
     project_id = session.getProjectID();
     owner = session.getUserName();
 
-    parentPane = new JPanel(new BorderLayout());
+    parent_pane = new JPanel(new BorderLayout());
 
-    pane1 = new JPanel(new BorderLayout());
-    pane1.setBorder(BorderFactory.createRaisedBevelBorder());
-    javax.swing.border.TitledBorder pane1Border = BorderFactory.createTitledBorder("Assay Runs:");
-    pane1Border.setTitlePosition(javax.swing.border.TitledBorder.TOP);
-    pane1.setBorder(pane1Border);
+    assay_runs_pane = new JPanel(new BorderLayout());
+    assay_runs_pane.setBorder(BorderFactory.createRaisedBevelBorder());
+    javax.swing.border.TitledBorder assay_runs_pane_border = BorderFactory.createTitledBorder("Assay Runs:");
+    assay_runs_pane_border.setTitlePosition(javax.swing.border.TitledBorder.TOP);
+    assay_runs_pane.setBorder(assay_runs_pane_border);
 
-    table = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRuns(session.getProjectID());
+    assay_runs_table = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRuns(session.getProjectID());
 
-    scrollPane = new JScrollPane(table);
-    table.setFillsViewportHeight(true);
-    pane1.add(scrollPane, BorderLayout.CENTER);
+    assay_runs_scroll_pane = new JScrollPane(assay_runs_table);
+    assay_runs_table.setFillsViewportHeight(true);
+    assay_runs_pane.add(assay_runs_scroll_pane, BorderLayout.CENTER);
 
     GridLayout buttonLayout = new GridLayout(1,4,5,5);
     projectList = new JComboBox(dmf.getDatabaseManager().getDatabaseRetriever().getAllProjects());
-    projectList.setSelectedIndex(9);
+    for(int i=0; i < projectList.getItemCount(); i++){
+	if(((ComboItem)projectList.getItemAt(i)).getKey() == project_id){
+		projectList.setSelectedIndex(i);
+	    }
+    }
+    
+    //projectList.setSelectedIndex(9);
     projectList.addActionListener(this);
     exportAssayRun = new JButton("Export");
     exportAssayRun.addActionListener(this);
-    viewAssayRun = new JButton("View");
+    viewAssayRun = new JButton("Plot");
     viewAssayRun.addActionListener(this);
     arButtons = new JPanel(buttonLayout);
     arButtons.add(projectList);
     arButtons.add(exportAssayRun);
     arButtons.add(viewAssayRun);
-    pane1.add(arButtons, BorderLayout.SOUTH);
+    assay_runs_pane.add(arButtons, BorderLayout.SOUTH);
     
     
     
     
     
 
-    pane2  = new JPanel(new BorderLayout());
-    pane2.setBorder(BorderFactory.createRaisedBevelBorder());
-    javax.swing.border.TitledBorder pane2Border = BorderFactory.createTitledBorder("Hit Lists:");
-    pane2Border.setTitlePosition(javax.swing.border.TitledBorder.TOP);
-    pane2.setBorder(pane2Border);
+    hit_lists_pane  = new JPanel(new BorderLayout());
+    hit_lists_pane.setBorder(BorderFactory.createRaisedBevelBorder());
+    javax.swing.border.TitledBorder hit_lists_pane_border = BorderFactory.createTitledBorder("Hit Lists:");
+    hit_lists_pane_border.setTitlePosition(javax.swing.border.TitledBorder.TOP);
+    hit_lists_pane.setBorder(hit_lists_pane_border);
 
-    table2 = dmf.getDatabaseManager().getDatabaseRetriever().getHitLists(session.getProjectID());
+    hit_lists_table = dmf.getDatabaseManager().getDatabaseRetriever().getHitLists(session.getProjectID());
 
-    scrollPane2 = new JScrollPane(table2);
-    table2.setFillsViewportHeight(true);
-    pane2.add(scrollPane2, BorderLayout.CENTER);
+    hit_lists_scroll_pane = new JScrollPane(hit_lists_table);
+    hit_lists_table.setFillsViewportHeight(true);
+    hit_lists_pane.add(hit_lists_scroll_pane, BorderLayout.CENTER);
 
     hlButtons = new JPanel(buttonLayout);
     closeButton = new JButton("Close");
@@ -113,12 +122,12 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     
     hlButtons.add(exportHitList);
     hlButtons.add(viewHitList);
-    pane2.add(hlButtons, BorderLayout.SOUTH);
+    hit_lists_pane.add(hlButtons, BorderLayout.SOUTH);
 
 
-    this.getContentPane().add(parentPane, BorderLayout.CENTER);
-    parentPane.add(pane1, BorderLayout.NORTH);
-    parentPane.add(pane2, BorderLayout.SOUTH);
+    this.getContentPane().add(parent_pane, BorderLayout.CENTER);
+    parent_pane.add(assay_runs_pane, BorderLayout.WEST);
+    parent_pane.add(hit_lists_pane, BorderLayout.EAST);
     
     GridBagConstraints c = new GridBagConstraints();
    
@@ -138,23 +147,44 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     }
 
         if (e.getSource() == viewAssayRun) {
-    	    if(!table.getSelectionModel().isSelectionEmpty()){
+    	    if(!assay_runs_table.getSelectionModel().isSelectionEmpty()){
 		 
-		 TableModel arModel = table.getModel();
-		 int row = table.getSelectedRow();
-		 String assay_run_sys_name =  table.getModel().getValueAt(row, 0).toString();
-		 int  assay_run_id = Integer.parseInt(assay_run_sys_name.substring(3));
-		 new ScatterPlot(dmf, assay_run_id);}
+		 TableModel arModel = assay_runs_table.getModel();
+		 int row = assay_runs_table.getSelectedRow();
+		 String assay_runs_sys_name =  assay_runs_table.getModel().getValueAt(row, 0).toString();
+		 int  assay_runs_id = Integer.parseInt(assay_runs_sys_name.substring(3));
+		 new ScatterPlot(dmf, assay_runs_id);}
 	    else{
 	      JOptionPane.showMessageDialog(dmf, "Select an Assay Run!");	      
 	    }
 	
     }
     if (e.getSource() == exportHitList) {
+	   Object[][] results = hit_lists_table.getSelectedRowsAndHeaderAsStringArray();
+	   LOGGER.info("hit list table: " + results);
+	       POIUtilities poi = new POIUtilities(dmf);
+            poi.writeJTableToSpreadsheet("Hit Lists", results);
+            try {
+              Desktop d = Desktop.getDesktop();
+              d.open(new File("./Writesheet.xlsx"));
+            } catch (IOException ioe) {
+            }	 
+	
+	 
     	
     }
     if (e.getSource() == viewHitList) {
-    	
+  if(!hit_lists_table.getSelectionModel().isSelectionEmpty()){
+	 TableModel arModel = hit_lists_table.getModel();
+		 int row = hit_lists_table.getSelectedRow();
+		 String hit_list_sys_name =  hit_lists_table.getModel().getValueAt(row, 0).toString();
+		 int  hit_list_id = Integer.parseInt(hit_list_sys_name.substring(3));
+		 new HitListViewer( dmf, hit_list_id);}
+  else{
+	      JOptionPane.showMessageDialog(dmf, "Select a Hit List!");	      
+	    }
+
+	
     }
         if (e.getSource() == closeButton) {
 	    AssayRunViewer.this.dispose();
@@ -173,12 +203,12 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
        
 	CustomTable arTable = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRuns(project_id);
 	TableModel arModel = arTable.getModel();
-	table.setModel(arModel);	
+	assay_runs_table.setModel(arModel);	
 
 		//LOGGER.info("project: " + project_id);
 	CustomTable hlTable = dmf.getDatabaseManager().getDatabaseRetriever().getHitLists(project_id);
 	TableModel hlModel = hlTable.getModel();
-	table2.setModel(hlModel);
+	hit_lists_table.setModel(hlModel);
 	
     }
 

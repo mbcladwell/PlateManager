@@ -33,14 +33,16 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
   final DialogMainFrame dmf;
     final Session session;
     private int project_id;
+    private int hit_list_id;
+    
     private String owner;
-  private JTable table;
-  private JTable table2;
-  private JScrollPane scrollPane;
-    private JScrollPane scrollPane2;
-    private  JPanel parentPane;
-    private  JPanel pane1;
-    private  JPanel pane2;
+  private JTable hits_table;
+  private JTable counts_table;
+  private JScrollPane hits_scroll_pane;
+    private JScrollPane counts_scroll_pane;
+    private  JPanel parent_pane;
+    private  JPanel hits_pane;
+    private  JPanel counts_pane;
     private JPanel arButtons;
     private JPanel hlButtons;
     
@@ -49,28 +51,30 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
   private static final long serialVersionUID = 1L;
     
     
-  public HitListViewer(DialogMainFrame _dmf) {
-    this.setTitle("Assay Run Viewer");
+    public HitListViewer(DialogMainFrame _dmf, int _hit_list_id) {
     this.dmf = _dmf;
     this.session = dmf.getSession();
+      this.setTitle("Hit List Viewer - " + session.getProjectSysName());
     project_id = session.getProjectID();
     owner = session.getUserName();
+    hit_list_id = _hit_list_id;
+    parent_pane = new JPanel(new BorderLayout());
 
-    parentPane = new JPanel(new BorderLayout());
+    hits_pane = new JPanel(new BorderLayout());
+    hits_pane.setBorder(BorderFactory.createRaisedBevelBorder());
+    javax.swing.border.TitledBorder hits_pane_border = BorderFactory.createTitledBorder("Hits:");
+    hits_pane_border.setTitlePosition(javax.swing.border.TitledBorder.TOP);
+    hits_pane.setBorder(hits_pane_border);
 
-    pane1 = new JPanel(new BorderLayout());
-    pane1.setBorder(BorderFactory.createRaisedBevelBorder());
-    javax.swing.border.TitledBorder pane1Border = BorderFactory.createTitledBorder("Assay Runs:");
-    pane1Border.setTitlePosition(javax.swing.border.TitledBorder.TOP);
-    pane1.setBorder(pane1Border);
+    hits_table = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRuns(session.getProjectID());
 
-    table = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRuns(session.getProjectID());
+    hits_scroll_pane = new JScrollPane(hits_table);
+    hits_table.setFillsViewportHeight(true);
+    hits_pane.add(hits_scroll_pane, BorderLayout.CENTER);
 
-    scrollPane = new JScrollPane(table);
-    table.setFillsViewportHeight(true);
-    pane1.add(scrollPane, BorderLayout.CENTER);
-
+    
     GridLayout buttonLayout = new GridLayout(1,4,5,5);
+    /*
     projectList = new JComboBox(dmf.getDatabaseManager().getDatabaseRetriever().getAllProjects());
     projectList.setSelectedIndex(9);
     projectList.addActionListener(this);
@@ -83,25 +87,22 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
     arButtons.add(exportAssayRun);
     arButtons.add(viewAssayRun);
     pane1.add(arButtons, BorderLayout.SOUTH);
-    
-    
-    
-    
+    */
     
 
-    pane2  = new JPanel(new BorderLayout());
-    pane2.setBorder(BorderFactory.createRaisedBevelBorder());
-    javax.swing.border.TitledBorder pane2Border = BorderFactory.createTitledBorder("Hit Lists:");
-    pane2Border.setTitlePosition(javax.swing.border.TitledBorder.TOP);
-    pane2.setBorder(pane2Border);
+    counts_pane  = new JPanel(new BorderLayout());
+    counts_pane.setBorder(BorderFactory.createRaisedBevelBorder());
+    javax.swing.border.TitledBorder counts_paneBorder = BorderFactory.createTitledBorder("Hit Lists:");
+    counts_paneBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
+    counts_pane.setBorder(counts_paneBorder);
 
-    table2 = dmf.getDatabaseManager().getDatabaseRetriever().getHitLists(session.getProjectID());
+    counts_table = dmf.getDatabaseManager().getDatabaseRetriever().getHitCountPerPlateSet(session.getProjectID(), hit_list_id);
 
-    scrollPane2 = new JScrollPane(table2);
-    table2.setFillsViewportHeight(true);
-    pane2.add(scrollPane2, BorderLayout.CENTER);
-
-    hlButtons = new JPanel(buttonLayout);
+    counts_scroll_pane = new JScrollPane(counts_table);
+    counts_table.setFillsViewportHeight(true);
+    counts_pane.add(counts_scroll_pane, BorderLayout.CENTER);
+   
+        hlButtons = new JPanel(buttonLayout);
     closeButton = new JButton("Close");
     closeButton.addActionListener(this);
    
@@ -113,12 +114,12 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
     
     hlButtons.add(exportHitList);
     hlButtons.add(viewHitList);
-    pane2.add(hlButtons, BorderLayout.SOUTH);
+    counts_pane.add(hlButtons, BorderLayout.SOUTH);
 
 
-    this.getContentPane().add(parentPane, BorderLayout.CENTER);
-    parentPane.add(pane1, BorderLayout.NORTH);
-    parentPane.add(pane2, BorderLayout.SOUTH);
+    this.getContentPane().add(parent_pane, BorderLayout.CENTER);
+    parent_pane.add(hits_pane, BorderLayout.WEST);
+    parent_pane.add(counts_pane, BorderLayout.EAST);
     
     GridBagConstraints c = new GridBagConstraints();
    
@@ -132,11 +133,11 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
 
    
     public void actionPerformed(ActionEvent e) {
-	
+	/*	
     if (e.getSource() == exportAssayRun) {
     	
     }
-
+    
         if (e.getSource() == viewAssayRun) {
     	    if(!table.getSelectionModel().isSelectionEmpty()){
 		 
@@ -148,6 +149,7 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
 	    else{
 	      JOptionPane.showMessageDialog(dmf, "Select an Assay Run!");	      
 	    }
+	        
 	
     }
     if (e.getSource() == exportHitList) {
@@ -166,11 +168,12 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
 	    project_id  = ((ComboItem)projectList.getSelectedItem()).getKey();
 	    this.refreshTables(); 
 	}
-    }  
+    }
+	*/  
   }
 
     public void refreshTables(){
-       
+	/*
 	CustomTable arTable = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRuns(project_id);
 	TableModel arModel = arTable.getModel();
 	table.setModel(arModel);	
@@ -178,8 +181,8 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
 		//LOGGER.info("project: " + project_id);
 	CustomTable hlTable = dmf.getDatabaseManager().getDatabaseRetriever().getHitLists(project_id);
 	TableModel hlModel = hlTable.getModel();
-	table2.setModel(hlModel);
-	
+	counts_table.setModel(hlModel);
+	*/
     }
 
  

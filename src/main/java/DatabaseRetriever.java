@@ -1024,13 +1024,44 @@ int project_id = _project_id;
       ResultSet rs = pstmt.executeQuery();
 
       table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
-       LOGGER.info("Got layout sources table " + table);
+      // LOGGER.info("Got layout sources table " + table);
       rs.close();
       pstmt.close();
     
 
     } catch (SQLException sqle) {
  LOGGER.severe("Failed to retrieve plate_layout sources table: " + sqle);
+    }
+    return table;
+  }
+
+    /**
+     * Determine the number of hits (sample IDs) per plate set
+     * called from HitListViewer.java
+     */
+    public CustomTable getHitCountPerPlateSet(int _project_id, int _hit_list_id) {
+	  int project_id = _project_id;
+	  int hit_list_id = _hit_list_id;
+      CustomTable table = null;
+
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+"SELECT plate_set.plate_set_sys_name as \"Plate Set\", MAX(plate_type.plate_type_name) as \"Type\", COUNT(sample.ID) as \"Count\" FROM plate_set, plate_plate_set, plate_type, plate, well, well_sample, sample WHERE plate_plate_set.plate_set_id=plate_set.ID AND plate_plate_set.plate_id=plate.id AND plate_set.plate_type_id = plate_type.id   and well.plate_id=plate.ID AND well_sample.well_id=well.ID AND well_sample.sample_id= sample.ID  AND sample.id  IN (SELECT  sample.id FROM hit_list, hit_sample, plate_set, assay_run, sample WHERE hit_sample.hitlist_id=hit_list.id  AND hit_sample.sample_id=sample.id  and assay_run.plate_set_id=plate_set.id AND   hit_list.assay_run_id=assay_run.id   AND  hit_sample.hitlist_id IN (SELECT hit_list.ID FROM hit_list, assay_run WHERE hit_list.assay_run_id=assay_run.ID AND hit_list.id= ? and assay_run.ID IN (SELECT assay_run.ID FROM assay_run WHERE assay_run.plate_set_id IN (SELECT plate_set.ID FROM plate_set WHERE plate_set.project_id=?)))) GROUP BY plate_set.plate_set_sys_name;");
+ 
+      pstmt.setInt(1, hit_list_id);
+      pstmt.setInt(2, project_id);
+      
+      ResultSet rs = pstmt.executeQuery();
+
+      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+      // LOGGER.info("Got layout sources table " + table);
+      rs.close();
+      pstmt.close();
+    
+
+    } catch (SQLException sqle) {
+ LOGGER.severe("Failed to retrieve hit list counts table: " + sqle);
     }
     return table;
   }
