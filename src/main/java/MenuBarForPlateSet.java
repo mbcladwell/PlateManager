@@ -120,26 +120,6 @@ public class MenuBarForPlateSet extends JMenuBar {
         });
     utilitiesMenu.add(menuItem);
 
-    menuItem = new JMenuItem("View plate layouts", KeyEvent.VK_E);
-     menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.ALT_MASK));
-    menuItem.putClientProperty("mf", dmf);
-    menuItem.addActionListener(
-        new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-	      LayoutViewer lv = new LayoutViewer(dmf);
-          }
-        });
-    utilitiesMenu.add(menuItem);
-
-  menuItem = new JMenuItem("View Assay Runs", KeyEvent.VK_A);
-     menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.ALT_MASK));
-    menuItem.addActionListener(
-        new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-	      AssayRunViewer arv = new AssayRunViewer(dmf);
-          }
-        });
-    utilitiesMenu.add(menuItem);
 
     
     JButton downbutton = new JButton();
@@ -156,11 +136,12 @@ public class MenuBarForPlateSet extends JMenuBar {
           public void actionPerformed(ActionEvent e) {
 
             try {
-              dmf.getSession().setPlateSetSysName("plateset_sys_name");
               int i = plate_set_table.getSelectedRow();
-              String plate_sys_name = (String) plate_set_table.getValueAt(i, 0);
-              System.out.println("plate_sys_name: " + plate_sys_name);
-              dmf.showPlateTable(plate_sys_name);
+              String plate_set_sys_name = (String) plate_set_table.getValueAt(i, 0);
+              dmf.getSession().setPlateSetSysName(plate_set_sys_name);
+	      dmf.getSession().setPlateSetID(Integer.parseInt(plate_set_sys_name.substring(3)));
+              //System.out.println("plate_set_sys_name: " + plate_set_sys_name);
+              dmf.showPlateTable(plate_set_sys_name);
             } catch (ArrayIndexOutOfBoundsException s) {
             }
           }
@@ -185,7 +166,9 @@ public class MenuBarForPlateSet extends JMenuBar {
           }
         });
     this.add(upbutton);
-
+    menu = new ViewerMenu(dmf);
+    this.add(menu);
+   
     this.add(Box.createHorizontalGlue());
 
     menu = new HelpMenu();

@@ -1095,5 +1095,87 @@ int assay_run_id = _assay_run_id;
     return table;
   }
 
+    /**
+     * Content for the samples list in the Hit List Viewer
+     */
+        public CustomTable getSamplesForHitList( int _hit_list_id) {
+	
+	  int hit_list_id = _hit_list_id;
+      CustomTable table = null;
+
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+"SELECT hit_sample.hitlist_id AS \"Hit List\", sample.ID AS \"Sample\", sample.sample_sys_name AS \"Sample Name\", sample.accs_id AS \"Accession\" FROM hit_sample, sample WHERE hit_sample.hitlist_id=? AND hit_sample.sample_id=sample.id;");
+ 
+      pstmt.setInt(1, hit_list_id);
+      
+      ResultSet rs = pstmt.executeQuery();
+
+      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+      // LOGGER.info("Got layout sources table " + table);
+      rs.close();
+      pstmt.close();
     
+
+    } catch (SQLException sqle) {
+ LOGGER.severe("Failed to retrieve hit list counts table: " + sqle);
+    }
+    return table;
+  }
+
+    public int getNumberOfPlatesForPlateSetID(int _plate_set_id){
+
+	int plate_set_id = _plate_set_id;
+	int num_plates = 0;
+	  try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+"SELECT num_plates FROM plate_set WHERE plate_set.ID = ?;");
+ 
+      pstmt.setInt(1, plate_set_id);
+      
+      ResultSet rs = pstmt.executeQuery();
+
+          rs.next();
+      num_plates = rs.getInt(1);
+ 
+      rs.close();
+      pstmt.close();
+    
+
+    } catch (SQLException sqle) {
+ LOGGER.severe("Failed to retrieve hit list counts table: " + sqle);
+    }
+    return num_plates;
+	
+    }
+
+        public int getFormatForPlateSetID(int _plate_set_id){
+
+	int plate_set_id = _plate_set_id;
+	int format_id = 0;
+	  try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+"SELECT plate_format_id FROM plate_set WHERE plate_set.ID = ?;");
+ 
+      pstmt.setInt(1, plate_set_id);
+      
+      ResultSet rs = pstmt.executeQuery();
+
+          rs.next();
+      format_id = rs.getInt(1);
+ 
+      rs.close();
+      pstmt.close();
+    
+
+    } catch (SQLException sqle) {
+ LOGGER.severe("Failed to retrieve hit list counts table: " + sqle);
+    }
+    return format_id;
+	
+    }
+
 }

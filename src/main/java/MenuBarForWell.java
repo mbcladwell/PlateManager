@@ -84,9 +84,10 @@ public class MenuBarForWell extends JMenuBar {
         });
 
     this.add(upbutton);
-    //    menu.setMnemonic(KeyEvent.VK_T);
-    // menu.getAccessibleContext().setAccessibleDescription("This menu does nothing");
-    // this.add(menu);
+
+      menu = new ViewerMenu(dmf);
+    this.add(menu);
+
     this.add(Box.createHorizontalGlue());
 
     menu = new JMenu("Help");

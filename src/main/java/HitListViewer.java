@@ -20,7 +20,6 @@ import javax.swing.JScrollPane;
 import javax.swing.table.*;
 
 
-
 public class HitListViewer extends JDialog implements java.awt.event.ActionListener {
   static JButton exportAssayRun;
   static JButton viewAssayRun;
@@ -66,7 +65,7 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
     hits_pane_border.setTitlePosition(javax.swing.border.TitledBorder.TOP);
     hits_pane.setBorder(hits_pane_border);
 
-    hits_table = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRuns(session.getProjectID());
+    hits_table = dmf.getDatabaseManager().getDatabaseRetriever().getSamplesForHitList(hit_list_id);
 
     hits_scroll_pane = new JScrollPane(hits_table);
     hits_table.setFillsViewportHeight(true);

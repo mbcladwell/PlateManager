@@ -21,7 +21,8 @@ public class ViewerMenu extends JMenu{
     this.setMnemonic(KeyEvent.VK_V);
     this.getAccessibleContext().setAccessibleDescription("Viewers");
 
-    JMenuItem menuItem = new JMenuItem("Plate Layouts", KeyEvent.VK_P);
+    JMenuItem menuItem = new JMenuItem("Plate Layouts");
+     menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.ALT_MASK));
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {

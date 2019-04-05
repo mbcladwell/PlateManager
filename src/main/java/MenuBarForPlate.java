@@ -13,10 +13,12 @@ public class MenuBarForPlate extends JMenuBar {
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   DialogMainFrame dmf;
   CustomTable plate_table;
+    Session session;
 
   public MenuBarForPlate(DialogMainFrame _dmf, CustomTable _table) {
     plate_table = _table;
     dmf = _dmf;
+    session = dmf.getSession();
     // Create the menu bar.
     // JMenuBar menuBar = new JMenuBar();
     //    this.em = em;
@@ -54,6 +56,17 @@ public class MenuBarForPlate extends JMenuBar {
         });
     menu.add(menuItem);
 
+    menuItem = new JMenuItem("Import Accessions");
+    menuItem.setMnemonic(KeyEvent.VK_I);
+    menuItem.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+	      dmf.getDatabaseManager().getDatabaseInserter().importAccessionsByPlateSet(session.getPlateSetID());
+          }
+        });
+    menu.add(menuItem);
+
+    
     menuItem = new JMenuItem("Export", KeyEvent.VK_E);
     // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
     menuItem.getAccessibleContext().setAccessibleDescription("Export as .csv.");
@@ -93,6 +106,9 @@ public class MenuBarForPlate extends JMenuBar {
             try {
               int i = plate_table.getSelectedRow();
               String plate_sys_name = (String) plate_table.getValueAt(i, 0);
+	      //session.setPlateSysName(plate_sys_name);
+	      session.setPlateID(Integer.parseInt(plate_sys_name.substring(3)));
+  
               dmf.showWellTable(plate_sys_name);
             } catch (ArrayIndexOutOfBoundsException s) {
             }
@@ -117,9 +133,10 @@ public class MenuBarForPlate extends JMenuBar {
         });
 
     this.add(upbutton);
-    //    menu.setMnemonic(KeyEvent.VK_T);
-    // menu.getAccessibleContext().setAccessibleDescription("This menu does nothing");
-    // this.add(menu);
+
+        menu = new ViewerMenu(dmf);
+    this.add(menu);
+
     this.add(Box.createHorizontalGlue());
 
     menu = new JMenu("Help");

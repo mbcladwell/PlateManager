@@ -748,4 +748,14 @@ Integer[] plate_set_id =
     
   }
 
+    public void importAccessionsByPlateSet(int _plate_set_id){
+	int plate_set_id = _plate_set_id;
+	String plate_set_sys_name = new String("PS-" + String.valueOf(plate_set_id));
+	int plate_num = dmf.getDatabaseManager().getDatabaseRetriever().getNumberOfPlatesForPlateSetID(plate_set_id);
+	int format_id = dmf.getDatabaseManager().getDatabaseRetriever().getFormatForPlateSetID(plate_set_id);
+	   
+	new DialogImportPlateSetAccessionIDs(dmf, plate_set_sys_name, plate_set_id, format_id, plate_num);
+	
+	
+    }
 }

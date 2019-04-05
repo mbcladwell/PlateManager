@@ -88,6 +88,7 @@ public class MenuBarForProject extends JMenuBar {
 
     menu = new ViewerMenu(dmf);
     this.add(menu);
+
     
     menu = new AdminMenu(dmf, project_table);
      this.add(menu);

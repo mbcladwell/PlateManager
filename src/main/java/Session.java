@@ -18,6 +18,8 @@ public class Session {
   private int projectID;
   private String projectSysName;
   private String plateSetSysName;
+    private int plate_set_id;
+    private int plate_id;
   private Long sessionID;
   private String workingDir;
   private String tempDir;
@@ -84,6 +86,23 @@ public class Session {
     return plateSetSysName;
   }
 
+      public void setPlateSetID(int _id) {
+    plate_set_id = _id;
+  }
+
+  public int getPlateSetID() {
+    return plate_set_id;
+  }
+
+      public void setPlateID(int _id) {
+    plate_id = _id;
+  }
+
+  public int getPlateID() {
+    return plate_id;
+  }
+
+    
   public Long getSessionID() {
     return sessionID;
   }
