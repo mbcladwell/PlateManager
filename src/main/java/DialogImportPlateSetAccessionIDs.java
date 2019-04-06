@@ -8,13 +8,10 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.logging.Logger;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import javax.swing.JOptionPane;
+
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -23,6 +20,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -47,6 +45,7 @@ public class DialogImportPlateSetAccessionIDs extends JDialog
 
   static JButton select;
   static JButton cancelButton;
+  static JButton helpButton;
   private static final long serialVersionUID = 1L;
   private DialogMainFrame dmf;
   private DatabaseManager dbm;
@@ -58,9 +57,11 @@ public class DialogImportPlateSetAccessionIDs extends JDialog
   private String plate_set_description;
     private ComboItem format;
     private int plate_num;
+    private int expected_rows;
     private ComboItem plate_layout;
   private JFileChooser fileChooser;
     private JCheckBox checkBox;
+    private ArrayList<String[]>  accessions; 
     
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
@@ -74,7 +75,7 @@ public class DialogImportPlateSetAccessionIDs extends JDialog
     plate_set = new ComboItem(_plate_set_id, _plate_set_sys_name);
     format = new ComboItem(_format_id, String.valueOf(_format_id));
     plate_num = _plate_num;
-   
+    expected_rows = plate_num*format.getKey();
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
     this.dmf = _dmf;
@@ -217,6 +218,20 @@ public class DialogImportPlateSetAccessionIDs extends JDialog
           }
         }));
 
+        helpButton = new JButton("Help");
+    helpButton.setMnemonic(KeyEvent.VK_H);
+    helpButton.setActionCommand("help");
+    helpButton.setEnabled(true);
+    c.gridx = 3;
+    c.gridy = 9;
+    pane.add(helpButton, c);
+    helpButton.addActionListener(
+        (new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            dispose();
+          }
+        }));
+
     this.getContentPane().add(pane, BorderLayout.CENTER);
     this.pack();
     this.setLocation(
@@ -240,30 +255,20 @@ public class DialogImportPlateSetAccessionIDs extends JDialog
       int top_n_number = 0;
 
     if (e.getSource() == okButton) {
-	if(((ComboItem)algorithmList.getSelectedItem()).getKey()==1){  //If Top N is the algorithm
-	    try{
-		top_n_number = Integer.parseInt(nField.getText());
-	    }catch(NumberFormatException nfe){
-		JOptionPane.showMessageDialog(dmf,
-			      "Invalid number of hits.",
-			      "Number Format Exception",
-			      JOptionPane.ERROR_MESSAGE);
+
+	accessions = dmf.getUtilities().loadDataFile(fileField.getText());
+	if(!((accessions.size()-1) == expected_rows)){  //If Top N is the algorithm
+	    	JOptionPane.showMessageDialog(dmf,
+					      new String("Expecting " + String.valueOf(expected_rows) + " rows but found " + (accessions.size()-1) + " rows." ), "Import Error",      JOptionPane.ERROR_MESSAGE);
 		return;
-	    }
+	    
 	    
 	}
 	
-      dbi.associateDataWithPlateSet(
-          nameField.getText(),
-          descrField.getText(),
-          plate_set.toString(),
+      dbi.associateAccessionsWithPlateSet(
+          plate_set_id,
           format.getKey(),
-          ((ComboItem)assayTypes.getSelectedItem()).getKey(),
-          plate_layout.getKey(),
-          dmf.getUtilities().loadDataFile(fileField.getText()),
-	  checkBox.isSelected(),
-	  ((ComboItem)algorithmList.getSelectedItem()).getKey(),
-	  top_n_number);
+          accessions);
       dispose();
     }
 
@@ -282,7 +287,7 @@ public class DialogImportPlateSetAccessionIDs extends JDialog
 
   public void insertUpdate(DocumentEvent e) {
 
-    if (nameField.getText().length() > 0 & fileField.getText().length() > 0) {
+    if ( fileField.getText().length() > 0) {
       okButton.setEnabled(true);
     } else {
       okButton.setEnabled(false);
