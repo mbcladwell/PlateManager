@@ -12,11 +12,9 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTable;
-
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.table.*;
 
 
@@ -24,7 +22,7 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
   static JButton exportAssayRun;
   static JButton viewAssayRun;
   static JButton exportHitList;
-  static JButton viewHitList;
+  static JButton rearrayHitList;
   static JButton closeButton;
     
   static JLabel label;
@@ -91,7 +89,7 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
 
     counts_pane  = new JPanel(new BorderLayout());
     counts_pane.setBorder(BorderFactory.createRaisedBevelBorder());
-    javax.swing.border.TitledBorder counts_paneBorder = BorderFactory.createTitledBorder("Hit Lists:");
+    javax.swing.border.TitledBorder counts_paneBorder = BorderFactory.createTitledBorder("Contained in Plate Sets:");
     counts_paneBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
     counts_pane.setBorder(counts_paneBorder);
 
@@ -107,12 +105,12 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
    
     exportHitList = new JButton("Export");
     exportHitList.addActionListener(this);
-   viewHitList = new JButton("View");
-     viewHitList.addActionListener(this);
+   rearrayHitList = new JButton("Rearray");
+     rearrayHitList.addActionListener(this);
    hlButtons.add(closeButton);
     
     hlButtons.add(exportHitList);
-    hlButtons.add(viewHitList);
+    hlButtons.add(rearrayHitList);
     counts_pane.add(hlButtons, BorderLayout.SOUTH);
 
 
@@ -132,6 +130,14 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
 
    
     public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == rearrayHitList) {
+    	
+    }
+
+
+        if (e.getSource() == closeButton) {
+	    HitListViewer.this.dispose();
+    }
 	/*	
     if (e.getSource() == exportAssayRun) {
     	
@@ -153,12 +159,6 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
     }
     if (e.getSource() == exportHitList) {
     	
-    }
-    if (e.getSource() == viewHitList) {
-    	
-    }
-        if (e.getSource() == closeButton) {
-	    HitListViewer.this.dispose();
     }
 
 
