@@ -159,10 +159,16 @@ public class DialogImportPlateSetAccessionIDs extends JDialog
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(label, c);
 
-    label = new JLabel("Expecting:", SwingConstants.RIGHT);
+    label = new JLabel("Expected row count:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 2;
     c.anchor = GridBagConstraints.LINE_END;
+    pane.add(label, c);
+
+    label = new JLabel(String.valueOf(expected_rows), SwingConstants.LEFT);
+    c.gridx = 1;
+    c.gridy = 2;
+    c.anchor = GridBagConstraints.LINE_START;
     pane.add(label, c);
 
     
@@ -222,8 +228,8 @@ public class DialogImportPlateSetAccessionIDs extends JDialog
     helpButton.setMnemonic(KeyEvent.VK_H);
     helpButton.setActionCommand("help");
     helpButton.setEnabled(true);
-    c.gridx = 3;
-    c.gridy = 9;
+    c.gridx = 4;
+    c.gridy = 8;
     pane.add(helpButton, c);
     helpButton.addActionListener(
         (new ActionListener() {
@@ -266,7 +272,7 @@ public class DialogImportPlateSetAccessionIDs extends JDialog
 	}
 	
       dbi.associateAccessionsWithPlateSet(
-          plate_set_id,
+					  plate_set.getKey(),
           format.getKey(),
           accessions);
       dispose();

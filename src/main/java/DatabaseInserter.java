@@ -764,8 +764,63 @@ Integer[] plate_set_id =
 
     /**
      * Loads table and make the association
+     *
+     * accessions looks like:
+     * plate	well	accs.id
+     * 1	1	AMRVK5473H
+     * 1	2	KMNCX9294W
+     * 1	3	EHRXZ2102Z
+     * 1	4	COZHR7852Q
+     * 1	5	FJVNR6433Q
      */
     public void associateAccessionsWithPlateSet(int  _plate_set_id, int _format, ArrayList<String[]> _accessions){
+
+	int plate_set_id = _plate_set_id;
+	int format = _format;
+	ArrayList<String[]> accessions = _accessions;
 	
+	    // read in data file an populate assay_result with data;
+    // only continue if successful
+    String sql_statement = new String("INSERT INTO temp_accs_id (plate_order, by_col, accs_id) VALUES ");
+    //LOGGER.info(accessions.get(0)[0] + " " + accessions.get(0)[1] + " " +accessions.get(0)[2] );	
+    if (accessions.get(0)[0].equals("plate") & accessions.get(0)[1].equals("well") & accessions.get(0)[2].equals("accs.id")) {
+
+    accessions.remove(0); // get rid of the header
+    for (String[] row : accessions) {
+      sql_statement =
+          sql_statement
+	  + "("
+	  + Integer.parseInt(row[0])
+	  + ", "
+	  + Integer.parseInt(row[1])
+	  + ", '"
+	  + row[2]
+	  + "'), ";
+    }
+    }else{
+    JOptionPane.showMessageDialog(
+				  dmf, "Expecting the headers \"plate\", \"well\", and \"accs.id\", but found\n" + accessions.get(0)[0] + ", " +  accessions.get(0)[1] +  ", and " + accessions.get(0)[2] + "." , "Error", JOptionPane.ERROR_MESSAGE);
+    return;
+  	
+    }
+
+    String insertSql = "SELECT process_access_ids(?,?);";
+    LOGGER.info("sqlstatement: " + insertSql);
+    PreparedStatement insertPs;
+    try {
+      insertPs = conn.prepareStatement(insertSql);
+          insertPs.setInt(1, plate_set_id);
+      insertPs.setString(2, sql_statement.substring(0, sql_statement.length() - 2));
+  
+      insertPreparedStatement(insertPs);
+    } catch (SQLException sqle) {
+      LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
+      JOptionPane.showMessageDialog(
+          dmf, "Problems parsing accesion ids file!.", "Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+
+    
+
     }
 }
