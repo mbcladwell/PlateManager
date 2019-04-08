@@ -823,4 +823,47 @@ Integer[] plate_set_id =
     
 
     }
+
+  public void insertRearrayedPlateSet(
+      String _name,
+      String _description,
+      String _num_plates,
+      int _plate_format_id,
+      int _plate_type_id,
+      int _plate_layout_id,
+      int _hit_list_id,
+      int _source_plate_set_id) {
+
+    try {
+      int project_id = dmf.getSession().getProjectID();
+      int plate_format_id = _plate_format_id;
+      int plate_type_id = _plate_type_id;
+      int plate_layout_id = _plate_layout_id;
+         
+
+      String insertSql = "SELECT new_plate_set ( ?, ?, ?, ?, ?, ?, ?, ?);";
+      PreparedStatement insertPs =
+          conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+      insertPs.setString(1, _description);
+      insertPs.setString(2, _name);
+      insertPs.setInt(3, Integer.valueOf(_num_plates));
+      insertPs.setInt(4, plate_format_id);
+      insertPs.setInt(5, plate_type_id);
+      insertPs.setInt(6, project_id);
+      insertPs.setInt(7, plate_layout_id);    
+      insertPs.setBoolean(8, false);
+
+      // LOGGER.info(insertPs.toString());
+      int rowsAffected   = insertPs.executeUpdate();
+       ResultSet rsKey = insertPs.getGeneratedKeys();
+       rsKey.next();
+       int dest_plate_set_id = rsKey.getInt(1);
+       insertPs.close();
+      //  SELECT new_plate_set ( 'descrip', 'myname', '10', '96', 'assay', 0, 't')
+    } catch (SQLException sqle) {
+      LOGGER.severe("Failed to create plate set: " + sqle);
+    }
+  }
+
+    
 }

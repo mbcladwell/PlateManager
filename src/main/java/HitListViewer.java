@@ -12,9 +12,9 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.*;
 
@@ -136,7 +136,9 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
 		 int row = counts_table.getSelectedRow();
 		 int plate_set_id =  (int)counts_table.getModel().getValueAt(row, 0);
 		 String plate_set_sys_name =  counts_table.getModel().getValueAt(row, 1).toString();
-		 int sample_count = (int)counts_table.getModel().getValueAt(row, 4);
+		 LOGGER.info("counts_table.getModel().getValueAt(row, 4): " + counts_table.getModel().getValueAt(row, 4));
+		 int sample_count = (int)Integer.valueOf(counts_table.getModel().getValueAt(row, 4).toString());
+		 //int sample_count = 92;
 		 int source_plate_set_format =  (int)counts_table.getModel().getValueAt(row, 3);
 		 if(source_plate_set_format==1536){
 		     JOptionPane.showMessageDialog(dmf, "1536 well plates can't be rarrayed!");

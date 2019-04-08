@@ -583,7 +583,10 @@ public class DatabaseRetriever {
     return (ComboItem[])output;
   }
 
-    
+
+    /**
+     * Called from DialogRearrayHitList.  Need only source layouts for a given format
+     */   
   public ComboItem[] getSourcePlateLayoutNames(int format_id) {
     ComboItem[] output = null;
     Array results = null;
