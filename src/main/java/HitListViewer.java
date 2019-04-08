@@ -14,6 +14,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.*;
 
@@ -89,7 +90,7 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
 
     counts_pane  = new JPanel(new BorderLayout());
     counts_pane.setBorder(BorderFactory.createRaisedBevelBorder());
-    javax.swing.border.TitledBorder counts_paneBorder = BorderFactory.createTitledBorder("Contained in Plate Sets:");
+    javax.swing.border.TitledBorder counts_paneBorder = BorderFactory.createTitledBorder("Hits available in Plate Sets:");
     counts_paneBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
     counts_pane.setBorder(counts_paneBorder);
 
@@ -131,7 +132,22 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
    
     public void actionPerformed(ActionEvent e) {
     if (e.getSource() == rearrayHitList) {
-    	
+    		 TableModel hits_count_model = counts_table.getModel();
+		 int row = counts_table.getSelectedRow();
+		 int plate_set_id =  (int)counts_table.getModel().getValueAt(row, 0);
+		 String plate_set_sys_name =  counts_table.getModel().getValueAt(row, 1).toString();
+		 int sample_count = (int)counts_table.getModel().getValueAt(row, 4);
+		 int source_plate_set_format =  (int)counts_table.getModel().getValueAt(row, 3);
+		 if(source_plate_set_format==1536){
+		     JOptionPane.showMessageDialog(dmf, "1536 well plates can't be rarrayed!");
+		     return;
+		 }
+
+    		 TableModel hit_list_model = hits_table.getModel();		 
+		 int hit_list_id =  Integer.valueOf(hits_table.getModel().getValueAt(0, 0).toString());
+		 String hit_list_sys_name =  new String("HL-" + hit_list_id);
+		 new DialogRearrayHitList(dmf, plate_set_id, plate_set_sys_name, source_plate_set_format, hit_list_id, hit_list_sys_name, sample_count);
+	
     }
 
 

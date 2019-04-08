@@ -31,6 +31,7 @@ public class DialogRearrayHitList extends JDialog {
   static JLabel Description;
   static JTextField nameField;
   static JLabel ownerLabel;
+  static JLabel numberLabel;
   static String owner;
   static JTextField descriptionField;
   static JTextField numberField;
@@ -39,7 +40,16 @@ public class DialogRearrayHitList extends JDialog {
     private ComboItem [] layoutNames;
     private JComboBox<ComboItem> layoutList;
     private DefaultComboBoxModel<ComboItem> layout_names_list_model;
-
+    private int hit_list_id;
+    private int plate_set_id;
+    private int source_plate_set_format;
+    private int dest_plate_set_format;
+    private int num_dest_plates;
+    private int unknown_count;
+    private int samples_per_dest_plate;
+    private String hit_list_sys_name;
+    private String plate_set_sys_name;
+    
   static JButton okButton;
   static JButton cancelButton;
   final Instant instant = Instant.now();
@@ -49,8 +59,16 @@ public class DialogRearrayHitList extends JDialog {
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
 
-  public DialogRearryHitList(DialogMainFrame _dmf) {
+    public DialogRearrayHitList(DialogMainFrame _dmf, int _plate_set_id, String _plate_set_sys_name, int _source_plate_set_format, int _hit_list_id, String _hit_list_sys_name, int _unknown_count) {
     this.dmf = _dmf;
+    plate_set_id = _plate_set_id;
+    plate_set_sys_name = _plate_set_sys_name;
+    source_plate_set_format = _source_plate_set_format;
+    hit_list_id = _hit_list_id;
+    hit_list_sys_name = _hit_list_sys_name;
+    dest_plate_set_format = source_plate_set_format;
+    unknown_count = _unknown_count;
+    
     this.session = dmf.getSession();
     owner = session.getUserName();
     // Create and set up the window.
@@ -63,7 +81,7 @@ public class DialogRearrayHitList extends JDialog {
     // Image img = new
     // ImageIcon(DialogAddProject.class.getResource("../resources/mwplate.png")).getImage();
     // this.setIconImage(img);
-    this.setTitle("Rearray Hit List HL-");
+    this.setTitle("Rearray Hit List " + hit_list_sys_name + " using plate set " + plate_set_sys_name);
     // c.gridwidth = 2;
 
     label = new JLabel("Date:", SwingConstants.RIGHT);
@@ -120,18 +138,21 @@ public class DialogRearrayHitList extends JDialog {
     pane.add(nameField, c);
 
     descriptionField = new JTextField(30);
+    descriptionField.setText("Rearray of plate set " + plate_set_sys_name + " using hit list " + hit_list_sys_name + ";");
     c.gridx = 1;
     c.gridy = 3;
     c.gridheight = 1;
     pane.add(descriptionField, c);
 
-    numberField = new JTextField(4);
+    
+    numberLabel = new JLabel("");
     c.gridx = 1;
     c.gridy = 4;
     c.gridheight = 1;
     c.gridwidth = 1;
-    pane.add(numberField, c);
+    pane.add(numberLabel, c);
 
+    
     label = new JLabel("Format:", SwingConstants.RIGHT);
     c.gridx = 2;
     c.gridy = 4;
@@ -139,21 +160,26 @@ public class DialogRearrayHitList extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    Integer[] formats = {96, 384, 1536};
+    Integer[] formats = {96, 384};
 
     formatList = new JComboBox<Integer>(formats);
-    formatList.setSelectedIndex(0);
-    c.gridx = 3;
+     for(int i=0; i < formatList.getItemCount(); i++){
+	if(formatList.getItemAt(i) == dest_plate_set_format){
+		formatList.setSelectedIndex(i);
+	    }
+    }
+       c.gridx = 3;
     c.gridy = 4;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_START;
- formatList.addActionListener(
+    formatList.addActionListener(
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 	      layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames((int)formatList.getSelectedItem());
 	      layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
 	      layoutList.setModel(layout_names_list_model );
-	      layoutList.setSelectedIndex(-1);
+	      layoutList.setSelectedIndex(0);
+	      DialogRearrayHitList.this.refreshPlateNumberLabel();
           }
         }));
     pane.add(formatList, c);
@@ -169,7 +195,11 @@ public class DialogRearrayHitList extends JDialog {
     ComboItem[] plateTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateTypes();
 
     typeList = new JComboBox<ComboItem>(plateTypes);
-    typeList.setSelectedIndex(0);
+     for(int i=0; i < typeList.getItemCount(); i++){
+	 if((((ComboItem)typeList.getItemAt(i)).toString()).equals("rearray")){
+		typeList.setSelectedIndex(i);
+	    }
+    }
     c.gridx = 5;
     c.gridy = 4;
     c.gridheight = 1;
@@ -183,8 +213,8 @@ public class DialogRearrayHitList extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    ComboItem[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);
-    LOGGER.info("layoutTypes: " + layoutTypes[0].toString());
+    ComboItem[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames((int)formatList.getSelectedItem());
+    //LOGGER.info("layoutTypes: " + layoutTypes[0].toString());
     layoutList = new JComboBox<ComboItem>(layoutTypes);
     layoutList.setSelectedIndex(0);
     c.gridx = 1;
@@ -193,9 +223,12 @@ public class DialogRearrayHitList extends JDialog {
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_START;
     pane.add(layoutList, c);
-
-
-
+    layoutList.addActionListener(
+        (new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+	      DialogRearrayHitList.this.refreshPlateNumberLabel();
+          }
+        }));
 
     
     okButton = new JButton("OK");
@@ -251,5 +284,9 @@ public class DialogRearrayHitList extends JDialog {
     this.setVisible(true);
   }
 
-  private void addToDB() {}
+  private void refreshPlateNumberLabel() {
+      unknown_count = dmf.getDatabaseManager().getDatabaseRetriever().getUnknownCountForLayoutID(((ComboItem)layoutList.getSelectedItem()).getKey());
+      num_dest_plates = Math.round(unknown_count/samples_per_dest_plate);
+      numberLabel.setText(String.valueOf(num_dest_plates));
+  }
 }

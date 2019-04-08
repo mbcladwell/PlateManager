@@ -1076,7 +1076,7 @@ int assay_run_id = _assay_run_id;
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-"SELECT plate_set.plate_set_sys_name as \"Plate Set\", MAX(plate_type.plate_type_name) as \"Type\", COUNT(sample.ID) as \"Count\" FROM plate_set, plate_plate_set, plate_type, plate, well, well_sample, sample WHERE plate_plate_set.plate_set_id=plate_set.ID AND plate_plate_set.plate_id=plate.id AND plate_set.plate_type_id = plate_type.id   and well.plate_id=plate.ID AND well_sample.well_id=well.ID AND well_sample.sample_id= sample.ID  AND sample.id  IN (SELECT  sample.id FROM hit_list, hit_sample, plate_set, assay_run, sample WHERE hit_sample.hitlist_id=hit_list.id  AND hit_sample.sample_id=sample.id  and assay_run.plate_set_id=plate_set.id AND   hit_list.assay_run_id=assay_run.id   AND  hit_sample.hitlist_id IN (SELECT hit_list.ID FROM hit_list, assay_run WHERE hit_list.assay_run_id=assay_run.ID AND hit_list.id= ? and assay_run.ID IN (SELECT assay_run.ID FROM assay_run WHERE assay_run.plate_set_id IN (SELECT plate_set.ID FROM plate_set WHERE plate_set.project_id=?)))) GROUP BY plate_set.plate_set_sys_name;");
+"SELECT MAX(plate_set.id) as \"ID\", plate_set.plate_set_sys_name as \"Plate Set\", MAX(plate_type.plate_type_name) as \"Type\", MAX(plate_set.plate_format_id) as \"Format\", COUNT(sample.ID) as \"Count\" FROM plate_set, plate_plate_set, plate_type, plate, well, well_sample, sample WHERE plate_plate_set.plate_set_id=plate_set.ID AND plate_plate_set.plate_id=plate.id AND plate_set.plate_type_id = plate_type.id   and well.plate_id=plate.ID AND well_sample.well_id=well.ID AND well_sample.sample_id= sample.ID  AND sample.id  IN (SELECT  sample.id FROM hit_list, hit_sample, plate_set, assay_run, sample WHERE hit_sample.hitlist_id=hit_list.id  AND hit_sample.sample_id=sample.id  and assay_run.plate_set_id=plate_set.id AND   hit_list.assay_run_id=assay_run.id   AND  hit_sample.hitlist_id IN (SELECT hit_list.ID FROM hit_list, assay_run WHERE hit_list.assay_run_id=assay_run.ID AND hit_list.id= ? and assay_run.ID IN (SELECT assay_run.ID FROM assay_run WHERE assay_run.plate_set_id IN (SELECT plate_set.ID FROM plate_set WHERE plate_set.project_id=?)))) GROUP BY plate_set.plate_set_sys_name;");
  
       pstmt.setInt(1, hit_list_id);
       pstmt.setInt(2, project_id);
@@ -1178,4 +1178,30 @@ int assay_run_id = _assay_run_id;
 	
     }
 
+    public int getUnknownCountForLayoutID(int _layout_id){
+	int layout_id = _layout_id;
+	int unknown_count = 0;
+	  try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+				"SELECT unknown_n FROM plate_layout_name WHERE plate_layout_name.ID = ?;");
+ 
+      pstmt.setInt(1, layout_id);
+      
+      ResultSet rs = pstmt.executeQuery();
+
+          rs.next();
+      unknown_count = rs.getInt(1);
+ 
+      rs.close();
+      pstmt.close();
+    
+
+    } catch (SQLException sqle) {
+ LOGGER.severe("Failed to retrieve unknown count: " + sqle);
+    }
+    return unknown_count;
+
+	
+    }
 }
