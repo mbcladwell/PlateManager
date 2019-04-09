@@ -251,7 +251,7 @@ public class DialogRearrayHitList extends JDialog {
                     nameField.getText(),
                     descriptionField.getText(),
                     numberLabel.getText(),
-                    formatList.getSelectedItem(),
+                    (int)formatList.getSelectedItem(),
                     ((ComboItem)typeList.getSelectedItem()).getKey(),
 		    ((ComboItem)layoutList.getSelectedItem()).getKey(),
 		    hit_list_id, plate_set_id);

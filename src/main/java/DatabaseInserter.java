@@ -863,6 +863,12 @@ Integer[] plate_set_id =
     } catch (SQLException sqle) {
       LOGGER.severe("Failed to create plate set: " + sqle);
     }
+
+    //plate set has been registered, new plates/empty wells created
+    //now copy samples into newly created (empty) plate
+    //  SELECT rearray_transfer_samples(source_plate_set, dest_plate_set, hit_list)
+
+    
   }
 
     
