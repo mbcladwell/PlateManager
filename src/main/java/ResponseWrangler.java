@@ -19,21 +19,33 @@ public class ResponseWrangler {
    private double max_response;
     private double min_response;
     private double mean_bkgrnd;
+    private double mean_pos;
+    private double mean_neg;
+    
     private double stdev_bkgrnd;
+    private double stdev_neg;
+    private double stdev_pos;
+    
+    
     private double threshold;
-    private double mean_3_sd;
-    private double mean_2_sd;
+    private double mean_neg_3_sd;
+    private double mean_neg_2_sd;
     private int format;
     private int num_plates;
     private int num_hits=0;
     private CustomTable table;
     private double[][] sorted_response;
+    private double[][] sorted_response_unknowns_only;
+    
   private DecimalFormat df = new DecimalFormat("#####.####");
         private Set<Integer> plate_set = new HashSet<Integer>();
     private Set<Integer> well_set = new HashSet<Integer>();
     private List<Double> desired_response_list = new LinkedList<Double>();
     private List<Double> blank_list = new LinkedList<Double>();
     private List<Double> neg_list = new LinkedList<Double>();
+    private List<Double> pos_list = new LinkedList<Double>();
+    private List<Double> unknowns_list = new LinkedList<Double>();
+    
     private int num_data_points;
 
     public static final int RAW = 0;
@@ -90,6 +102,13 @@ public class ResponseWrangler {
 	    if(well_type_id==3){  //if it is a negative control
 		neg_list.add(Double.valueOf((float)dtm.getValueAt(row, 2)));
 	    }
+	    if(well_type_id==2){  //if it is a positive control
+		pos_list.add(Double.valueOf((float)dtm.getValueAt(row, 2)));
+	    }
+	    if(well_type_id==1){  //if it is an unknown
+		unknowns_list.add(Double.valueOf((float)dtm.getValueAt(row, 2)));
+	    }
+	    
 	    break;
 	case 1: //norm
 	    desired_response_list.add(norm);
@@ -99,6 +118,12 @@ public class ResponseWrangler {
 	    }
 	    if(well_type_id==3){  //if it is a negative control
 		neg_list.add(Double.valueOf((float)dtm.getValueAt(row, 4)));
+	    }
+	    if(well_type_id==2){  //if it is a positive control
+		pos_list.add(Double.valueOf((float)dtm.getValueAt(row, 4)));
+	    }
+	    if(well_type_id==1){  //if it is an unknown
+		unknowns_list.add(Double.valueOf((float)dtm.getValueAt(row, 4)));
 	    }
 	    break;
 	case 2: //normpos
@@ -110,6 +135,13 @@ public class ResponseWrangler {
 	    if(well_type_id==3){  //if it is a negative control
 		neg_list.add(Double.valueOf((float)dtm.getValueAt(row, 5)));
 	    }
+	    if(well_type_id==2){  //if it is a positive control
+		pos_list.add(Double.valueOf((float)dtm.getValueAt(row, 5)));
+	    }
+	    if(well_type_id==1){  //if it is an unknown
+		unknowns_list.add(Double.valueOf((float)dtm.getValueAt(row, 5)));
+	    }
+
 	    break;
 	}
 
@@ -125,9 +157,14 @@ public class ResponseWrangler {
     
     mean_bkgrnd = Stats.meanOf(blank_list);
     stdev_bkgrnd = Stats.of(blank_list).populationStandardDeviation();
-    mean_3_sd = mean_bkgrnd + 3*(stdev_bkgrnd);
-    mean_2_sd = mean_bkgrnd + 2*(stdev_bkgrnd);
-    threshold = mean_3_sd;
+    mean_neg = Stats.meanOf(neg_list);
+    stdev_neg = Stats.of(neg_list).populationStandardDeviation();
+    mean_pos = Stats.meanOf(pos_list);
+    stdev_pos = Stats.of(pos_list).populationStandardDeviation();
+    
+    mean_neg_3_sd = mean_neg + 3*(stdev_neg);
+    mean_neg_2_sd = mean_neg + 2*(stdev_neg);
+    threshold = mean_neg_3_sd;
 
     Arrays.sort(sorted_response, new Comparator<double[]>() {
         @Override
@@ -135,6 +172,22 @@ public class ResponseWrangler {
             return Double.compare(o2[0], o1[0]);
         }
     });
+
+    //get the sorted response for unknowns only
+    sorted_response_unknowns_only = new double[unknowns_list.size()][4];
+	int unk_index = 0;
+	for(int i = 0; i < sorted_response.length; i++){
+	    if(sorted_response[i][2]==1){
+		sorted_response_unknowns_only[unk_index][0]=sorted_response[i][0];
+		sorted_response_unknowns_only[unk_index][1]=sorted_response[i][1];
+		sorted_response_unknowns_only[unk_index][2]=sorted_response[i][2];
+		sorted_response_unknowns_only[unk_index][3]=sorted_response[i][3];
+		unk_index++;
+	    }
+	}
+
+
+    
     /*
     if(_desired_response == 0){
 	System.out.println("max: " + max_response);
@@ -165,11 +218,9 @@ public class ResponseWrangler {
     public int getHitsAboveThreshold(double _threshold){
 	double threshold = _threshold;
 	int results = 0;
-	for(int i = 0; i < sorted_response.length; i++){
-	    if(sorted_response[i][0] > threshold){
-		if(sorted_response[i][2] == 1){ //an "unknown" (i.e. not a control)
+	for(int i = 0; i < sorted_response_unknowns_only.length; i++){
+	    if(sorted_response_unknowns_only[i][0] > threshold){
 		    results++;   
-		}
 	    }
 	}
 	return results;
@@ -258,34 +309,37 @@ public class ResponseWrangler {
 	/**
 	 * @return the mean_3_sd
 	 */
-	public double getMean_3_sd() {
-		return mean_3_sd;
+	public double getMean_neg_3_sd() {
+		return mean_neg_3_sd;
 	}
 
 
 	/**
 	 * @param mean_3_sd the mean_3_sd to set
 	 */
-	public void setMean_3_sd(double mean_3_sd) {
-		this.mean_3_sd = mean_3_sd;
+	public void setMean_neg_3_sd(double mean_neg_3_sd) {
+		this.mean_neg_3_sd = mean_neg_3_sd;
 	}
 
 
 	/**
 	 * @return the mean_2_sd
 	 */
-	public double getMean_2_sd() {
-		return mean_2_sd;
+	public double getMean_neg_2_sd() {
+		return mean_neg_2_sd;
 	}
 
 
 	/**
 	 * @param mean_2_sd the mean_2_sd to set
 	 */
-	public void setMean_2_sd(double mean_2_sd) {
-		this.mean_2_sd = mean_2_sd;
+	public void setMean_neg_2_sd(double mean_2_sd) {
+		this.mean_neg_2_sd = mean_2_sd;
 	}
 
+	public double getMean_pos() {
+		return mean_pos;
+	}
 
 	/**
 	 * @return the num_hits
@@ -338,6 +392,10 @@ public class ResponseWrangler {
 	 */
 	public double[][] getSortedResponse() {
 		return sorted_response;
+	}
+
+    	public double[][] getSortedResponseUnknownsOnly() {
+		return sorted_response_unknowns_only;
 	}
 
 

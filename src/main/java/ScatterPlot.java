@@ -36,6 +36,7 @@ import javax.swing.SwingConstants;
 
 public class ScatterPlot extends JFrame {
     private JButton genHitsBtn = new JButton("Generate hit list");
+    private JButton close_button = new JButton("Close");
     private DatabaseRetriever dbr;
     private DialogMainFrame dmf;
     private CustomTable table;
@@ -52,9 +53,12 @@ public class ScatterPlot extends JFrame {
     private double mean_bkgrnd;
     private double stdev_bkgrnd;
     private double threshold;
-    private double mean_3_sd;
-    private double mean_2_sd;
+    private double mean_neg_3_sd;
+    private double mean_neg_2_sd;
+    private double mean_pos;
+    
     private double[][] sortedResponse;
+    private double[][] sorted_response_unknowns_only;
     private int margin = 60;
     private int wth;
     private int hgt;	  
@@ -65,7 +69,7 @@ public class ScatterPlot extends JFrame {
     private int num_hits=0;
     //private DefaultTableModel dtm;
     private ResponseWrangler raw_response;
-    public JLabel numHitsLabel;
+    public JTextField numHitsField;
     private ResponseWrangler norm_response;
     private ResponseWrangler norm_pos_response;
     private ResponseWrangler selected_response;
@@ -114,7 +118,7 @@ public class ScatterPlot extends JFrame {
     c.anchor = GridBagConstraints.LINE_END;
     panel2.add(label, c);
 
-    ComboItem[] algorithmTypes = new ComboItem[]{ new ComboItem(3,"mean + 3SD"), new ComboItem(2,"mean + 2SD")};
+    ComboItem[] algorithmTypes = new ComboItem[]{ new ComboItem(3,"mean(neg) + 3SD"), new ComboItem(2,"mean(neg) + 2SD"), new ComboItem(1,"> mean(pos)")};
     
     algorithmList = new JComboBox<ComboItem>(algorithmTypes);
     algorithmList.setSelectedIndex(0);
@@ -128,10 +132,16 @@ public class ScatterPlot extends JFrame {
         public void actionPerformed(ActionEvent evt) {
 	    switch(((ComboItem)algorithmList.getSelectedItem()).getKey()){
 	    case 3:
-		setThreshold( mean_3_sd);		
+		setThreshold( mean_neg_3_sd);		
+		updateAllVariables();
 		break;
 	    case 2:
-		setThreshold( mean_2_sd);		
+		setThreshold( mean_neg_2_sd);		
+		updateAllVariables();
+		break;
+	    case 1:
+		setThreshold( mean_pos);		
+		updateAllVariables();
 		break;
 	    }
         }
@@ -148,7 +158,7 @@ public class ScatterPlot extends JFrame {
     panel2.add(label, c);
 
 
-    thresholdField = new JTextField(Double.toString(threshold), 10);
+    thresholdField = new JTextField(Double.toString(threshold), 20);
     c.gridx = 3;
     c.gridy = 0;
     c.gridheight = 1;
@@ -172,6 +182,18 @@ public class ScatterPlot extends JFrame {
     genHitsBtn.addActionListener(new ActionListener() { 
         public void actionPerformed(ActionEvent evt) {
             new DialogNewHitList(dmf, assay_run_id, sortedResponse, num_hits);
+        }
+    });
+
+        c.gridx = 4;
+    c.gridy = 1;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    panel2.add(close_button, c);
+    close_button.addActionListener(new ActionListener() { 
+        public void actionPerformed(ActionEvent evt) {
+            dispose();
         }
     });
 
@@ -221,7 +243,32 @@ public class ScatterPlot extends JFrame {
     c.anchor = GridBagConstraints.LINE_END;
     panel2.add(label, c);
 
+    numHitsField = new JTextField(String.valueOf(num_hits), 10);
+    c.gridx = 3;
+    c.gridy = 1;
+    c.gridheight = 1;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_START;
 
+    /**
+     * get the sorted response: double[][]  sorted_response [response] [well] [type_id] [sample_id]
+     * the needed threshold for e.g. 26 hits will be sorted_response[26][0]
+     */
+    panel2.add(numHitsField, c);
+    numHitsField.addActionListener(new ActionListener() { 
+        public void actionPerformed(ActionEvent evt) {
+	    num_hits = Integer.valueOf(numHitsField.getText()).intValue();
+	    //sorted_response_unknowns_only = selected_response.getSortedResponseUnknownsOnly();
+	    LOGGER.info("num_hits: " + num_hits);
+	    LOGGER.info("sorted_response.length: " + sorted_response_unknowns_only.length);	    
+	    LOGGER.info("sorted_response_unk_only[num_hits][0]: " + sorted_response_unknowns_only[num_hits][0]);
+       	
+	    setThreshold(sorted_response_unknowns_only[num_hits][0]);	    
+            
+        }
+    });
+
+    /*
     numHitsLabel = new JLabel(String.valueOf(num_hits));
     c.gridx = 3;
     c.gridy = 1;
@@ -229,7 +276,7 @@ public class ScatterPlot extends JFrame {
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_START;
     panel2.add(numHitsLabel, c);
-
+    */
     getContentPane().add(panel2, BorderLayout.SOUTH);
 
 	panel3 = new JPanel(new GridBagLayout());
@@ -379,13 +426,17 @@ public class ScatterPlot extends JFrame {
 		g2db.setStroke(dashed);
 		g2db.drawLine(margin, (int)Math.round(originY - scaleY*threshold) , wth-10, (int)Math.round(originY - scaleY*threshold));
 	      //label the threshold if it is + 2 or 3 SD
-		if( threshold == mean_3_sd){
+		if( threshold == mean_neg_3_sd){
 		g2db.setColor(Color.blue);
-		g2db.drawString( "mean(background) + 3SD", margin+20  , (int)Math.round(originY - scaleY*threshold - 10)  );
+		g2db.drawString( "mean(neg) + 3SD", margin+20  , (int)Math.round(originY - scaleY*threshold - 10)  );
 		}
-		if( threshold == mean_2_sd){
+		if( threshold == mean_neg_2_sd){
 		g2db.setColor(Color.blue);
-		g2db.drawString( "mean(background) + 2SD", margin+20  , (int)Math.round(originY - scaleY*threshold - 10)  );
+		g2db.drawString( "mean(neg) + 2SD", margin+20  , (int)Math.round(originY - scaleY*threshold - 10)  );
+		}
+		if( threshold == mean_pos){
+		g2db.setColor(Color.blue);
+		g2db.drawString( "mean(pos)", margin+20  , (int)Math.round(originY - scaleY*threshold - 10)  );
 		}
 		//gets rid of the copy
 		g2db.dispose();
@@ -410,7 +461,7 @@ public class ScatterPlot extends JFrame {
 	this.threshold = _threshold;
         thresholdField.setText(df.format(threshold));
 	slider.setDoubleValue(threshold);
-	numHitsLabel.setText(String.valueOf(selected_response.getHitsAboveThreshold(threshold)));
+	numHitsField.setText(String.valueOf(selected_response.getHitsAboveThreshold(threshold)));
 	this.repaint();
 	
     }
@@ -423,13 +474,16 @@ public class ScatterPlot extends JFrame {
 	min_response = selected_response.getMin_response();
 	mean_bkgrnd = selected_response.getMean_bkgrnd();
 	stdev_bkgrnd = selected_response.getStdev_bkgrnd();
-	mean_3_sd = selected_response.getMean_3_sd();
-	mean_2_sd = selected_response.getMean_2_sd();
+	mean_neg_3_sd = selected_response.getMean_neg_3_sd();
+	mean_neg_2_sd = selected_response.getMean_neg_2_sd();
+	mean_pos = selected_response.getMean_pos();
 	sortedResponse = selected_response.getSortedResponse();
+	sorted_response_unknowns_only = selected_response.getSortedResponseUnknownsOnly();
+	
 	num_hits = selected_response.getHitsAboveThreshold(threshold);
 	LOGGER.info("max " + max_response);
 	LOGGER.info("mean_bkgrnd " + mean_bkgrnd);
-	LOGGER.info("mean_3_sd " + mean_3_sd);
+	LOGGER.info("mean_neg_3_sd " + mean_neg_3_sd);
 	LOGGER.info("num_hits " + num_hits);
 	
 	//	LOGGER.info("num_hits: " + Integer.toString(num_hits));

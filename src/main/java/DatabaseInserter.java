@@ -530,10 +530,10 @@ Integer[] plate_set_id =
 	    break;
 	case 2: // mean(background) + 2SD
     
-	    number_of_hits =  rw.getHitsAboveThreshold(rw.getMean_2_sd() );
+	    number_of_hits =  rw.getHitsAboveThreshold(rw.getMean_neg_2_sd() );
 	    break;
 	case 3:  // mean(background) + 3SD
-	    number_of_hits =  rw.getHitsAboveThreshold(rw.getMean_3_sd() );
+	    number_of_hits =  rw.getHitsAboveThreshold(rw.getMean_neg_3_sd() );
 	    break;	    	    
 	}
 	DialogNewHitList dnhl = new DialogNewHitList(dmf, assay_run_id, sorted_response, number_of_hits);
