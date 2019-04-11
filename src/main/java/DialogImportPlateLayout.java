@@ -12,6 +12,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
+import java.util.ArrayList;
+
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -23,6 +25,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -47,6 +50,7 @@ public class DialogImportPlateLayout extends JDialog implements ActionListener, 
   private static DatabaseManager dbm;
   private static DatabaseInserter dbi;
   private JFileChooser fileChooser;
+    private ArrayList<String[]> imported_layout;
     
   final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
   private static final long serialVersionUID = 1L;
@@ -147,13 +151,13 @@ public class DialogImportPlateLayout extends JDialog implements ActionListener, 
     c.gridy = 5;
     c.gridwidth = 5;
     c.gridheight = 1;
-    fileField.getDocument().addDocumentListener(this);
     pane.add(fileField, c);
-
+    fileField.getDocument().addDocumentListener(this);
+    
     okButton = new JButton("OK");
     okButton.setMnemonic(KeyEvent.VK_O);
     okButton.setActionCommand("ok");
-    //okButton.setEnabled(false);
+    okButton.setEnabled(false);
     okButton.setForeground(Color.GREEN);
     c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 2;
@@ -189,11 +193,24 @@ public class DialogImportPlateLayout extends JDialog implements ActionListener, 
       public void actionPerformed(ActionEvent e) {
 
     if (e.getSource() == okButton) {
+	/*
       dbi.insertPlateLayout(
           nameField.getText(),
           descriptionField.getText(),
           //((ComboItem)formatList.getSelectedItem()).getKey(),
-	  fileField.getText());
+	  */
+
+	
+	  imported_layout =dmf.getUtilities().loadDataFile(fileField.getText());
+    int lines_data = imported_layout.size() -1; //for header
+	if(lines_data!= 96 && lines_data!=384 ){
+	    	JOptionPane.showMessageDialog(dmf,
+			      "Layout import file must contain 96 or 384 rows of data.",
+			      "File format Error",
+			      JOptionPane.ERROR_MESSAGE);
+	
+	}
+	new DialogImportLayoutViewer(dmf, imported_layout);
       dispose();
     }
         if (e.getSource() == select) {
@@ -221,26 +238,23 @@ public class DialogImportPlateLayout extends JDialog implements ActionListener, 
     }
   }
 
-  public void removeUpdate(DocumentEvent e) {
-    if (nameField.getText().length() > 0 & fileField.getText().length() > 0) {
-      okButton.setEnabled(true);
-    } else {
-      okButton.setEnabled(false);
-    }
-  }
-
       public void insertUpdate(DocumentEvent e) {
-
-    if (nameField.getText().length() > 0 & fileField.getText().length() > 0) {
-      okButton.setEnabled(true);
-    } else {
-      okButton.setEnabled(false);
+	  if(fileField.getText().length() >0){
+	      okButton.setEnabled(true);
+	  }else{
+	      okButton.setEnabled(false);
+	  }
     }
-  }
+    public void removeUpdate(DocumentEvent e) {
+	  if(fileField.getText().length() >0){
+	      okButton.setEnabled(true);
+	  }else{
+	      okButton.setEnabled(false);
+	  }
 
-  public void changedUpdate(DocumentEvent e) {
-    // Plain text components don't fire these events.
-  }
-    
-  private void addToDB() {}
+    }
+    public void changedUpdate(DocumentEvent e) {
+        //Plain text components do not fire these events
+    }
+
 }

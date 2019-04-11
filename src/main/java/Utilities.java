@@ -127,6 +127,57 @@ case 1536:
     return tableData;	
     }
 
+
+ public Object[][] getPlateLayoutGrid(Object[][] _import_data){
+     Object[][] import_data = _import_data;
+    
+    int row = 0;
+    int col = 0;
+    int nRow = import_data.length;
+    //LOGGER.info("nRow: " + nRow);
+    //96 well plate  tableData[row][col]
+    switch(nRow){
+    case 97:
+    row = 8; col=12;
+    break;
+case 385:
+    row = 16; col=24;
+    break;
+case 1537:
+    row = 32; col=48;
+    break;    
+    }
+        String[][] tableData = new String[row][col];
+
+
+    for (int i = 1; i < nRow; i++) {
+	//LOGGER.info("tdata i: " + i + " " + tm.getValueAt(i,1) );
+	//System.out.println("i: " + i + " array[" + ((i)%8) +"][" + (int)Math.floor((i)/8)+ "] = " + import_data[i][1] );
+	switch(Integer.parseInt((String)import_data[i][1])){
+	case 1:
+       	tableData[((i-1)%row)][(int)Math.floor((i-1)/row)] = "unknown";
+	    break;
+	case 2:
+       	tableData[((i-1)%row)][(int)Math.floor((i-1)/row)] = "positive";
+	    break;
+	case 3:
+       	tableData[((i-1)%row)][(int)Math.floor((i-1)/row)] = "negative";
+	    break;
+	case 4:
+       	tableData[((i-1)%row)][(int)Math.floor((i-1)/row)] = "blank";
+	    break;
+	case 5:
+       	tableData[((i-1)%row)][(int)Math.floor((i-1)/row)] = "edge";
+	    break;
+	}
+    }
+
+    return (Object[][])tableData;	
+    }
+
+
+
+    
     
     /**
      * Converts ArrayList of String[] to Object[][].

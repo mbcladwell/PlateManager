@@ -8,6 +8,17 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.time.Instant;
+import java.util.Date;
+import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
+import java.awt.event.ActionListener;
+
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -17,6 +28,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.*;
@@ -24,6 +37,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 
 /**
  * parentPane BorderLayout holds other panes
@@ -34,172 +50,135 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 
 
-public class LayoutViewer extends JDialog implements java.awt.event.ActionListener {
-  static JButton button;
+public class DialogImportLayoutViewer extends JDialog implements java.awt.event.ActionListener, DocumentListener {
+  static JButton cancel_button;
+  static JButton ok_button;
   static JLabel label;
-  static JComboBox<Integer> formatList;
-  static JComboBox<String> displayList;
-    //static JComboBox<ComboItem> layoutList;
-  static JButton okButton;
-  static JButton cancelButton;
-  final DialogMainFrame dmf;
+
+    final DialogMainFrame dmf;
   final Session session;
     private String owner;
   private JTable table;
   private JTable sourceTable;
   private JTable destTable;
+    private JTextField nameField;
+    private JTextField descriptionField;
     
   private JScrollPane scrollPane;
-  private JScrollPane sourceScrollPane;
-  private JScrollPane destScrollPane;
+  final Instant instant = Instant.now();
     
     private  JPanel parentPane;
-    private  JPanel pane2;
-    private  JPanel pane3;
-    private  JPanel pane4;
+    private  JPanel pane1;
     private  JPanel pane5;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+  final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
   // final EntityManager em;
   private static final long serialVersionUID = 1L;
   private MyModel tableModel;
-    private ComboItem [] layoutNames;
-    private Object[][] gridData;
+    private Object[][] grid_data;
     
     // private DefaultComboBoxModel<ComboItem> layout_names_list_model;
 
 
     
-  public LayoutViewer(DialogMainFrame _dmf) {
+    public DialogImportLayoutViewer(DialogMainFrame _dmf, ArrayList<String[]> _data) {
     this.dmf = _dmf;
     this.session = dmf.getSession();
     owner = session.getUserName();
+
+    	ArrayList<String[]> data = _data;
+	Object[][] temp_data = dmf.getUtilities().getObjectArrayForArrayList(data);
+	Object[][] grid_data = dmf.getUtilities().getPlateLayoutGrid(temp_data);
+
     //layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);
     //    layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
     
     parentPane = new JPanel(new BorderLayout());
     parentPane.setBorder(BorderFactory.createRaisedBevelBorder());
  
-    this.setTitle("Plate Layout Viewer");
+    this.setTitle("Import Plate Layout");
     // c.gridwidth = 2;
+   ////////////////////////////////////////////////////////////
+    //Pane 1
 
-////////////////////////////////////////////////////////////
-    //Pane 2
-    
-    JPanel pane2 = new JPanel(new GridBagLayout());
-    pane2.setBorder(BorderFactory.createRaisedBevelBorder());
+    pane1 = new JPanel(new GridBagLayout());
+    pane1.setBorder(BorderFactory.createRaisedBevelBorder());
+
     GridBagConstraints c = new GridBagConstraints();
-
-    
-    label = new JLabel("Format:", SwingConstants.RIGHT);
+  
+    label = new JLabel("Date:", SwingConstants.RIGHT);
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 0;
-    c.gridy = 1;
-    c.gridwidth = 1;
-    c.anchor = GridBagConstraints.LINE_END;
+    c.gridy = 0;
     c.insets = new Insets(5, 5, 2, 2);
-    pane2.add(label, c);
- 
-    Integer[] formats = {96, 384, 1536};
+    c.anchor = GridBagConstraints.LINE_END;
+    pane1.add(label, c);
 
-    formatList = new JComboBox<Integer>(formats);
-    formatList.setSelectedIndex(0);
-    c.gridx = 1;
-    c.gridy = 1;
-    c.gridheight = 1;
-    c.anchor = GridBagConstraints.LINE_START;
-    formatList.addActionListener(this);
-    pane2.add(formatList, c);
- 
-    label = new JLabel("Display:", SwingConstants.RIGHT);
+
+    label = new JLabel("Layout Name:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 2;
+    pane1.add(label, c);
+
+    label = new JLabel("Description:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 3;
+    pane1.add(label, c);
+    /*
+        label = new JLabel("Format:", SwingConstants.RIGHT);
+    c.gridx = 0;
+    c.gridy = 4;
+    pane.add(label, c);
+    */
+    label = new JLabel(df.format(Date.from(instant)));
     // c.fill = GridBagConstraints.HORIZONTAL;
-    c.gridx = 2;
-    c.gridy = 1;
-    c.gridwidth = 1;
-    c.anchor = GridBagConstraints.LINE_END;
-    c.insets = new Insets(5, 5, 2, 2);
-    pane2.add(label, c);
- 
-    String[] displayOptions = {"samples", "sample replicates", "target replicates"};
-
-    displayList = new JComboBox<String>(displayOptions);
-    displayList.setSelectedIndex(0);
-    c.gridx = 3;
-    c.gridy = 1;
-    c.gridheight = 1;
+    c.gridx = 1;
+    c.gridy = 0;
     c.anchor = GridBagConstraints.LINE_START;
-    displayList.addActionListener(this);
-    pane2.add(displayList, c);
- 
-    JButton helpButton = new JButton("Layout Help");
-    c.gridx = 4;
-    c.gridy = 1;
+    pane1.add(label, c);
+
+    nameField = new JTextField(30);
+    //nameField.setText(_name);
+    c.gridwidth = 2;
+    c.gridx = 1;
+    c.gridy = 2;
+    pane1.add(nameField, c);
+
+    descriptionField = new JTextField(30);
+    //descriptionField.setText(_description);
+    c.gridx = 1;
+    c.gridy = 3;
     c.gridheight = 1;
-    helpButton.addActionListener(this);
-    pane2.add(helpButton, c);
-    
+    pane1.add(descriptionField, c);
 
-    ////////////////////////////////////////////////////////////
-    //Pane 3
-    pane3  = new JPanel(new BorderLayout());
-    pane3.setBorder(BorderFactory.createRaisedBevelBorder());
-   javax.swing.border.TitledBorder sourceLayoutBorder = BorderFactory.createTitledBorder("Source:");
-    sourceLayoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
-    pane3.setBorder(sourceLayoutBorder);
-    sourceTable = dmf.getDatabaseManager().getDatabaseRetriever().getSourceForLayout(96);
-    sourceTable.getSelectionModel().addListSelectionListener(						     
-	  new ListSelectionListener() {
-	      public void valueChanged(ListSelectionEvent e) {
-		  ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-		  if(!e.getValueIsAdjusting() & sourceTable.getSelectedRow()>=0){
-		      //LOGGER.info("source: " + e);
-			int row = sourceTable.getSelectedRow();
-			
-			int source_layout_id = Integer.parseInt(( (String)sourceTable.getModel().getValueAt(row,0)).substring(4));
-			//LOGGER.info("source_layout_id: " + source_layout_id);
-			destTable.setModel(dmf.getDatabaseManager()
-					   .getDatabaseRetriever()
-					   .getDestForLayout(source_layout_id).getModel());
-			refreshLayoutTable(source_layout_id);
+    ok_button = new JButton("Proceed with import");
+    ok_button.setMnemonic(KeyEvent.VK_P);
+    ok_button.setEnabled(false);
+    c.fill = GridBagConstraints.HORIZONTAL;
+    c.gridx = 3;
+    c.gridy = 2;
+    c.gridwidth = 1;
+    c.gridheight = 1;
+    ok_button.addActionListener(this);
+    pane1.add(ok_button, c);
 
-		  }
-	      }
-	  });
-    sourceScrollPane = new JScrollPane(sourceTable);
-    sourceTable.setFillsViewportHeight(true);
-    pane3.add( sourceScrollPane, BorderLayout.CENTER);
-
+    cancel_button = new JButton("Cancel");
+    cancel_button.setMnemonic(KeyEvent.VK_C);
+    cancel_button.setActionCommand("cancel");
+    cancel_button.setEnabled(true);
+    cancel_button.setForeground(Color.RED);
+    c.gridx = 3;
+    c.gridy = 3;
+    pane1.add(cancel_button, c);
+    cancel_button.addActionListener(
+        (new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            dispose();
+          }
+        }));
 
     
-    
-    ////////////////////////////////////////////////////////////
-    //Pane 4
-  
-     pane4 = new JPanel(new BorderLayout());
-    pane4.setBorder(BorderFactory.createRaisedBevelBorder());
-      javax.swing.border.TitledBorder destLayoutBorder = BorderFactory.createTitledBorder("Destination: ");
-
-    destLayoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
-    pane4.setBorder(destLayoutBorder);
-    destTable = dmf.getDatabaseManager().getDatabaseRetriever().getDestForLayout(1);
-    destTable.getSelectionModel().addListSelectionListener(						     
-	  new ListSelectionListener() {
-	      public void valueChanged(ListSelectionEvent e) {
-		  if(!e.getValueIsAdjusting() & destTable.getSelectedRow()>=0){
-		  ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-		   	LOGGER.info("dest source: " + e);
-			int row = destTable.getSelectedRow();
-			
-			int dest_layout_id = Integer.parseInt(( (String)destTable.getModel().getValueAt(row,0)).substring(4));
-			LOGGER.info("dest_source_layout_id: " + dest_layout_id);
-			refreshLayoutTable(dest_layout_id);
-		  }
-	      }
-	  });
-    destScrollPane = new JScrollPane(destTable);
-    destTable.setFillsViewportHeight(true);
-    pane4.add( destScrollPane, BorderLayout.CENTER);
-
-
+////////////////////////////////////////////////////////////
    ////////////////////////////////////////////////////////////
     //Pane 5
 
@@ -209,14 +188,29 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 
     layoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
     pane5.setBorder(layoutBorder);    
+	tableModel = new MyModel(grid_data);
+	
+	//LOGGER.info("griddata length: " + gridData.length + "  " + gridData[0].length  );
+	table = new JTable( tableModel);
+	javax.swing.table.JTableHeader header = table.getTableHeader();
+	header.setBackground(java.awt.Color.DARK_GRAY);
+	header.setForeground(java.awt.Color.WHITE);
+	table.setDefaultRenderer(String.class, new MyRenderer());
+	scrollPane = new JScrollPane(table);
+	JTable rowTable = new RowNumberTable(table);
+	scrollPane.setRowHeaderView(rowTable);
+	scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
+			     rowTable.getTableHeader());
+	pane5.add(scrollPane, BorderLayout.CENTER);
+	table.setFillsViewportHeight(true);
+	pane5.revalidate();
+	pane5.repaint();
     
-    this.refreshLayoutTable(1);
+	//  this.refreshLayoutTable(1);
    
     this.getContentPane().add(parentPane, BorderLayout.CENTER);
-    parentPane.add(pane2, BorderLayout.NORTH);
-    parentPane.add(pane3, BorderLayout.WEST);
-    parentPane.add(pane4, BorderLayout.EAST);
-    parentPane.add(pane5, BorderLayout.SOUTH);
+    parentPane.add(pane5, BorderLayout.NORTH);
+    parentPane.add(pane1, BorderLayout.SOUTH);
     
     this.pack();
     this.setLocation(
@@ -228,40 +222,12 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 
     public void actionPerformed(ActionEvent e) {
 
-    if (e.getSource() == formatList) {
-      
-	sourceTable.setModel(dmf.getDatabaseManager()
-			     .getDatabaseRetriever()
-			     .getSourceForLayout((int)formatList.getSelectedItem()).getModel());
-      
- 	
     }
-    
-    }
-    /*
-     public void tableChanged(TableModelEvent e) {
-	 LOGGER.info("source: " + e);
-	 if (e.getSource() == sourceTable) {
-	     int[] row = sourceTable.getSelectedRows();
-	     //int column = e.getColumn();
-	     DefaultTableModel model = (DefaultTableModel)sourceTable.getModel();
-	     //String columnName = model.getColumnName(column);
-	     int source_layout_id = Integer.parseInt(((String)model.getValueAt(row[0], 0)).substring(3));
-	     LOGGER.info("source_layout_id: " + source_layout_id);
-	     	destTable.setModel(dmf.getDatabaseManager()
-			     .getDatabaseRetriever()
-				   .getDestForLayout(source_layout_id).getModel());
-	 }
- 
-
-	 
-    
-     }
-    */
-
     
     public void refreshLayoutTable(int _plate_layout_id){
+	/*
 	pane5.removeAll();
+	
 	CustomTable  table2 = null;
 	switch(displayList.getSelectedIndex()){
 	case 0:
@@ -276,8 +242,10 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 
 	    
 	}
+
 	gridData =  dmf.getUtilities().getPlateLayoutGrid(table2);
-	tableModel = new MyModel(gridData);
+	*/
+	tableModel = new MyModel(grid_data);
 	
 	//LOGGER.info("griddata length: " + gridData.length + "  " + gridData[0].length  );
 	table = new JTable( tableModel);
@@ -431,4 +399,26 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
             }
         }
     }
+
+      public void insertUpdate(DocumentEvent e) {
+	  if(nameField.getText().length() >0 && descriptionField.getText().length() >0){
+	      ok_button.setEnabled(true);
+	  }else{
+	      ok_button.setEnabled(false);
+	  }
+    }
+    public void removeUpdate(DocumentEvent e) {
+	  if(nameField.getText().length() >0 && descriptionField.getText().length() >0){
+	      ok_button.setEnabled(true);
+	  }else{
+	      ok_button.setEnabled(false);
+	  }
+
+    }
+    public void changedUpdate(DocumentEvent e) {
+        //Plain text components do not fire these events
+    }
+
+
+    
 }
