@@ -192,7 +192,7 @@ case 1537:
 	for (String[] row : array_list) {
 	    for(int i=0; i < ncol; i++){
 		results[counter][i] = row[i];
-	    LOGGER.info("results  counter(row): " + counter + " column " + i + " element " + results[counter][i] + "\n");
+		//LOGGER.info("results  counter(row): " + counter + " column " + i + " element " + results[counter][i] + "\n");
 	
 	}
     counter++;

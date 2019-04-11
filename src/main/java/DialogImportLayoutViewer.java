@@ -1,46 +1,34 @@
 package pm;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.*;
 import java.awt.event.ActionEvent;
-import java.util.logging.Logger;
-import java.util.ArrayList;
-import java.time.Instant;
-import java.util.Date;
-import java.awt.Color;
-import java.awt.event.KeyEvent;
+import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Date;
-import java.awt.event.ActionListener;
-
+import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
-
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 /**
  * parentPane BorderLayout holds other panes
  * pane2 GridBagLayout holds dropdowns
@@ -130,7 +118,7 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
     c.gridy = 4;
     pane.add(label, c);
     */
-    label = new JLabel(df.format(Date.from(instant)));
+    label = new JLabel(df.format(java.util.Date.from(instant)));
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 1;
     c.gridy = 0;
@@ -143,6 +131,7 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
     c.gridx = 1;
     c.gridy = 2;
     pane1.add(nameField, c);
+    nameField.getDocument().addDocumentListener(this);
 
     descriptionField = new JTextField(30);
     //descriptionField.setText(_description);
@@ -150,6 +139,7 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
     c.gridy = 3;
     c.gridheight = 1;
     pane1.add(descriptionField, c);
+    descriptionField.getDocument().addDocumentListener(this);
 
     ok_button = new JButton("Proceed with import");
     ok_button.setMnemonic(KeyEvent.VK_P);
@@ -161,6 +151,14 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
     c.gridheight = 1;
     ok_button.addActionListener(this);
     pane1.add(ok_button, c);
+    ok_button.addActionListener(
+        (new ActionListener() {
+		 public void actionPerformed(ActionEvent e) {
+		//temp_data is Object[][] of 2 columns, well, type, both integers
+		     dmf.getDatabaseManager().getDatabaseInserter().importPlateLayout(temp_data);
+            dispose();
+          }
+        }));
 
     cancel_button = new JButton("Cancel");
     cancel_button.setMnemonic(KeyEvent.VK_C);
@@ -223,9 +221,10 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
     public void actionPerformed(ActionEvent e) {
 
     }
-    
+
+    /*
     public void refreshLayoutTable(int _plate_layout_id){
-	/*
+	
 	pane5.removeAll();
 	
 	CustomTable  table2 = null;
@@ -244,7 +243,7 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
 	}
 
 	gridData =  dmf.getUtilities().getPlateLayoutGrid(table2);
-	*/
+	
 	tableModel = new MyModel(grid_data);
 	
 	//LOGGER.info("griddata length: " + gridData.length + "  " + gridData[0].length  );
@@ -262,10 +261,9 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
 	table.setFillsViewportHeight(true);
 	pane5.revalidate();
 	pane5.repaint();
-	
     
     }
-
+    */
     private static class MyRenderer extends DefaultTableCellRenderer {
      private static final long serialVersionUID = 1L;
 	

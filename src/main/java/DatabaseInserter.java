@@ -871,5 +871,32 @@ Integer[] plate_set_id =
     
   }
 
-    
+    public void importPlateLayout(Object[][] _data){
+	Object[][] data = _data;
+	String sql_statement = "INSERT INTO import_plate_layout (well_by_col, well_type_id, replicates, target) VALUES ";
+	for (int i = 1; i < data.length; i++) {
+      sql_statement =
+          sql_statement
+	  + "("
+	  + Integer.parseInt((String)data[i][0])
+	  + ", "
+	  + Integer.parseInt((String)data[i][1])
+	  + ", '1', 'a'), ";
+    }
+
+    String insertSql = sql_statement.substring(0, sql_statement.length() - 2) + ";";
+    //LOGGER.info(insertSql);
+    PreparedStatement insertPs;
+    try {
+      insertPs = conn.prepareStatement(insertSql);
+      insertPreparedStatement(insertPs);
+    } catch (SQLException sqle) {
+      LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
+      JOptionPane.showMessageDialog(
+          dmf, "Problems parsing data file!.", "Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+
+	
+    }    
 }
