@@ -3,18 +3,26 @@ package pm;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import javax.swing.JFileChooser;
+import javax.swing.JFileChooser.*;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+
 
 public class AdminMenu extends JMenu {
 
-DialogMainFrame dmf;
-  CustomTable project_table;
-    
-  private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private DialogMainFrame dmf;
+    private CustomTable project_table;
+    static JTextField fileField;
+    private ArrayList<String[]> imported_layout;;    
+    private JFileChooser fileChooser;
+
+    private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public AdminMenu(DialogMainFrame _dmf, CustomTable _project_table) {
 
@@ -83,10 +91,30 @@ DialogMainFrame dmf;
 
     menuItem = new JMenuItem("Import Plate Layout", KeyEvent.VK_I);
     menuItem.addActionListener(
-        new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-	      new DialogImportPlateLayout(dmf);
+	   new ActionListener() {
+	       public void actionPerformed(ActionEvent e) {
+	       
+		   JFileChooser file_chooser= new JFileChooser();
+		   int returnVal = file_chooser.showOpenDialog(null);
 
+		   if (returnVal == JFileChooser.APPROVE_OPTION) {
+		       java.io.File file = file_chooser.getSelectedFile();
+		       // This is where a real application would open the file.
+		       imported_layout =dmf.getUtilities().loadDataFile(file.toString());
+		       int lines_data = imported_layout.size() -1; //for header
+		       if(lines_data!= 96 && lines_data!=384 ){
+			   JOptionPane.showMessageDialog(dmf,
+							 "Layout import file must contain 96 or 384 rows of data.",
+							 "File format Error",
+							 JOptionPane.ERROR_MESSAGE);
+		       }
+		       new DialogImportLayoutViewer(dmf, imported_layout);
+		 
+		   } else {
+		       LOGGER.info("Open command cancelled by user.\n");
+		   }
+
+	      
 	  }
         });
     this.add(menuItem);
