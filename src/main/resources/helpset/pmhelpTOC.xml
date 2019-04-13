@@ -5,6 +5,10 @@
  <tocitem text="Overview ">
   <tocitem text="Plate Manager " target="index"/>
 
+  <tocitem text="Monolith " target="monolith"/>
+
+  <tocitem text="Services " target="services"/>
+
  </tocitem>
  <tocitem text="Developer ">
   <tocitem text="Useful SQL commands " target="sql"/>

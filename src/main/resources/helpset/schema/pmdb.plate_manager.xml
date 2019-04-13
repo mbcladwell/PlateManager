@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="pmdb" schema="plate_manager" type="PostgreSQL - 10.5 (Debian 10.5-1)">
+   <tables>
+      <table name="assay_result" numRows="0" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="sample_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="assay_result_sample_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="sample"/>
+         </column>
+         <column autoUpdated="false" digits="8" id="1" name="response" nullable="true" remarks="" size="8" type="float4"/>
+         <column autoUpdated="false" digits="0" id="2" name="assay_run_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="assay_result_assay_run_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="assay_run"/>
+         </column>
+         <index name="assay_result_assay_run_id_idx" unique="false">
+            <column ascending="true" name="assay_run_id"/>
+         </index>
+         <index name="assay_result_sample_id_idx" unique="false">
+            <column ascending="true" name="sample_id"/>
+         </index>
+      </table>
+      <table name="assay_run" numRows="0" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('assay_run_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="assay_run_id" foreignKey="assay_result_assay_run_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="assay_result"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="assay_run_sys_name" nullable="true" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="assay_run_name" nullable="true" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="descr" nullable="true" remarks="" size="250" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="assay_type_id" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="5" name="plate_set_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="assay_run_plate_set_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_set"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="6" name="plate_layout_name_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="assay_run_plate_layout_name_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_layout_name"/>
+         </column>
+         <column autoUpdated="false" defaultValue="CURRENT_TIMESTAMP" digits="6" id="7" name="updated" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="assay_run_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="assay_run_assay_type_id_idx" unique="false">
+            <column ascending="true" name="assay_type_id"/>
+         </index>
+         <index name="assay_run_plate_layout_name_id_idx" unique="false">
+            <column ascending="true" name="plate_layout_name_id"/>
+         </index>
+         <index name="assay_run_plate_set_id_idx" unique="false">
+            <column ascending="true" name="plate_set_id"/>
+         </index>
+      </table>
+      <table name="assay_type" numRows="6" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('assay_type_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="assay_type_name" nullable="true" remarks="" size="30" type="varchar"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="assay_type_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="hit_list" numRows="5" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('hit_list_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="hitlist_id" foreignKey="hit_sample_hitlist_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="hit_sample"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="hitlist_sys_name" nullable="true" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="descr" nullable="true" remarks="" size="250" type="varchar"/>
+         <column autoUpdated="false" defaultValue="CURRENT_TIMESTAMP" digits="6" id="3" name="updated" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <column autoUpdated="false" digits="0" id="4" name="project_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="hit_list_project_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="project"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="hit_list_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="hit_list_project_id_idx" unique="false">
+            <column ascending="true" name="project_id"/>
+         </index>
+      </table>
+      <table name="hit_sample" numRows="0" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="hitlist_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="hit_sample_hitlist_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="hit_list"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="sample_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="hit_sample_sample_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="sample"/>
+         </column>
+         <index name="hit_sample_hitlist_id_idx" unique="false">
+            <column ascending="true" name="hitlist_id"/>
+         </index>
+         <index name="hit_sample_sample_id_idx" unique="false">
+            <column ascending="true" name="sample_id"/>
+         </index>
+      </table>
+      <table name="hits" numRows="10" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('hits_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="hitlist_id" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="2" name="sample_id" nullable="true" remarks="" size="10" type="int4"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="hits_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="plate" numRows="402" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('plate_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="plate_id" foreignKey="plate_plate_set_plate_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_plate_set"/>
+            <child column="plate_id" foreignKey="well_plate_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="well"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="plate_sys_name" nullable="true" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="plate_type_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="plate_plate_type_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_type"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="project_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="plate_project_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="project"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="4" name="plate_format_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="plate_plate_format_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_format"/>
+         </column>
+         <column autoUpdated="false" defaultValue="CURRENT_TIMESTAMP" digits="6" id="5" name="updated" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="plate_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="plate_plate_format_id_idx" unique="false">
+            <column ascending="true" name="plate_format_id"/>
+         </index>
+         <index name="plate_plate_type_id_idx" unique="false">
+            <column ascending="true" name="plate_type_id"/>
+         </index>
+         <index name="plate_project_id_idx" unique="false">
+            <column ascending="true" name="project_id"/>
+         </index>
+      </table>
+      <table name="plate_format" numRows="3" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="int4">
+            <child column="plate_format_id" foreignKey="plate_plate_format_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate"/>
+            <child column="plate_format_id" foreignKey="plate_layout_name_plate_format_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_layout_name"/>
+            <child column="plate_format_id" foreignKey="plate_set_plate_format_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_set"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="format" nullable="true" remarks="" size="6" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="rownum" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="3" name="colnum" nullable="true" remarks="" size="10" type="int4"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="plate_format_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="plate_layout" numRows="2496" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="plate_layout_name_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="plate_layout_plate_layout_name_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_layout_name"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="well_by_col" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="2" name="well_type_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="plate_layout_well_type_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="well_type"/>
+         </column>
+         <index name="plate_layout_plate_layout_name_id_idx" unique="false">
+            <column ascending="true" name="plate_layout_name_id"/>
+         </index>
+         <index name="plate_layout_well_by_col_idx" unique="false">
+            <column ascending="true" name="well_by_col"/>
+         </index>
+         <index name="plate_layout_well_type_id_idx" unique="false">
+            <column ascending="true" name="well_type_id"/>
+         </index>
+      </table>
+      <table name="plate_layout_name" numRows="5" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('plate_layout_name_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="plate_layout_name_id" foreignKey="assay_run_plate_layout_name_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="assay_run"/>
+            <child column="plate_layout_name_id" foreignKey="plate_layout_plate_layout_name_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_layout"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="true" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="descr" nullable="true" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="plate_format_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="plate_layout_name_plate_format_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_format"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="plate_layout_name_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="plate_layout_name_plate_format_id_idx" unique="false">
+            <column ascending="true" name="plate_format_id"/>
+         </index>
+      </table>
+      <table name="plate_plate_set" numRows="402" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="plate_set_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="plate_plate_set_plate_set_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_set"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="plate_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="plate_plate_set_plate_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="plate_order" nullable="true" remarks="" size="10" type="int4"/>
+         <index name="plate_plate_set_plate_id_idx" unique="false">
+            <column ascending="true" name="plate_id"/>
+         </index>
+         <index name="plate_plate_set_plate_set_id_idx" unique="false">
+            <column ascending="true" name="plate_set_id"/>
+         </index>
+      </table>
+      <table name="plate_set" numRows="21" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('plate_set_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="plate_set_id" foreignKey="assay_run_plate_set_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="assay_run"/>
+            <child column="plate_set_id" foreignKey="plate_plate_set_plate_set_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_plate_set"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="plate_set_name" nullable="true" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="descr" nullable="true" remarks="" size="250" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="plate_set_sys_name" nullable="true" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="num_plates" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="5" name="plate_format_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="plate_set_plate_format_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_format"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="6" name="plate_type_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="plate_set_plate_type_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_type"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="7" name="project_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="plate_set_project_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="project"/>
+         </column>
+         <column autoUpdated="false" defaultValue="CURRENT_TIMESTAMP" digits="6" id="8" name="updated" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="plate_set_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="plate_set_plate_format_id_idx" unique="false">
+            <column ascending="true" name="plate_format_id"/>
+         </index>
+         <index name="plate_set_plate_type_id_idx" unique="false">
+            <column ascending="true" name="plate_type_id"/>
+         </index>
+         <index name="plate_set_project_id_idx" unique="false">
+            <column ascending="true" name="project_id"/>
+         </index>
+      </table>
+      <table name="plate_size" numRows="3" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('plate_size_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="format" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="2" name="rownum" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="3" name="colnum" nullable="true" remarks="" size="10" type="int4"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="plate_size_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="plate_type" numRows="6" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('plate_type_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="plate_type_id" foreignKey="plate_plate_type_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate"/>
+            <child column="plate_type_id" foreignKey="plate_set_plate_type_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_set"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="plate_type_name" nullable="true" remarks="" size="30" type="varchar"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="plate_type_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="pmsession" numRows="14" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('pmsession_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="pmuser_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="pmsession_pmuser_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="pmuser"/>
+         </column>
+         <column autoUpdated="false" defaultValue="CURRENT_TIMESTAMP" digits="6" id="2" name="updated" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="pmsession_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="pmuser" numRows="2" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('pmuser_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="pmuser_id" foreignKey="pmsession_pmuser_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="pmsession"/>
+            <child column="pmuser_id" foreignKey="project_pmuser_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="project"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="permissions" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="2" name="pmuser_name" nullable="true" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="email" nullable="false" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="password" nullable="false" remarks="" size="64" type="varchar"/>
+         <column autoUpdated="false" defaultValue="CURRENT_TIMESTAMP" digits="6" id="5" name="updated" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="pmuser_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="pmuser_email_key" unique="true">
+            <column ascending="true" name="email"/>
+         </index>
+      </table>
+      <table name="pmuser_permissions" numRows="3" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('pmuser_permissions_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="permissions" nullable="true" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" defaultValue="CURRENT_TIMESTAMP" digits="6" id="2" name="updated" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="pmuser_permissions_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="project" numRows="10" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('project_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="project_id" foreignKey="hit_list_project_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="hit_list"/>
+            <child column="project_id" foreignKey="plate_project_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate"/>
+            <child column="project_id" foreignKey="plate_set_project_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_set"/>
+            <child column="project_id" foreignKey="sample_project_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="sample"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="project_sys_name" nullable="true" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="descr" nullable="true" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="project_name" nullable="true" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="pmuser_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="project_pmuser_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="pmuser"/>
+         </column>
+         <column autoUpdated="false" defaultValue="CURRENT_TIMESTAMP" digits="6" id="5" name="updated" nullable="false" remarks="" size="35" type="timestamptz"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="project_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="project_pmuser_id_idx" unique="false">
+            <column ascending="true" name="pmuser_id"/>
+         </index>
+      </table>
+      <table name="sample" numRows="268992" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('sample_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="sample_id" foreignKey="assay_result_sample_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="assay_result"/>
+            <child column="sample_id" foreignKey="hit_sample_sample_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="hit_sample"/>
+            <child column="sample_id" foreignKey="well_sample_sample_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="well_sample"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="sample_sys_name" nullable="true" remarks="" size="20" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="project_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="sample_project_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="project"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="accs_id" nullable="true" remarks="" size="10" type="int4"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="sample_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="sample_project_id_idx" unique="false">
+            <column ascending="true" name="project_id"/>
+         </index>
+      </table>
+      <table name="temp_data" numRows="0" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="plate" nullable="false" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="1" name="well" nullable="false" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="8" id="2" name="response" nullable="true" remarks="" size="8" type="float4"/>
+         <primaryKey column="plate" sequenceNumberInPK="1"/>
+         <primaryKey column="well" sequenceNumberInPK="2"/>
+         <index name="temp_data_pkey" unique="true">
+            <column ascending="true" name="plate"/>
+            <column ascending="true" name="well"/>
+         </index>
+         <index name="temp_data_plate_idx" unique="false">
+            <column ascending="true" name="plate"/>
+         </index>
+         <index name="temp_data_well_idx" unique="false">
+            <column ascending="true" name="well"/>
+         </index>
+      </table>
+      <table name="well" numRows="268992" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('well_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="well_id" foreignKey="well_sample_well_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="well_sample"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="well_name" nullable="true" remarks="" size="5" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="plate_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="well_plate_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="well_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="well_plate_id_idx" unique="false">
+            <column ascending="true" name="plate_id"/>
+         </index>
+      </table>
+      <table name="well_numbers" numRows="2016" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="plate_format" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="1" name="well_name" nullable="true" remarks="" size="5" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="row" nullable="true" remarks="" size="2" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="row_num" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="4" name="col" nullable="true" remarks="" size="2" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="5" name="total_col_count" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="6" name="by_row" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="7" name="by_col" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="8" name="quad" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="9" name="parent_well" nullable="true" remarks="" size="5" type="varchar"/>
+         <index name="well_numbers_by_col_idx" unique="false">
+            <column ascending="true" name="by_col"/>
+         </index>
+      </table>
+      <table name="well_sample" numRows="268992" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="well_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="well_sample_well_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="well"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="sample_id" nullable="true" remarks="" size="10" type="int4">
+            <parent column="id" foreignKey="well_sample_sample_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="sample"/>
+         </column>
+         <index name="well_sample_sample_id_idx" unique="false">
+            <column ascending="true" name="sample_id"/>
+         </index>
+         <index name="well_sample_well_id_idx" unique="false">
+            <column ascending="true" name="well_id"/>
+         </index>
+      </table>
+      <table name="well_type" numRows="4" remarks="" schema="plate_manager" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('well_type_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial">
+            <child column="well_type_id" foreignKey="plate_layout_well_type_id_fkey" implied="false" onDeleteCascade="false" schema="plate_manager" table="plate_layout"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="true" remarks="" size="30" type="varchar"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="well_type_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+   </tables>
+</database>

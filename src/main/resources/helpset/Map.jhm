@@ -8,15 +8,13 @@
 
 <mapID target="schema.tables.plate_set" url="schema/tables/plate_set.html"/>
 
-<mapID target="schema.tables.plate_plate_set" url="schema/tables/plate_plate_set.html"/>
-
 <mapID target="assayresult" url="assayresult.html"/>
+
+<mapID target="featurelist" url="featurelist.html"/>
 
 <mapID target="schema.tables.assay_run" url="schema/tables/assay_run.html"/>
 
 <mapID target="project" url="project.html"/>
-
-<mapID target="plate" url="plate.html"/>
 
 <mapID target="schema.tables.project" url="schema/tables/project.html"/>
 
@@ -24,37 +22,17 @@
 
 <mapID target="schema.orphans" url="schema/orphans.html"/>
 
-<mapID target="sql" url="sql.html"/>
-
-<mapID target="schema.tables.pmuser_permissions" url="schema/tables/pmuser_permissions.html"/>
-
-<mapID target="schema.tables.plate_type" url="schema/tables/plate_type.html"/>
-
 <mapID target="reformat" url="reformat.html"/>
 
-<mapID target="assaytype" url="assaytype.html"/>
-
-<mapID target="schema.tables.well_sample" url="schema/tables/well_sample.html"/>
-
-<mapID target="schema.tables.assay_result" url="schema/tables/assay_result.html"/>
-
 <mapID target="schema.tables.plate_layout_name" url="schema/tables/plate_layout_name.html"/>
-
-<mapID target="schema.tables.hit_list" url="schema/tables/hit_list.html"/>
-
-<mapID target="schema.tables.assay_type" url="schema/tables/assay_type.html"/>
-
-<mapID target="simplifying-assumptions" url="simplifying-assumptions.html"/>
 
 <mapID target="schema.constraints" url="schema/constraints.html"/>
 
 <mapID target="schema.tables.hits" url="schema/tables/hits.html"/>
 
-<mapID target="schema.anomalies" url="schema/anomalies.html"/>
+<mapID target="monolith" url="monolith.html"/>
 
 <mapID target="schema.routines" url="schema/routines.html"/>
-
-<mapID target="schema.columns" url="schema/columns.html"/>
 
 <mapID target="schema.tables.well_type" url="schema/tables/well_type.html"/>
 
@@ -64,15 +42,11 @@
 
 <mapID target="schema.tables.plate_format" url="schema/tables/plate_format.html"/>
 
-<mapID target="sample" url="sample.html"/>
-
-<mapID target="schema.tables.pmuser" url="schema/tables/pmuser.html"/>
-
-<mapID target="schema.tables.well" url="schema/tables/well.html"/>
-
-<mapID target="schema.index" url="schema/index.html"/>
+<mapID target="monoloth" url="monoloth.html"/>
 
 <mapID target="plateset" url="plateset.html"/>
+
+<mapID target="license" url="license.html"/>
 
 <mapID target="schema.tables.temp_data" url="schema/tables/temp_data.html"/>
 
@@ -82,15 +56,61 @@
 
 <mapID target="schema.tables.pmsession" url="schema/tables/pmsession.html"/>
 
-<mapID target="well" url="well.html"/>
-
 <mapID target="schema.tables.sample" url="schema/tables/sample.html"/>
+
+<mapID target="schema.tables.plate" url="schema/tables/plate.html"/>
+
+<mapID target="examplefiles" url="examplefiles.html"/>
+
+<mapID target="schema.tables.plate_plate_set" url="schema/tables/plate_plate_set.html"/>
+
+<mapID target="plate" url="plate.html"/>
+
+<mapID target="workflows" url="workflows.html"/>
+
+<mapID target="enities" url="enities.html"/>
+
+<mapID target="sql" url="sql.html"/>
+
+<mapID target="schema.tables.pmuser_permissions" url="schema/tables/pmuser_permissions.html"/>
+
+<mapID target="schema.tables.plate_type" url="schema/tables/plate_type.html"/>
+
+<mapID target="assaytype" url="assaytype.html"/>
+
+<mapID target="schema.tables.well_sample" url="schema/tables/well_sample.html"/>
+
+<mapID target="terminology" url="terminology.html"/>
+
+<mapID target="schema.tables.assay_result" url="schema/tables/assay_result.html"/>
+
+<mapID target="schema.tables.hit_list" url="schema/tables/hit_list.html"/>
+
+<mapID target="schema.tables.assay_type" url="schema/tables/assay_type.html"/>
+
+<mapID target="simplifying-assumptions" url="simplifying-assumptions.html"/>
+
+<mapID target="canonicalworkflow" url="canonicalworkflow.html"/>
+
+<mapID target="schema.anomalies" url="schema/anomalies.html"/>
+
+<mapID target="schema.columns" url="schema/columns.html"/>
+
+<mapID target="services" url="services.html"/>
+
+<mapID target="sample" url="sample.html"/>
+
+<mapID target="schema.tables.pmuser" url="schema/tables/pmuser.html"/>
+
+<mapID target="schema.tables.well" url="schema/tables/well.html"/>
+
+<mapID target="schema.index" url="schema/index.html"/>
+
+<mapID target="well" url="well.html"/>
 
 <mapID target="hitlist" url="hitlist.html"/>
 
 <mapID target="schema.tables.plate_layout" url="schema/tables/plate_layout.html"/>
-
-<mapID target="schema.tables.plate" url="schema/tables/plate.html"/>
 
 <mapID target="schema.favicon" url="schema/favicon.png"/>
 
