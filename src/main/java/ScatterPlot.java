@@ -461,7 +461,8 @@ public class ScatterPlot extends JFrame {
 	this.threshold = _threshold;
         thresholdField.setText(df.format(threshold));
 	slider.setDoubleValue(threshold);
-	numHitsField.setText(String.valueOf(selected_response.getHitsAboveThreshold(threshold)));
+	num_hits = selected_response.getHitsAboveThreshold(threshold);
+	numHitsField.setText(String.valueOf(num_hits));
 	this.repaint();
 	
     }

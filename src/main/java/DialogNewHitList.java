@@ -24,7 +24,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 /**
- * Called from: DatabaseInserter.associatedDataWithPlateSet()
  * Called from: ScatterPlot genHits Button
  */
 public class DialogNewHitList extends JDialog {
@@ -143,7 +142,6 @@ public class DialogNewHitList extends JDialog {
     okButton.setMnemonic(KeyEvent.VK_O);
     okButton.setActionCommand("ok");
     okButton.setEnabled(true);
-    okButton.setForeground(Color.GREEN);
     c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 2;
     c.gridy = 6;
