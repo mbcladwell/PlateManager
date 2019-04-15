@@ -46,11 +46,13 @@ public class DatabaseInserter {
     String insertSql = "SELECT new_project(?, ?, ?);";
     PreparedStatement insertPs;
     try {
-      insertPs = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+      insertPs = conn.prepareStatement(insertSql);
       insertPs.setString(1, _description);
       insertPs.setString(2, _name);
       insertPs.setInt(3, _pmuser_id);
-      insertPreparedStatement(insertPs);
+      int i = insertPs.executeUpdate();
+   
+      //      insertPreparedStatement(insertPs);
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
     }
