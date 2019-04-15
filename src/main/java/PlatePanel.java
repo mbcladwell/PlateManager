@@ -63,7 +63,7 @@ public class PlatePanel extends JPanel {
     c.anchor = GridBagConstraints.LINE_END;
     textPanel.add(label, c);
 
-    LOGGER.info("table.getValueAt(0, 0)" + table.getValueAt(0, 0));
+    //LOGGER.info("table.getValueAt(0, 0)" + table.getValueAt(0, 0));
 
     plateset_sys_name =
         dmf.getDatabaseManager()
@@ -105,7 +105,8 @@ public class PlatePanel extends JPanel {
 
   public void updatePanel(String _plate_set_sys_name) {
     String plate_set_sys_name = _plate_set_sys_name;
-    JTable table = dmf.getDatabaseManager().getPlateTableData(plate_set_sys_name);
+      int plate_set_id = Integer.parseInt(plate_set_sys_name.substring(3));
+    JTable table = dmf.getDatabaseManager().getDatabaseRetriever().getDMFTableData(plate_set_id, DialogMainFrame.PLATE);
     TableModel model = table.getModel();
     this.table.setModel(model);
   }

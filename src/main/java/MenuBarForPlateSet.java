@@ -160,7 +160,7 @@ public class MenuBarForPlateSet extends JMenuBar {
     upbutton.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            dmf.showProjectTable();
+            dmf.flipToProjectTable();
 	    	      dmf.setMainFrameTitle("");
 
           }

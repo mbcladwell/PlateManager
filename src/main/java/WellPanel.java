@@ -5,6 +5,8 @@ import java.awt.event.*;
 import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
+import javax.swing.table.TableModel;
+
 
 public class WellPanel extends JPanel {
 
@@ -92,5 +94,13 @@ public class WellPanel extends JPanel {
 
   public CustomTable getTable() {
     return table;
+  }
+
+    public void updatePanel(String _plate_sys_name) {
+    String plate_sys_name = _plate_sys_name;
+      int plate_id = Integer.parseInt(plate_sys_name.substring(4));
+    JTable table = dmf.getDatabaseManager().getDatabaseRetriever().getDMFTableData(plate_id, DialogMainFrame.WELL);
+    TableModel model = table.getModel();
+    this.table.setModel(model);
   }
 }

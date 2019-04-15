@@ -16,7 +16,6 @@ public class DialogMainFrame extends JFrame {
 
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-  private DatabaseManager dbm;
   private JPanel cards; // a panel that uses CardLayout
   private CardLayout card_layout;
 
@@ -27,17 +26,21 @@ public class DialogMainFrame extends JFrame {
 
   private static final Session session = new Session();
   private static Utilities utils;
-
+  private DatabaseManager dbm;
+  private DatabaseRetriever dbr;
+    
+ 
   private Long sessionID;
 
-  public static final String PROJECTPANEL = "Card with projects";
-  public static final String PLATESETPANEL = "Card with plate sets";
-  public static final String PLATEPANEL = "Card with plates";
-  public static final String WELLPANEL = "Card with wells";
+    public static final int PROJECT = 1; //Card with projects
+    public static final int PLATESET = 2; //Card with plate sets
+    public static final int PLATE = 3; //Card with plates
+    public static final int WELL = 4; //Card with wells
 
  
   public DialogMainFrame() throws SQLException {
     dbm = new DatabaseManager(this);
+    dbr = new DatabaseRetriever(dbm);
     utils = new Utilities(this);
       this.setTitle("LIMS*Nucleus");
     // new DialogLogin();
@@ -62,12 +65,13 @@ public class DialogMainFrame extends JFrame {
     //    ImageIcon ii = new ImageIcon(getResource("images/mwplate.png"));
     /////////////////////////////////////////////
     // set up the project table
-    project_card = new ProjectPanel(this, dbm.getProjectTableData());
-
+   
     cards = new JPanel(new CardLayout());
     card_layout = (CardLayout) cards.getLayout();
-    cards.add(project_card, PROJECTPANEL);
-
+    project_card = new ProjectPanel(this, dbr.getDMFTableData(0, DialogMainFrame.PROJECT));
+    cards.add(project_card, "ProjectPanel");
+  
+    
     this.getContentPane().add(cards, BorderLayout.CENTER);
 
     this.pack();
@@ -77,52 +81,70 @@ public class DialogMainFrame extends JFrame {
     this.setVisible(true);
   }
 
-  public void showProjectTable() {
-    card_layout.show(cards, DialogMainFrame.PROJECTPANEL);
-  }
-
+    
   public ProjectPanel getProjectPanel() {
     return project_card;
   }
+    
 
+  public void showProjectTable() {
+    project_card = new ProjectPanel(this, dbr.getDMFTableData(0, DialogMainFrame.PROJECT));
+    cards.add(project_card, "ProjectPanel");
+    card_layout.show(cards, "ProjectPanel");
+  }
+
+    
   public void showPlateSetTable(String _project_sys_name) {
-    plate_set_card =
-        new PlateSetPanel(this, dbm.getPlateSetTableData(_project_sys_name), _project_sys_name);
+      int project_id = Integer.parseInt(_project_sys_name.substring(4));
+      LOGGER.info("project_id: " + project_id);
+      //  plate_set_card = new PlateSetPanel(this, dbm.getPlateSetTableData(_project_sys_name), _project_sys_name);
+      plate_set_card = new PlateSetPanel(this, dbr.getDMFTableData(project_id, DialogMainFrame.PLATESET), _project_sys_name);
 
-    cards.add(plate_set_card, PLATESETPANEL);
-    card_layout.show(cards, DialogMainFrame.PLATESETPANEL);
+    cards.add(plate_set_card, "PlateSetPanel");
+    card_layout.show(cards, "PlateSetPanel");
   }
 
-  public void flipToPlateSet() {
-    card_layout.show(cards, DialogMainFrame.PLATESETPANEL);
-  }
 
   public void showPlateTable(String _plate_set_sys_name) {
-      CustomTable ct = dbm.getPlateTableData(_plate_set_sys_name);
-      LOGGER.info("CustomTable: " + ct);
-      LOGGER.info("valueAt: " + ct.getValueAt(0,0));
-      plate_card = new PlatePanel(this, ct);
-    LOGGER.info("_plate_set_sys_name: " + _plate_set_sys_name);
-    LOGGER.info("_plate card: " + plate_card);
+      int plate_set_id = Integer.parseInt(_plate_set_sys_name.substring(3));
+      
+      plate_card = new PlatePanel(this, dbr.getDMFTableData(plate_set_id, DialogMainFrame.PLATE));
     
-    cards.add(plate_card, PLATEPANEL);
-    card_layout.show(cards, DialogMainFrame.PLATEPANEL);
+    cards.add(plate_card, "PlatePanel");
+    card_layout.show(cards, "PlatePanel");
   }
 
-  public void flipToPlate() {
-    card_layout.show(cards, DialogMainFrame.PLATEPANEL);
-  }
 
   public void showWellTable(String _plate_sys_name) {
-    well_card = new WellPanel(this, dbm.getWellTableData(_plate_sys_name));
-    cards.add(well_card, WELLPANEL);
-    card_layout.show(cards, DialogMainFrame.WELLPANEL);
+      int plate_id = Integer.parseInt(_plate_sys_name.substring(4));
+      
+      well_card = new WellPanel(this, dbr.getDMFTableData(plate_id, DialogMainFrame.WELL));
+    cards.add(well_card, "Well");
+    card_layout.show(cards, "Well");
   }
 
+    /**
+     * The "flip" methods are used with the up button to return to a previous card
+     */
+
+  public void flipToProjectTable() {
+    card_layout.show(cards, "ProjectPanel");
+  }
+    
+    public void flipToPlateSet() {
+    card_layout.show(cards, "PlateSetPanel");
+  }
+
+
+  public void flipToPlate() {
+    card_layout.show(cards, "PlatePanel");
+  }
+    
   public void flipToWell() {
-    card_layout.show(cards, DialogMainFrame.WELLPANEL);
+    card_layout.show(cards, "Well");
   }
 
+    
   public DatabaseManager getDatabaseManager() {
     return this.dbm;
   }

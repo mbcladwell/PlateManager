@@ -13,12 +13,19 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.util.Set;
+import java.util.Vector;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import javax.swing.JTable;
 
 /** */
 public class DatabaseRetriever {
   DatabaseManager dbm;
+    DialogMainFrame dmf;
   Connection conn;
   JTable table;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -26,6 +33,7 @@ public class DatabaseRetriever {
   /** */
   public DatabaseRetriever(DatabaseManager _dbm) {
     this.dbm = _dbm;
+    this.dmf=dbm.getDmf();
     this.conn = dbm.getConnection();
   }
 
@@ -36,6 +44,53 @@ public class DatabaseRetriever {
    *
    * <p>****************************************************************
    */
+
+    /**
+     * This is the table retriever for the main entity tables project, plate set, plate, well
+     * @param _id the primary key for the table
+     * @param _the desired table as an int
+     */
+    public CustomTable getDMFTableData(int _id, int _desired_table) {
+    	int id = _id;
+	int desired_table = _desired_table;
+	String sql_statement = new String();
+    try {
+
+      switch(desired_table){
+      case DialogMainFrame.PROJECT:
+	  sql_statement = "SELECT project_sys_name AS \"ProjectID\", project_name As \"Name\", pmuser_name AS \"Owner\", descr AS \"Description\" FROM project, pmuser WHERE pmuser_id = pmuser.id ORDER BY project.id DESC;";
+	  break;
+      case DialogMainFrame.PLATESET:
+	  sql_statement = "SELECT plate_set.plate_set_sys_name AS \"PlateSetID\", plate_set_name As \"Name\", format AS \"Format\", num_plates AS \"# plates\" , plate_type.plate_type_name AS \"Type\", plate_layout_name.name AS \"Layout\"   , plate_set.descr AS \"Description\" FROM plate_set, plate_format, plate_type, plate_layout_name WHERE plate_format.id = plate_set.plate_format_id AND plate_set.plate_layout_name_id = plate_layout_name.id  AND plate_set.plate_type_id = plate_type.id AND project_id = ? ORDER BY plate_set.id DESC;";
+	  break;
+      case DialogMainFrame.PLATE:
+	  sql_statement = "SELECT plate.plate_sys_name AS \"PlateID\", plate_plate_set.plate_order AS \"Order\",  plate_type.plate_type_name As \"Type\", plate_format.format AS \"Format\" FROM plate_set, plate, plate_type, plate_format, plate_plate_set WHERE plate_plate_set.plate_set_id = ? AND plate.plate_type_id = plate_type.id AND plate_plate_set.plate_id = plate.id AND plate_plate_set.plate_set_id = plate_set.id  AND plate_format.id = plate.plate_format_id ORDER BY plate_plate_set.plate_order DESC;";
+	  break;
+      case DialogMainFrame.WELL:
+	  sql_statement = "SELECT plate.plate_sys_name AS \"PlateID\", well_numbers.well_name AS \"Well\", well.by_col AS \"Well_NUM\", sample.sample_sys_name AS \"Sample\", sample.accs_id as \"Accession\" FROM  plate, sample, well_sample, well JOIN well_numbers ON ( well.by_col= well_numbers.by_col)  WHERE plate.id = well.plate_id AND well_sample.well_id=well.id AND well_sample.sample_id=sample.id AND well.plate_id = ? AND  well_numbers.plate_format = (SELECT plate_format_id  FROM plate_set WHERE plate_set.ID =  (SELECT plate_set_id FROM plate_plate_set WHERE plate_id = plate.ID LIMIT 1) ) ORDER BY well.by_col DESC;";
+	  break;
+	  
+      }
+      
+      java.sql.PreparedStatement pstmt =  conn.prepareStatement(sql_statement);
+      if(desired_table != DialogMainFrame.PROJECT){
+	  pstmt.setInt(1, id);
+LOGGER.info("pstmt: " + pstmt);
+      }
+
+      ResultSet rs =  pstmt.executeQuery();
+
+      CustomTable table = new CustomTable(dmf, buildTableModel(rs));
+      //LOGGER.info("table: " + table);
+
+      rs.close();
+      pstmt.close();
+      return table;
+    } catch (SQLException sqle) {
+    }
+    return null;
+  }
+
   public String getDescriptionForProject(String _project_sys_name) {
     String result = new String();
     try {
@@ -116,6 +171,27 @@ public class DatabaseRetriever {
    *
    * <p>****************************************************************
    */
+
+ public CustomTable getPlateSetTableData(int _project_id) {
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+              "SELECT plate_set.plate_set_sys_name AS \"PlateSetID\", plate_set_name As \"Name\", format AS \"Format\", num_plates AS \"# plates\" , plate_type.plate_type_name AS \"Type\", plate_layout_name.name AS \"Layout\"   , plate_set.descr AS \"Description\" FROM plate_set, plate_format, plate_type, plate_layout_name WHERE plate_format.id = plate_set.plate_format_id AND plate_set.plate_layout_name_id = plate_layout_name.id  AND plate_set.plate_type_id = plate_type.id AND project_id =  ? ORDER BY plate_set.id DESC;");
+
+      pstmt.setInt(1, _project_id);
+      ResultSet rs = pstmt.executeQuery();
+
+      CustomTable table = new CustomTable(dmf, buildTableModel(rs));
+      rs.close();
+      pstmt.close();
+      return table;
+    } catch (SQLException sqle) {
+
+    }
+    return null;
+  }
+
+    
   public String getPlateSetSysNameForPlateSysName(String _plate_sys_name) {
     String result = new String();
     try {
@@ -1207,4 +1283,45 @@ int assay_run_id = _assay_run_id;
 
 	
     }
+
+      public DefaultTableModel buildTableModel(ResultSet _rs) {
+
+    try {
+      ResultSet rs = _rs;
+      ResultSetMetaData metaData = rs.getMetaData();
+      int columnCount = metaData.getColumnCount();
+
+      Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+      Vector<String> columnNames = new Vector<String>();
+      /*
+      String[] columnNames = new String[columnCount];
+      for (int column = 0; column < columnCount; column++) {
+        columnNames[column] = metaData.getColumnName(column + 1);
+      }
+      */
+      for (int column = 0; column < columnCount; column++) {
+        columnNames.addElement(metaData.getColumnName(column + 1));
+      }
+
+      // data of the table
+      while (rs.next()) {
+        Vector<Object> vector = new Vector<Object>();
+
+        for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+          vector.add(rs.getObject(columnIndex + 1));
+        }
+        data.add(vector);
+      }
+      // LOGGER.info("data: " + data);
+      return new DefaultTableModel(data, columnNames);
+
+      //          data.stream().map(List::toArray).toArray(Object[][]::new), columnNames);
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQLException in buildTableModel: " + sqle);
+    }
+
+    return null;
+  }
+
 }
