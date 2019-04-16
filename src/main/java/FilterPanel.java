@@ -23,12 +23,21 @@ public class FilterPanel extends JPanel {
   private DialogMainFrame parent;
   private JPanel textPanel;
   private JButton clearButton;
+  private JButton refreshButton;
+    private int entity_type;
+    private int id;
+    private JTextField textField;
+    
 
-  /** */
-  public FilterPanel(DialogMainFrame _parent, JTable _table) {
+  /**
+   * @param id the project/plateset/plate etc id for fetching the main table
+ */
+    public FilterPanel(DialogMainFrame _parent, JTable _table, int _id, int _entity_type) {
     this.setLayout(new GridBagLayout());
     parent = _parent;
     table = _table;
+    id = _id;
+    entity_type = _entity_type;
 
     TableRowSorter<TableModel> rowSorter = new TableRowSorter<>(table.getModel());
     table.setRowSorter(rowSorter);
@@ -43,9 +52,39 @@ public class FilterPanel extends JPanel {
     c.insets = new Insets(5, 5, 2, 2);
     this.add(label, c);
     */
-
-    JTextField textField = new JTextField(60);
+    refreshButton = new JButton("Refresh");
+    c.gridx = 0;
+    c.gridy = 0;
+    c.weightx = 0.1;
+    c.anchor = GridBagConstraints.LINE_END;
+    c.insets = new Insets(5, 5, 2, 2);
+    refreshButton.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+	      JTable table2 =  parent.getDatabaseManager().getDatabaseRetriever().getDMFTableData(id, entity_type );
+	       TableModel model = table2.getModel();
+	       table.setModel(model);
+          }
+        });
+    this.add(refreshButton, c);
+ 
+    clearButton = new JButton("Filter:");
     c.gridx = 1;
+    c.gridy = 0;
+    c.weightx = 0.1;
+    c.anchor = GridBagConstraints.LINE_END;
+    c.insets = new Insets(5, 5, 2, 2);
+    clearButton.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            textField.setText("");
+            clearButton.setText("Filter:");
+          }
+        });
+    this.add(clearButton, c);
+    
+    textField = new JTextField(60);
+    c.gridx = 2;
     c.gridy = 0;
     c.weightx = 0.9;
     c.anchor = GridBagConstraints.LINE_START;
@@ -90,20 +129,7 @@ public class FilterPanel extends JPanel {
                 }
               }
             });
-    clearButton = new JButton("Filter:");
-    c.gridx = 0;
-    c.gridy = 0;
-    c.weightx = 0.1;
-    c.anchor = GridBagConstraints.LINE_END;
-    c.insets = new Insets(5, 5, 2, 2);
-    clearButton.addActionListener(
-        new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            textField.setText("");
-            clearButton.setText("Filter:");
-          }
-        });
-    this.add(clearButton, c);
+
   }
 
   /*

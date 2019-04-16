@@ -92,7 +92,7 @@ public class ProjectPanel extends JPanel {
     scrollPane = new JScrollPane(table);
     this.add(scrollPane, BorderLayout.CENTER);
     table.setFillsViewportHeight(true);
-    FilterPanel fp = new FilterPanel(dmf, table);
+    FilterPanel fp = new FilterPanel(dmf, table, 0, DialogMainFrame.PROJECT );
     this.add(fp, BorderLayout.SOUTH);
   }
 

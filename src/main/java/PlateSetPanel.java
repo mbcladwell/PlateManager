@@ -69,7 +69,7 @@ public class PlateSetPanel extends JPanel {
     scrollPane = new JScrollPane(table);
     table.setFillsViewportHeight(true);
     this.add(scrollPane, BorderLayout.CENTER);
-    FilterPanel fp = new FilterPanel(dmf, table);
+    FilterPanel fp = new FilterPanel(dmf, table, Integer.parseInt(project_sys_name.substring(4)), DialogMainFrame.PLATESET );
     this.add(fp, BorderLayout.SOUTH);
   }
 
