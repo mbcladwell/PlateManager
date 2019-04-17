@@ -6,6 +6,9 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -20,14 +23,15 @@ import javax.swing.table.*;
 
 
 public class HitListViewer extends JDialog implements java.awt.event.ActionListener {
-  static JButton exportAssayRun;
-  static JButton viewAssayRun;
+  static JButton select_all_button;
+  static JButton export_hits_button;
   static JButton exportHitList;
   static JButton rearrayHitList;
   static JButton closeButton;
     
   static JLabel label;
-  static JComboBox<ComboItem> projectList;
+    //  static JComboBox<ComboItem> projectList;
+    private  JComboBox<ComboItem> all_hit_lists_in_project;
   final DialogMainFrame dmf;
     final Session session;
     private int project_id;
@@ -43,7 +47,7 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
     private  JPanel counts_pane;
     private JPanel arButtons;
     private JPanel hlButtons;
-    
+    private int current_project_id;
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
   private static final long serialVersionUID = 1L;
@@ -72,6 +76,30 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
 
     
     GridLayout buttonLayout = new GridLayout(1,4,5,5);
+
+      JPanel     hits_buttons = new JPanel(buttonLayout);
+      
+      //get all the hit lists in the current project       
+      current_project_id = session.getProjectID();
+      all_hit_lists_in_project = new JComboBox(dmf.getDatabaseManager().getDatabaseRetriever().getHitListsForProject(current_project_id));
+    for(int i=0; i < all_hit_lists_in_project.getItemCount(); i++){
+	if(((ComboItem)all_hit_lists_in_project.getItemAt(i)).getKey() == current_project_id){
+		all_hit_lists_in_project.setSelectedIndex(i);
+	    }
+    }
+    all_hit_lists_in_project.addActionListener(this);
+   
+   select_all_button = new JButton("Select All");
+    select_all_button.addActionListener(this);
+   
+    export_hits_button = new JButton("Export Hits");
+    export_hits_button.addActionListener(this);
+    hits_buttons.add(all_hit_lists_in_project);
+    
+   hits_buttons.add(select_all_button);
+   hits_buttons.add(export_hits_button);
+   hits_pane.add(hits_buttons, BorderLayout.SOUTH);
+ 
     /*
     projectList = new JComboBox(dmf.getDatabaseManager().getDatabaseRetriever().getAllProjects());
     projectList.setSelectedIndex(9);
@@ -129,8 +157,73 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
     this.setVisible(true);
   }
 
+    
    
     public void actionPerformed(ActionEvent e) {
+
+    if (e.getSource() == all_hit_lists_in_project) {
+	int selected_hit_list_id = ((ComboItem)all_hit_lists_in_project.getSelectedItem()).getKey();
+	JTable new_hits_table = dmf.getDatabaseManager().getDatabaseRetriever().getSamplesForHitList(selected_hit_list_id);
+	TableModel new_model = new_hits_table.getModel();
+	hits_table.setModel(new_model); 
+
+	JTable new_counts_table = dmf.getDatabaseManager().getDatabaseRetriever().getHitCountPerPlateSet(session.getProjectID(), selected_hit_list_id);
+	TableModel new_model2 = new_counts_table.getModel();
+	counts_table.setModel(new_model2);
+
+    }
+
+	if (e.getSource() == select_all_button) {
+    	hits_table.selectAll();
+    }
+
+	
+    if (e.getSource() == export_hits_button) {
+	Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(hits_table);
+	if(results.length>1){
+	   LOGGER.info("hit list table: " + results);
+	       POIUtilities poi = new POIUtilities(dmf);
+            poi.writeJTableToSpreadsheet("Hits", results);
+            try {
+              Desktop d = Desktop.getDesktop();
+              d.open(new File("./Writesheet.xlsx"));
+            } catch (IOException ioe) {
+            }	 
+	
+	}else{
+	    JOptionPane.showMessageDialog(dmf, "Select one or more or all Hits!");	
+	}
+    	
+    }
+    
+	        
+	
+    
+
+
+        if (e.getSource() == closeButton) {
+	    HitListViewer.this.dispose();
+    }
+
+        if (e.getSource() == exportHitList) {
+	Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(counts_table);
+	if(results.length>1){
+	//   LOGGER.info("hit list table: " + results);
+	       POIUtilities poi = new POIUtilities(dmf);
+            poi.writeJTableToSpreadsheet("Counts", results);
+            try {
+              Desktop d = Desktop.getDesktop();
+              d.open(new File("./Writesheet.xlsx"));
+            } catch (IOException ioe) {
+            }	 
+	
+	}else{
+	    JOptionPane.showMessageDialog(dmf, "Select one or more Plate Sets!");	
+	}
+    	
+    }
+
+	
     if (e.getSource() == rearrayHitList) {
     		 TableModel hits_count_model = counts_table.getModel();
 		 int row = counts_table.getSelectedRow();
@@ -153,56 +246,6 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
     }
 
 
-        if (e.getSource() == closeButton) {
-	    HitListViewer.this.dispose();
-    }
-	/*	
-    if (e.getSource() == exportAssayRun) {
-    	
-    }
-    
-        if (e.getSource() == viewAssayRun) {
-    	    if(!table.getSelectionModel().isSelectionEmpty()){
-		 
-		 TableModel arModel = table.getModel();
-		 int row = table.getSelectedRow();
-		 String assay_run_sys_name =  table.getModel().getValueAt(row, 0).toString();
-		 int  assay_run_id = Integer.parseInt(assay_run_sys_name.substring(3));
-		 new ScatterPlot(dmf, assay_run_id);}
-	    else{
-	      JOptionPane.showMessageDialog(dmf, "Select an Assay Run!");	      
-	    }
-	        
-	
-    }
-    if (e.getSource() == exportHitList) {
-    	
-    }
-
-
-    if (e.getSource() == projectList) {
-	if(projectList.getSelectedIndex() > -1){
-	    project_id  = ((ComboItem)projectList.getSelectedItem()).getKey();
-	    this.refreshTables(); 
-	}
-    }
-	*/  
+    }			 
   }
 
-    public void refreshTables(){
-	/*
-	CustomTable arTable = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRuns(project_id);
-	TableModel arModel = arTable.getModel();
-	table.setModel(arModel);	
-
-		//LOGGER.info("project: " + project_id);
-	CustomTable hlTable = dmf.getDatabaseManager().getDatabaseRetriever().getHitLists(project_id);
-	TableModel hlModel = hlTable.getModel();
-	counts_table.setModel(hlModel);
-	*/
-    }
-
- 
-
- 
-}

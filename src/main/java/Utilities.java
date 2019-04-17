@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import javax.swing.JFileChooser;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 public class Utilities {
@@ -255,21 +256,34 @@ case 1536:
 	
     }
 
-}
-    /*
-    try {
-      Scanner inputStream = new Scanner(file);
-      while (inputStream.hasNext()) {
-        String data = inputStream.next();
-        LOGGER.info("data: " + data);
 
-        String[] values = data.split("\t");
-        // LOGGER.info("values: " + values);
-
-        LOGGER.info("index 0: " + values[0]);
-      }
-      inputStream.close();
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
+    /**
+     * @param default_table_model table with selected rows
+     * returns a string array of selected data
+     */
+     public String[][] getSelectedRowsAndHeaderAsStringArray(JTable _table) {
+     JTable table = _table;
+     DefaultTableModel model = (DefaultTableModel) table.getModel();
+    int colCount = model.getColumnCount();
+    int rowCount = table.getSelectedRowCount();
+    int[] selected_rows = table.getSelectedRows();
+    
+    String[][] results = new String[rowCount + 1][colCount];
+    for (int i = 0; i < colCount; i++) {
+      	LOGGER.info("ij: " + results[0][i]);
+      results[0][i] = table.getColumnName(i);
     }
-    */
+
+    for (int i = 1; i <= rowCount; i++) { //start at 1; 0 holds the header
+      for (int j = 0; j < colCount; j++) {
+	  if(model.getValueAt(selected_rows[i-1], j) != null){ //accessions might be null
+	      results[i][j] = model.getValueAt(selected_rows[i-1], j).toString();
+	  }
+      }
+    }
+    return results;
+  }
+
+
+}
+  

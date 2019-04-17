@@ -962,6 +962,37 @@ int plate_layout_name_id = _plate_layout_name_id;
     return (ComboItem[])output;
   }
 
+      public ComboItem[] getHitListsForProject(int _project_id) {
+	  int project_id = _project_id;
+    ComboItem[] output = null;
+    Array results = null;
+    ArrayList<ComboItem> combo_items = new ArrayList<ComboItem>();
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement( "SELECT hit_list.id, hit_list.hitlist_sys_name   FROM assay_run, plate_set, hit_list WHERE hit_list.assay_run_id= assay_run.id AND assay_run.plate_set_id= plate_set.ID AND plate_set.project_id=?;");
+
+      pstmt.setInt(1, project_id);
+
+      ResultSet rs = pstmt.executeQuery();
+      //rs.next();
+ while (rs.next()) {
+     //all_plate_ids.add(rs.getInt(1));
+	combo_items.add(new ComboItem(rs.getInt(1), rs.getString(2)));
+        // LOGGER.info("A plate set ID: " + rs.getInt(1));
+      }
+
+
+      rs.close();
+      pstmt.close();
+      output = combo_items.toArray(new ComboItem[combo_items.size()]);
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting hit lists: " + sqle);
+    }
+    return (ComboItem[])output;
+  }
+
+    
     public int getNumberOfReplicatesForPlateLayout(int _selected_layout_id){
 	int selected_layout_id = _selected_layout_id;
 	int result = 0;

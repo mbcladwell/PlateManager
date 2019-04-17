@@ -16,6 +16,8 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTable;
+
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.*;
@@ -37,8 +39,8 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     final Session session;
     private int project_id;
     private String owner;
-  private CustomTable assay_runs_table;
-  private CustomTable hit_lists_table;
+  private JTable assay_runs_table;
+  private JTable hit_lists_table;
   private JScrollPane assay_runs_scroll_pane;
     private JScrollPane hit_lists_scroll_pane;
     private  JPanel parent_pane;
@@ -165,6 +167,20 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     public void actionPerformed(ActionEvent e) {
 	
     if (e.getSource() == exportAssayRun) {
+	Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(assay_runs_table);
+	if(results.length>1){
+	//   LOGGER.info("hit list table: " + results);
+	       POIUtilities poi = new POIUtilities(dmf);
+            poi.writeJTableToSpreadsheet("Assay Runs", results);
+            try {
+              Desktop d = Desktop.getDesktop();
+              d.open(new File("./Writesheet.xlsx"));
+            } catch (IOException ioe) {
+            }	 
+	
+	}else{
+	    JOptionPane.showMessageDialog(dmf, "Select one or more  Assay Runs!");	
+	}
     	
     }
 
@@ -182,8 +198,10 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 	
     }
     if (e.getSource() == exportHitList) {
-	   Object[][] results = hit_lists_table.getSelectedRowsAndHeaderAsStringArray();
-	   LOGGER.info("hit list table: " + results);
+	
+	Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(hit_lists_table);
+	if(results.length>1){
+	//   LOGGER.info("hit list table: " + results);
 	       POIUtilities poi = new POIUtilities(dmf);
             poi.writeJTableToSpreadsheet("Hit Lists", results);
             try {
@@ -192,7 +210,9 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
             } catch (IOException ioe) {
             }	 
 	
-	 
+	}else{
+	    JOptionPane.showMessageDialog(dmf, "Select one or more  Hit Lists!");	
+	}
     	
     }
     if (e.getSource() == viewHitList) {

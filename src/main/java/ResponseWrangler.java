@@ -175,16 +175,16 @@ public class ResponseWrangler {
 
     //get the sorted response for unknowns only
     sorted_response_unknowns_only = new double[unknowns_list.size()][4];
-	int unk_index = 0;
-	for(int i = 0; i < sorted_response.length; i++){
-	    if(sorted_response[i][2]==1){
-		sorted_response_unknowns_only[unk_index][0]=sorted_response[i][0];
-		sorted_response_unknowns_only[unk_index][1]=sorted_response[i][1];
-		sorted_response_unknowns_only[unk_index][2]=sorted_response[i][2];
-		sorted_response_unknowns_only[unk_index][3]=sorted_response[i][3];
-		unk_index++;
-	    }
+    int unk_index = 0;
+    for(int i = 0; i < sorted_response.length; i++){
+	if(sorted_response[i][2]==1){
+	    sorted_response_unknowns_only[unk_index][0]=sorted_response[i][0];
+	    sorted_response_unknowns_only[unk_index][1]=sorted_response[i][1];
+	    sorted_response_unknowns_only[unk_index][2]=sorted_response[i][2];
+	    sorted_response_unknowns_only[unk_index][3]=sorted_response[i][3];
+	    unk_index++;
 	}
+    }
 
 
     
