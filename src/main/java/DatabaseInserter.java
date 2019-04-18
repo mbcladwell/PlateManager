@@ -422,10 +422,18 @@ public int insertPlateSet2(
     int hit_selection_algorithm = _hit_selection_algorithm;
     int top_n_number = _top_n_number;
 
+
+    
 Integer[] plate_set_id =
         dbm.getDatabaseRetriever()
             .getIDsForSysNames(plate_set_sys_name, "plate_set", "plate_set_sys_name");
 
+ int num_of_plate_ids = dmf.getDatabaseManager().getDatabaseRetriever().getAllPlateIDsForPlateSetID(plate_set_id[0]).size();
+//check that there are the correct number of rows in the table
+if(num_of_plate_ids*format_id!=table.size()-1){
+    	JOptionPane.showMessageDialog(dmf, new String("Expecting " + String.valueOf(num_of_plate_ids*format_id) + " rows but found " + (table.size()-1) + " rows." ), "Import Error", JOptionPane.ERROR_MESSAGE);
+	return;
+}
 
     int assay_run_id =
         createAssayRun(assayName, descr, assay_type_id, plate_set_id[0], plate_layout_name_id);

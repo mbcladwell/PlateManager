@@ -62,13 +62,14 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
     hit_list_id = _hit_list_id;
     parent_pane = new JPanel(new BorderLayout());
 
+        hits_table = dmf.getDatabaseManager().getDatabaseRetriever().getSamplesForHitList(hit_list_id);
+
     hits_pane = new JPanel(new BorderLayout());
     hits_pane.setBorder(BorderFactory.createRaisedBevelBorder());
-    javax.swing.border.TitledBorder hits_pane_border = BorderFactory.createTitledBorder("Hits:");
+    javax.swing.border.TitledBorder hits_pane_border = BorderFactory.createTitledBorder("Hits (Total count = "+ hits_table.getRowCount()  +  "):");
     hits_pane_border.setTitlePosition(javax.swing.border.TitledBorder.TOP);
     hits_pane.setBorder(hits_pane_border);
 
-    hits_table = dmf.getDatabaseManager().getDatabaseRetriever().getSamplesForHitList(hit_list_id);
 
     hits_scroll_pane = new JScrollPane(hits_table);
     hits_table.setFillsViewportHeight(true);
