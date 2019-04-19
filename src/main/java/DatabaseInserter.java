@@ -880,13 +880,25 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 
     
   }
-
-    public void importPlateLayout(Object[][] _data){
+    /**
+     * @param _data
+     * batch sql https://www.mkyong.com/jdbc/jdbc-preparedstatement-example-batch-update/
+     */
+    public void importPlateLayout(Object[][] _data, String _name, String _descr, String _control_location, int _n_controls, int _n_unknowns, int _format){
 	Object[][] data = _data;
-	String sql_statement = "INSERT INTO import_plate_layout (well_by_col, well_type_id, replicates, target) VALUES ";
+	String name = _name;
+	String descr = _descr;
+	String control_location = _control_location;
+	int n_controls = _n_controls;
+	int n_unknowns = _n_unknowns;
+	int format = _format;
+
+	String sql_statement1="TRUNCATE TABLE import_plate_layout;";
+	
+	String sql_statement2_pre = "INSERT INTO import_plate_layout (well_by_col, well_type_id, replicates, target) VALUES ";
 	for (int i = 1; i < data.length; i++) {
-      sql_statement =
-          sql_statement
+      sql_statement2_pre =
+          sql_statement2_pre
 	  + "("
 	  + Integer.parseInt((String)data[i][0])
 	  + ", "
@@ -894,12 +906,25 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 	  + ", '1', 'a'), ";
     }
 
-    String insertSql = sql_statement.substring(0, sql_statement.length() - 2) + ";";
+	String sql_statement2 = sql_statement2_pre.substring(0, sql_statement2_pre.length() - 2) + ";";
+
+	String sql_statement3 = "SELECT create_layout_records(name, descr, control_location, n_controls, n_unknowns, format);";
     //LOGGER.info(insertSql);
     PreparedStatement insertPs;
     try {
-      insertPs = conn.prepareStatement(insertSql);
+	conn.setAutoCommit(false);
+      insertPs = conn.prepareStatement(sql_statement1);
       insertPreparedStatement(insertPs);
+      //insertPs.addBatch();
+	
+      insertPs = conn.prepareStatement(sql_statement2);
+      insertPreparedStatement(insertPs);
+      insertPs = conn.prepareStatement(sql_statement3);
+      insertPreparedStatement(insertPs);
+      //insertPs.addBatch();
+      //insertPs.executeBatch();
+      //insertPreparedStatement(insertPs);
+      conn.commit();
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
       JOptionPane.showMessageDialog(

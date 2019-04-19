@@ -20,6 +20,8 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JOptionPane;
+
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -51,19 +53,28 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
   private JTable destTable;
     private JTextField nameField;
     private JTextField descriptionField;
+    private JLabel num_controls_label;
+    private JLabel num_unk_label;
+    private JTextField control_location;
     
   private JScrollPane scrollPane;
   final Instant instant = Instant.now();
     
     private  JPanel parentPane;
     private  JPanel pane1;
+    private  JPanel pane2;
     private  JPanel pane5;
-  private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-  final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+    private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private final  DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
   // final EntityManager em;
-  private static final long serialVersionUID = 1L;
-  private MyModel tableModel;
+    private static final long serialVersionUID = 1L;
+    private MyModel tableModel;
     private Object[][] grid_data;
+    private int format;
+    private int num_controls;
+    private int num_unknowns;
+    private int num_edge;
+    
     
     // private DefaultComboBoxModel<ComboItem> layout_names_list_model;
 
@@ -78,9 +89,21 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
 	Object[][] temp_data = dmf.getUtilities().getObjectArrayForArrayList(data);
 	Object[][] grid_data = dmf.getUtilities().getPlateLayoutGrid(temp_data);
 
-    //layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);
-    //    layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
-    
+	format = data.size()-1;  //the length of the imput ArrayList
+
+	if( format != 96 && format != 384 && format != 1536 ){
+	    JOptionPane.showMessageDialog(this,
+					  "Found " + String.valueOf(format) + " rows of data.\nNeed 96, 384 or 1536.",
+					  "Import error",
+					  JOptionPane.ERROR_MESSAGE);
+	    return;
+	}
+	
+	num_controls = dmf.getUtilities().getNumberOfControls(temp_data);
+	num_unknowns = dmf.getUtilities().getNumberOfUnknowns(temp_data);
+	num_edge = dmf.getUtilities().getNumberOfEdge(temp_data);
+
+	
     parentPane = new JPanel(new BorderLayout());
     parentPane.setBorder(BorderFactory.createRaisedBevelBorder());
  
@@ -94,40 +117,68 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
 
     GridBagConstraints c = new GridBagConstraints();
   
-    label = new JLabel("Date:", SwingConstants.RIGHT);
-    // c.fill = GridBagConstraints.HORIZONTAL;
-    c.gridx = 0;
-    c.gridy = 0;
-    c.insets = new Insets(5, 5, 2, 2);
-    c.anchor = GridBagConstraints.LINE_END;
-    pane1.add(label, c);
 
 
     label = new JLabel("Layout Name:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 2;
+    c.gridwidth = 1;
+    c.insets = new Insets(5, 5, 2, 2);
     pane1.add(label, c);
 
     label = new JLabel("Description:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 3;
     pane1.add(label, c);
-    /*
-        label = new JLabel("Format:", SwingConstants.RIGHT);
+   
+    label = new JLabel("# controls:");
     c.gridx = 0;
     c.gridy = 4;
-    pane.add(label, c);
-    */
-    label = new JLabel(df.format(java.util.Date.from(instant)));
-    // c.fill = GridBagConstraints.HORIZONTAL;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane1.add(label, c);
+
+        num_controls_label = new JLabel(String.valueOf(num_controls));   
+    c.gridwidth = 1;
     c.gridx = 1;
-    c.gridy = 0;
+    c.gridy = 4;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane1.add(num_controls_label, c);
+
+        label = new JLabel("       # unknowns:", SwingConstants.RIGHT);
+    c.gridx = 2;
+    c.gridy = 4;
+    c.anchor = GridBagConstraints.LINE_END;
+     pane1.add(label, c);
+
+        num_unk_label = new JLabel(String.valueOf(num_unknowns));
+    c.gridwidth = 1;
+    c.gridx = 3;
+    c.gridy = 4;
+       c.anchor = GridBagConstraints.LINE_START;
+       pane1.add(num_unk_label, c);
+
+       label = new JLabel("       Format:");
+    // c.fill = GridBagConstraints.HORIZONTAL;
+    c.gridx = 4;
+    c.gridy = 4;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane1.add(label, c);
+
+
+    
+    label = new JLabel(String.valueOf(format));
+    // c.fill = GridBagConstraints.HORIZONTAL;
+    c.gridx = 5;
+    c.gridy = 4;
+    c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_START;
     pane1.add(label, c);
 
+
     nameField = new JTextField(30);
     //nameField.setText(_name);
-    c.gridwidth = 2;
+    c.gridwidth = 5;
     c.gridx = 1;
     c.gridy = 2;
     pane1.add(nameField, c);
@@ -141,11 +192,32 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
     pane1.add(descriptionField, c);
     descriptionField.getDocument().addDocumentListener(this);
 
+        label = new JLabel("Control Location:", SwingConstants.RIGHT);
+    // c.fill = GridBagConstraints.HORIZONTAL;
+    c.gridx = 0;
+    c.gridy = 5;
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane1.add(label, c);
+
+    control_location = new JTextField(30);
+    //descriptionField.setText(_description);
+    c.gridx = 1;
+    c.gridy = 5;
+       c.gridwidth = 5;
+ 
+    c.gridheight = 1;
+    pane1.add(control_location, c);
+    control_location.getDocument().addDocumentListener(this);
+
+
+
+    
     ok_button = new JButton("Proceed with import");
     ok_button.setMnemonic(KeyEvent.VK_P);
     ok_button.setEnabled(false);
     c.fill = GridBagConstraints.HORIZONTAL;
-    c.gridx = 3;
+    c.gridx = 6;
     c.gridy = 2;
     c.gridwidth = 1;
     c.gridheight = 1;
@@ -155,7 +227,7 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
         (new ActionListener() {
 		 public void actionPerformed(ActionEvent e) {
 		//temp_data is Object[][] of 2 columns, well, type, both integers
-		     dmf.getDatabaseManager().getDatabaseInserter().importPlateLayout(temp_data);
+		     dmf.getDatabaseManager().getDatabaseInserter().importPlateLayout(temp_data, nameField.getText(), descriptionField.getText(), control_location.getText(),  Integer.parseInt(num_controls_label.getText()), Integer.parseInt(num_unk_label.getText()), format);
             dispose();
           }
         }));
@@ -165,7 +237,7 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
     cancel_button.setActionCommand("cancel");
     cancel_button.setEnabled(true);
     cancel_button.setForeground(Color.RED);
-    c.gridx = 3;
+    c.gridx = 6;
     c.gridy = 3;
     pane1.add(cancel_button, c);
     cancel_button.addActionListener(
@@ -175,8 +247,31 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
           }
         }));
 
+    ////////////////////////////////////////////////////////////
+   ////////////////////////////////////////////////////////////
+    //Pane 2   top pane with info
+
+        pane2 = new JPanel(new GridBagLayout());
+    pane2.setBorder(BorderFactory.createRaisedBevelBorder());
+
+    label = new JLabel("Date:", SwingConstants.RIGHT);
+    // c.fill = GridBagConstraints.HORIZONTAL;
+    c.gridx = 0;
+    c.gridy = 0;
+    c.anchor = GridBagConstraints.LINE_END;
+    pane2.add(label, c);
     
-////////////////////////////////////////////////////////////
+    label = new JLabel(df.format(java.util.Date.from(instant)));
+    // c.fill = GridBagConstraints.HORIZONTAL;
+    c.gridx = 1;
+    c.gridy = 0;
+    c.gridwidth = 2;
+    c.anchor = GridBagConstraints.LINE_START;
+    pane2.add(label, c);
+
+
+    
+    ////////////////////////////////////////////////////////////
    ////////////////////////////////////////////////////////////
     //Pane 5
 
@@ -207,8 +302,9 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
 	//  this.refreshLayoutTable(1);
    
     this.getContentPane().add(parentPane, BorderLayout.CENTER);
-    parentPane.add(pane5, BorderLayout.NORTH);
+    parentPane.add(pane5, BorderLayout.CENTER);
     parentPane.add(pane1, BorderLayout.SOUTH);
+    parentPane.add(pane2, BorderLayout.NORTH);
     
     this.pack();
     this.setLocation(
@@ -399,14 +495,14 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
     }
 
       public void insertUpdate(DocumentEvent e) {
-	  if(nameField.getText().length() >0 && descriptionField.getText().length() >0){
+	  if(nameField.getText().length() >0 && descriptionField.getText().length() >0 && control_location.getText().length() >0){
 	      ok_button.setEnabled(true);
 	  }else{
 	      ok_button.setEnabled(false);
 	  }
     }
     public void removeUpdate(DocumentEvent e) {
-	  if(nameField.getText().length() >0 && descriptionField.getText().length() >0){
+	  if(nameField.getText().length() >0 && descriptionField.getText().length() >0 && control_location.getText().length() >0 ){
 	      ok_button.setEnabled(true);
 	  }else{
 	      ok_button.setEnabled(false);

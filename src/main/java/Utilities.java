@@ -284,6 +284,54 @@ case 1536:
     return results;
   }
 
+    /**
+     * @param data  [well][type] both ints
+     * 1: unknown; 2,3,4 are controls; 5 is edge
+     */
+    
+    public int getNumberOfControls(Object[][] _data){
+	Object[][] data = _data;
+	int len = data.length;
+	int counter = 0;
+	for(int i =1; i < len; i++){
+	    if( Integer.parseInt((String)data[i][1]) == 2 || Integer.parseInt((String)data[i][1]) == 3 || Integer.parseInt((String)data[i][1]) == 4 ) counter++;
+	}
+	    
+	return counter;	
+    }
+    
 
+    /**
+     * @param data  [well][type] both ints
+     * 1: unknown; 2,3,4 are controls; 5 is edge
+     */
+    public int getNumberOfUnknowns(Object[][] _data){
+	Object[][] data = _data;
+	int len = data.length;
+	int counter = 0;
+	
+	for(int i =1; i < len; i++){
+	    if( Integer.parseInt((String)data[i][1]) == 1 ) counter++;
+	}
+	    
+	return counter;	
+    }
+
+    /**
+     * @param data  [well][type] both ints
+     * 1: unknown; 2,3,4 are controls; 5 is edge
+     */
+    public int getNumberOfEdge(Object[][] _data){
+	Object[][] data = _data;
+	int len = data.length;
+	int counter = 0;
+	
+	for(int i =1; i < len; i++){
+	    if( Integer.parseInt((String)data[i][1]) == 5 ) counter++;
+	}
+	    
+	return counter;	
+    }
+    
 }
   
