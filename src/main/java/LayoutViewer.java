@@ -2,11 +2,14 @@ package pm;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.net.*;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -19,7 +22,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
-import java.awt.Dimension;
 import javax.swing.event.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -37,6 +39,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 public class LayoutViewer extends JDialog implements java.awt.event.ActionListener {
   static JButton button;
+  static JButton helpButton;
   static JLabel label;
   static JComboBox<Integer> formatList;
   static JComboBox<String> displayList;
@@ -131,12 +134,13 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     displayList.addActionListener(this);
     pane2.add(displayList, c);
  
-    JButton helpButton = new JButton("Layout Help");
+    helpButton = new JButton("Layout Help");
     c.gridx = 4;
     c.gridy = 1;
     c.gridheight = 1;
     helpButton.addActionListener(this);
     pane2.add(helpButton, c);
+
     
 
     ////////////////////////////////////////////////////////////
@@ -239,7 +243,10 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
       
  	
     }
-    
+
+    if (e.getSource() == helpButton) {
+	openWebpage(URI.create("http://www.stiehie.net"));
+    }
     }
     /*
      public void tableChanged(TableModelEvent e) {
@@ -434,4 +441,26 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
             }
         }
     }
+
+public static boolean openWebpage(URI uri) {
+    Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+    if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+        try {
+            desktop.browse(uri);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    return false;
+}
+
+    public static boolean openWebpage(URL url) {
+    try {
+        return openWebpage(url.toURI());
+    } catch (URISyntaxException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 }
