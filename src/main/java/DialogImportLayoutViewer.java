@@ -185,7 +185,7 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
     nameField.getDocument().addDocumentListener(this);
 
     descriptionField = new JTextField(30);
-    //descriptionField.setText(_description);
+    descriptionField.setText("1S1T");
     c.gridx = 1;
     c.gridy = 3;
     c.gridheight = 1;
@@ -227,7 +227,7 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
         (new ActionListener() {
 		 public void actionPerformed(ActionEvent e) {
 		//temp_data is Object[][] of 2 columns, well, type, both integers
-		     dmf.getDatabaseManager().getDatabaseInserter().importPlateLayout(temp_data, nameField.getText(), descriptionField.getText(), control_location.getText(),  Integer.parseInt(num_controls_label.getText()), Integer.parseInt(num_unk_label.getText()), format);
+		     dmf.getDatabaseManager().getDatabaseInserter().importPlateLayout(temp_data, nameField.getText(), descriptionField.getText(), control_location.getText(),  Integer.parseInt(num_controls_label.getText()), Integer.parseInt(num_unk_label.getText()), format, num_edge);
             dispose();
           }
         }));

@@ -884,7 +884,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
      * @param _data
      * batch sql https://www.mkyong.com/jdbc/jdbc-preparedstatement-example-batch-update/
      */
-    public void importPlateLayout(Object[][] _data, String _name, String _descr, String _control_location, int _n_controls, int _n_unknowns, int _format){
+    public void importPlateLayout(Object[][] _data, String _name, String _descr, String _control_location, int _n_controls, int _n_unknowns, int _format, int _n_edge){
 	Object[][] data = _data;
 	String name = _name;
 	String descr = _descr;
@@ -892,6 +892,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 	int n_controls = _n_controls;
 	int n_unknowns = _n_unknowns;
 	int format = _format;
+	int n_edge = _n_edge;
 
 	String sql_statement1="TRUNCATE TABLE import_plate_layout;";
 	
@@ -908,7 +909,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 
 	String sql_statement2 = sql_statement2_pre.substring(0, sql_statement2_pre.length() - 2) + ";";
 
-	String sql_statement3 = "SELECT create_layout_records(name, descr, control_location, n_controls, n_unknowns, format);";
+	String sql_statement3 = "SELECT create_layout_records(?,?,?,?,?,?,?);";
     //LOGGER.info(insertSql);
     PreparedStatement insertPs;
     try {
@@ -920,6 +921,13 @@ if(num_of_plate_ids*format_id!=table.size()-1){
       insertPs = conn.prepareStatement(sql_statement2);
       insertPreparedStatement(insertPs);
       insertPs = conn.prepareStatement(sql_statement3);
+      insertPs.setString(1, name);
+      insertPs.setString(2, descr);
+      insertPs.setString(3, control_location);
+      insertPs.setInt(4, n_controls);
+      insertPs.setInt(5, n_unknowns);
+      insertPs.setInt(6, format);
+      insertPs.setInt(7, n_edge);
       insertPreparedStatement(insertPs);
       //insertPs.addBatch();
       //insertPs.executeBatch();

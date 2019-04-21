@@ -19,6 +19,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import java.awt.Dimension;
 import javax.swing.event.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -215,9 +216,11 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     this.getContentPane().add(parentPane, BorderLayout.CENTER);
     parentPane.add(pane2, BorderLayout.NORTH);
     parentPane.add(pane3, BorderLayout.WEST);
+    pane3.setPreferredSize(new Dimension(500,200));    
     parentPane.add(pane4, BorderLayout.EAST);
+    pane4.setPreferredSize(new Dimension(500,200));    
     parentPane.add(pane5, BorderLayout.SOUTH);
-    
+    pane5.setPreferredSize(new Dimension(500,600));    
     this.pack();
     this.setLocation(
         (Toolkit.getDefaultToolkit().getScreenSize().width) / 2 - getWidth() / 2,
