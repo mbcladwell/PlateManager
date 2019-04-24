@@ -300,7 +300,8 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
                 table, value, isSelected, hasFocus, row, column);
             MyModel model = (MyModel) table.getModel();
 	    //LOGGER.info("6,11: " + (String)model.getValueAt(row,column));
-	    switch((String)model.getValueAt(row,column)){
+	    //switch((String)model.getValueAt(row,column)){
+	    switch(model.getValueAt(row,column).toString()){
 	    case "unknown":
 		c.setBackground(java.awt.Color.WHITE);
 		break;
@@ -318,9 +319,11 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 		break;
 	    case "1":
 		c.setBackground(java.awt.Color.BLACK);
+		c.setForeground(java.awt.Color.WHITE);
 		break;
 	    case "2":
 		c.setBackground(java.awt.Color.WHITE);
+		c.setForeground(java.awt.Color.BLACK);
 		break;
 	    case "3":
 		c.setBackground(java.awt.Color.BLUE);
