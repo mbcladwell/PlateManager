@@ -21,7 +21,8 @@ public class AdminMenu extends JMenu {
     static JTextField fileField;
     private ArrayList<String[]> imported_layout;;    
     private JFileChooser fileChooser;
-
+    private JMenu projectMenu;
+    
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public AdminMenu(DialogMainFrame _dmf, CustomTable _project_table) {
@@ -42,7 +43,10 @@ public class AdminMenu extends JMenu {
         });
     this.add(menuItem);
 
-    menuItem = new JMenuItem("Add Project", KeyEvent.VK_P);
+    projectMenu = new JMenu("Project");
+    this.add(projectMenu);
+    
+    menuItem = new JMenuItem("Add", KeyEvent.VK_A);
     menuItem.getAccessibleContext().setAccessibleDescription("Launch the Add Project dialog.");
     menuItem.addActionListener(
         new ActionListener() {
@@ -52,9 +56,9 @@ public class AdminMenu extends JMenu {
           }
         });
     
-    this.add(menuItem);
+    projectMenu.add(menuItem);
 
-    menuItem = new JMenuItem("Edit Project", KeyEvent.VK_E);
+    menuItem = new JMenuItem("Edit", KeyEvent.VK_E);
 	   menuItem.getAccessibleContext().setAccessibleDescription("Launch the Edit Project dialog.");
     menuItem.putClientProperty("mf", dmf);
  
@@ -87,8 +91,55 @@ public class AdminMenu extends JMenu {
 	  }
 	});
     
-    this.add(menuItem);
+    projectMenu.add(menuItem);
 
+
+    menuItem = new JMenuItem("Delete", KeyEvent.VK_D);
+    menuItem.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+	      try{
+		  int rowIndex = project_table.getSelectedRow();
+		  String projectid = project_table.getValueAt(rowIndex, 0).toString();
+		  String name = project_table.getValueAt(rowIndex, 1).toString();
+		  String owner = project_table.getValueAt(rowIndex, 2).toString();
+		  String description = project_table.getValueAt(rowIndex, 3).toString();
+		  if (owner.equals(dmf.getSession().getUserName())) {
+		      int n =  JOptionPane.showConfirmDialog(dmf,
+							     "Permanently delete " + projectid + " and all its\n"
+							     + "components? This is a cascading delete\n"
+							     + "that cannot be undone!",
+							     "Delete Project?",
+							     JOptionPane.YES_NO_OPTION);
+		      if(n == JOptionPane.YES_OPTION){
+			  int prj_id = Integer.parseInt(projectid.substring(4));
+			  dmf.getDatabaseManager().getDatabaseInserter().deleteProject(prj_id);
+			  
+		      }
+		    
+	      } else {
+                JOptionPane.showMessageDialog(
+                    dmf,
+                    "Only the owner can modify a project.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+              }
+            } catch(ArrayIndexOutOfBoundsException aioob) {
+              JOptionPane.showMessageDialog(
+                  dmf, "Please select a project!", "Error", JOptionPane.ERROR_MESSAGE);
+            }catch(IndexOutOfBoundsException ioob) {
+              JOptionPane.showMessageDialog(
+                  dmf, "Please select a project!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+	 	
+	  }
+	});
+    
+    projectMenu.add(menuItem);
+
+
+
+    
     menuItem = new JMenuItem("Import Plate Layout", KeyEvent.VK_I);
     menuItem.addActionListener(
 	   new ActionListener() {

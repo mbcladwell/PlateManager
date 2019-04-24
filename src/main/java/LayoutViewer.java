@@ -245,30 +245,9 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     }
 
     if (e.getSource() == helpButton) {
-	openWebpage(URI.create("http://www.stiehie.net"));
+	openWebpage(URI.create("http://labsolns.com/layouts"));
     }
     }
-    /*
-     public void tableChanged(TableModelEvent e) {
-	 LOGGER.info("source: " + e);
-	 if (e.getSource() == sourceTable) {
-	     int[] row = sourceTable.getSelectedRows();
-	     //int column = e.getColumn();
-	     DefaultTableModel model = (DefaultTableModel)sourceTable.getModel();
-	     //String columnName = model.getColumnName(column);
-	     int source_layout_id = Integer.parseInt(((String)model.getValueAt(row[0], 0)).substring(3));
-	     LOGGER.info("source_layout_id: " + source_layout_id);
-	     	destTable.setModel(dmf.getDatabaseManager()
-			     .getDatabaseRetriever()
-				   .getDestForLayout(source_layout_id).getModel());
-	 }
- 
-
-	 
-    
-     }
-    */
-
     
     public void refreshLayoutTable(int _plate_layout_id){
 	pane5.removeAll();

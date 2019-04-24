@@ -596,6 +596,21 @@ if(num_of_plate_ids*format_id!=table.size()-1){
     return new_assay_run_id;
   }
 
+    /**
+     * Called from AdminMenu
+     */
+    public void deleteProject(int _prj_id){
+	int prj_id = _prj_id;
+    String sqlstring = "delete from project  WHERE project.id = ?;";
+    PreparedStatement preparedStatement;
+    try {
+      preparedStatement = conn.prepareStatement(sqlstring);
+      preparedStatement.setInt(1, prj_id);
+      preparedStatement.executeUpdate();
+    } catch (SQLException sqle) {
+      LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
+    }
+  }
 
 
      
