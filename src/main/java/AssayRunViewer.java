@@ -16,9 +16,8 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTable;
-
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.*;
 import javax.swing.event.ListSelectionEvent;
@@ -27,9 +26,10 @@ import javax.swing.table.*;
 
 
 public class AssayRunViewer extends JDialog implements java.awt.event.ActionListener {
-  static JButton exportAssayRun;
+  static JButton exportAssayRunTable;
+  static JButton exportAssayRunData;
   static JButton viewAssayRun;
-  static JButton exportHitList;
+  static JButton exportHitListTable;
   static JButton viewHitList;
   static JButton refreshHitListsButton;
     
@@ -107,13 +107,16 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     
     //projectList.setSelectedIndex(9);
     projectList.addActionListener(this);
-    exportAssayRun = new JButton("Export");
-    exportAssayRun.addActionListener(this);
+    exportAssayRunTable = new JButton("Export Table");
+    exportAssayRunTable.addActionListener(this);
+    exportAssayRunData = new JButton("Export Data");
+    exportAssayRunData.addActionListener(this);
     viewAssayRun = new JButton("Plot");
     viewAssayRun.addActionListener(this);
     arButtons = new JPanel(buttonLayout);
     arButtons.add(projectList);
-    arButtons.add(exportAssayRun);
+    arButtons.add(exportAssayRunTable);
+    arButtons.add(exportAssayRunData);
     arButtons.add(viewAssayRun);
     assay_runs_pane.add(arButtons, BorderLayout.SOUTH);
     
@@ -138,13 +141,13 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     refreshHitListsButton = new JButton("Refresh List");
     refreshHitListsButton.addActionListener(this);
    
-    exportHitList = new JButton("Export");
-    exportHitList.addActionListener(this);
+    exportHitListTable = new JButton("Export Table");
+    exportHitListTable.addActionListener(this);
    viewHitList = new JButton("View");
      viewHitList.addActionListener(this);
    hlButtons.add(refreshHitListsButton);
     
-    hlButtons.add(exportHitList);
+    hlButtons.add(exportHitListTable);
     hlButtons.add(viewHitList);
     hit_lists_pane.add(hlButtons, BorderLayout.SOUTH);
 
@@ -166,7 +169,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
    
     public void actionPerformed(ActionEvent e) {
 	
-    if (e.getSource() == exportAssayRun) {
+    if (e.getSource() == exportAssayRunTable) {
 	Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(assay_runs_table);
 	if(results.length>1){
 	//   LOGGER.info("hit list table: " + results);
@@ -184,6 +187,26 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     	
     }
 
+    if (e.getSource() == exportAssayRunData) {
+	Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(assay_runs_table);
+	if(results.length>1){
+	//   LOGGER.info("hit list table: " + results);
+	       POIUtilities poi = new POIUtilities(dmf);
+            poi.writeJTableToSpreadsheet("Assay Runs", results);
+            try {
+              Desktop d = Desktop.getDesktop();
+              d.open(new File("./Writesheet.xlsx"));
+            } catch (IOException ioe) {
+            }	 
+	
+	}else{
+	    JOptionPane.showMessageDialog(dmf, "Select one or more  Assay Runs!");	
+	}
+    	
+    }
+
+
+    
         if (e.getSource() == viewAssayRun) {
     	    if(!assay_runs_table.getSelectionModel().isSelectionEmpty()){
 		 
@@ -197,7 +220,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 	    }
 	
     }
-    if (e.getSource() == exportHitList) {
+    if (e.getSource() == exportHitListTable) {
 	
 	Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(hit_lists_table);
 	if(results.length>1){
