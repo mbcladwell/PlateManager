@@ -84,8 +84,8 @@ public class ResponseWrangler {
 	    Double normpos = Double.valueOf((float)dtm.getValueAt(row, 5));
 	    int well_type_id = (int)dtm.getValueAt(row, 6);
 	    sorted_response[row][2] = (int)dtm.getValueAt(row, 6);
-	    String replicates = (String)dtm.getValueAt(row, 7);
-	    String target = (String)dtm.getValueAt(row, 8);
+	    int replicates = (int)dtm.getValueAt(row, 7);
+	    int target = (int)dtm.getValueAt(row, 8);
 	    int sample_id = 0;
 	    if(dtm.getValueAt(row, 9) != null){
 		sample_id = (int)dtm.getValueAt(row, 9);

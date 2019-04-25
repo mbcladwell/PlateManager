@@ -23,12 +23,16 @@ public class Session {
   private Long sessionID;
   private String workingDir;
   private String tempDir;
+    private String help_url_prefix;  
 
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   private static final long serialVersionUID = 1L;
 
-  public Session() {}
+  public Session() {
+
+      help_url_prefix = new String("http://labsolns.com/software/");
+  }
 
   public void setUserID(int _id) {
     userID = _id;
@@ -126,4 +130,7 @@ public class Session {
   public String getWorkingDir() {
     return workingDir;
   }
+    public String getHelpURLPrefix(){
+	return help_url_prefix;
+    }
 }

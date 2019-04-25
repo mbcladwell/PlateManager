@@ -245,7 +245,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     }
 
     if (e.getSource() == helpButton) {
-	openWebpage(URI.create("http://labsolns.com/layouts"));
+	openWebpage(URI.create(session.getHelpURLPrefix() + "layouts"));
     }
     }
     

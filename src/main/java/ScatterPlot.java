@@ -88,7 +88,7 @@ public class ScatterPlot extends JFrame {
     public ScatterPlot(DialogMainFrame _dmf, int _assay_run_id) {
 	super("ScatterPlot");
 	setSize(800, 600);
-	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	this.setLayout(new BorderLayout());
 	this.dmf = _dmf;
 	assay_run_id = _assay_run_id;
@@ -158,7 +158,7 @@ public class ScatterPlot extends JFrame {
     panel2.add(label, c);
 
 
-    thresholdField = new JTextField(Double.toString(threshold), 20);
+    thresholdField = new JTextField(Double.toString(threshold), 10);
     c.gridx = 3;
     c.gridy = 0;
     c.gridheight = 1;
@@ -177,7 +177,8 @@ public class ScatterPlot extends JFrame {
     c.gridy = 0;
     c.gridheight = 1;
     c.gridwidth = 1;
-    c.anchor = GridBagConstraints.LINE_START;
+    c.anchor = GridBagConstraints.LINE_END;
+    c.fill = GridBagConstraints.HORIZONTAL;
     panel2.add(genHitsBtn, c);
     genHitsBtn.addActionListener(new ActionListener() { 
         public void actionPerformed(ActionEvent evt) {
@@ -482,10 +483,10 @@ public class ScatterPlot extends JFrame {
 	sorted_response_unknowns_only = selected_response.getSortedResponseUnknownsOnly();
 	
 	num_hits = selected_response.getHitsAboveThreshold(threshold);
-	LOGGER.info("max " + max_response);
-	LOGGER.info("mean_bkgrnd " + mean_bkgrnd);
-	LOGGER.info("mean_neg_3_sd " + mean_neg_3_sd);
-	LOGGER.info("num_hits " + num_hits);
+	//LOGGER.info("max " + max_response);
+	//LOGGER.info("mean_bkgrnd " + mean_bkgrnd);
+	//LOGGER.info("mean_neg_3_sd " + mean_neg_3_sd);
+	//LOGGER.info("num_hits " + num_hits);
 	
 	//	LOGGER.info("num_hits: " + Integer.toString(num_hits));
 	//	    slider.setDoubleMinimum(min_response);
