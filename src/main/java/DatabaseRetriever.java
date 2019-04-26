@@ -725,8 +725,13 @@ LOGGER.info("pstmt: " + pstmt);
     return output;
   }
 
-
-    
+    /**
+     * Called from DialogReformatPlateSet
+     * @param _source_id
+     * @param _source_reps
+     * @param _target_reps
+     */
+  
     public ComboItem[] getLayoutDestinationsForSourceID(int _source_id, int  _source_reps, int _target_reps) {
     ComboItem[] output = null;
     Array results = null;

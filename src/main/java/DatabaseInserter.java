@@ -919,7 +919,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 	  + Integer.parseInt((String)data[i][0])
 	  + ", "
 	  + Integer.parseInt((String)data[i][1])
-	  + ", '1', 'a'), ";
+	  + ", 1, 1), ";
     }
 
 	String sql_statement2 = sql_statement2_pre.substring(0, sql_statement2_pre.length() - 2) + ";";
