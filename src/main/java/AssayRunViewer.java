@@ -55,7 +55,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     
     
   public AssayRunViewer(DialogMainFrame _dmf) {
-    this.setTitle("Assay Run || Hit List Viewer");
+    this.setTitle("Assay Run Viewer");
     this.dmf = _dmf;
     this.session = dmf.getSession();
     project_id = session.getProjectID();
