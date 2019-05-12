@@ -44,7 +44,7 @@ public class DatabaseManager {
       Class.forName("org.postgresql.Driver");
 
 // String url = "jdbc:postgresql://localhost/postgres";
-      String url = "jdbc:postgresql://192.168.1.7/pmdb";
+      String url = "jdbc:postgresql://192.168.1.11/pmdb";
       Properties props = new Properties();
       props.setProperty("user", "pm_admin");
       props.setProperty("password", "welcome");
