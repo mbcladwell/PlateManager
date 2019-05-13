@@ -3,7 +3,10 @@ package pm;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.logging.*;
-
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 /**
  * Upon insert session gains a timestamp
  *
@@ -30,6 +33,23 @@ public class Session {
   private static final long serialVersionUID = 1L;
 
   public Session() {
+try (InputStream input = Session.class.getClassLoader().getResourceAsStream("limsnucleus.properties")) {
+
+            Properties prop = new Properties();
+
+            // load a properties file
+            prop.load(input);
+
+            // get the property value and print it out
+            System.out.println(prop.getProperty("pgip"));
+            System.out.println(prop.getProperty("db.name"));
+            System.out.println(prop.getProperty("base.help.url"));
+            System.out.println(prop.getProperty("username"));
+            System.out.println(prop.getProperty("password"));
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
 
       help_url_prefix = new String("http://labsolns.com/software/");
   }
