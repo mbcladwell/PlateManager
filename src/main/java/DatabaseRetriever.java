@@ -728,8 +728,8 @@ LOGGER.info("pstmt: " + pstmt);
     /**
      * Called from DialogReformatPlateSet
      * @param _source_id
-     * @param _source_reps
-     * @param _target_reps
+     * @param _source_reps   not needed
+     * @param _target_reps   not needed
      */
   
     public ComboItem[] getLayoutDestinationsForSourceID(int _source_id, int  _source_reps, int _target_reps) {
@@ -738,14 +738,19 @@ LOGGER.info("pstmt: " + pstmt);
     int source_id = _source_id;
     int source_reps = _source_reps;
     int target_reps = _target_reps;
+    String replication = String.valueOf(source_reps) + "S" + String.valueOf(target_reps) + "T";
+    LOGGER.info(replication);
     ArrayList<ComboItem> combo_items = new ArrayList<ComboItem>();
     try {
       PreparedStatement pstmt =
           conn.prepareStatement(
-              "select id, sys_name, name, descr FROM plate_layout_name, layout_source_dest WHERE layout_source_dest.src = ? AND layout_source_dest.dest = plate_layout_name.id AND plate_layout_name.replicates = ? AND plate_layout_name.targets = ?;");
+        "select id, sys_name, name, descr FROM plate_layout_name, layout_source_dest WHERE layout_source_dest.src = ? AND layout_source_dest.dest = plate_layout_name.id AND plate_layout_name.descr=?;");
+      				
+      //        "select id, sys_name, name, descr FROM plate_layout_name, layout_source_dest WHERE layout_source_dest.src = ? AND layout_source_dest.dest = plate_layout_name.id AND plate_layout_name.replicates = ? AND plate_layout_name.targets = ?;");
+      
       pstmt.setInt(1, source_id);
-      pstmt.setInt(2, source_reps);
-      pstmt.setInt(3, target_reps);
+      pstmt.setString(2, replication);
+      // pstmt.setInt(3, target_reps);
       
       ResultSet rs = pstmt.executeQuery();
       

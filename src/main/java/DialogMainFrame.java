@@ -96,7 +96,7 @@ public class DialogMainFrame extends JFrame {
     
   public void showPlateSetTable(String _project_sys_name) {
       int project_id = Integer.parseInt(_project_sys_name.substring(4));
-      LOGGER.info("project_id: " + project_id);
+     
       //  plate_set_card = new PlateSetPanel(this, dbm.getPlateSetTableData(_project_sys_name), _project_sys_name);
       plate_set_card = new PlateSetPanel(this, dbr.getDMFTableData(project_id, DialogMainFrame.PLATESET), _project_sys_name);
 

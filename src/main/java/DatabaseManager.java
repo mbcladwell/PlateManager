@@ -284,6 +284,8 @@ public class DatabaseManager {
     } catch (SQLException sqle) {
       LOGGER.severe("Failed to create plate set: " + sqle);
     }
+
+ this.getDmf().showPlateSetTable(this.getDmf().getSession().getProjectSysName());    
   }
   /**
    * ******************************************************************

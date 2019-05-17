@@ -408,7 +408,7 @@ javax.swing.border.TitledBorder dest = BorderFactory.createTitledBorder("Destina
     c.anchor = GridBagConstraints.LINE_END;
     pane3.add(label, c);
  
-    target_reps = new ComboItem[]{ new ComboItem(1,"1"), new ComboItem(2,"2"), new ComboItem(4,"4")};
+    target_reps = new ComboItem[]{ new ComboItem(4,"4")};
 target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
     
     targetRepsList = new JComboBox<ComboItem>(target_reps);
@@ -431,7 +431,7 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
     c.anchor = GridBagConstraints.LINE_END;
     pane3.add(label, c);
  
-    source_layout = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,1,1);
+    source_layout = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,1,4);
     //layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes );
 
     
@@ -522,9 +522,9 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
 	 switch(number_of_sample_replicates){
 	 case 1:
 	    
-	      targetRepsList.setModel(new DefaultComboBoxModel<ComboItem>( new ComboItem[]{ new ComboItem(1,"1"), new ComboItem(2,"2"), new ComboItem(4,"4")}  ));
+	      targetRepsList.setModel(new DefaultComboBoxModel<ComboItem>( new ComboItem[]{ new ComboItem(4,"4")}  ));
 	      targetRepsList.setSelectedIndex(0);
-	      targetRepsList.setEnabled(true);
+	      targetRepsList.setEnabled(false);
 	      	ComboItem[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,number_of_sample_replicates,((ComboItem)targetRepsList.getSelectedItem()).getKey());
 		//layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes  );
 		//layoutList.setModel(layout_names_list_model);
@@ -532,7 +532,7 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
 	      sourceLayoutLabel.setText(layoutTypes[0].toString());
 	     break;
 	 case 2:
-	    targetRepsList.setModel(new DefaultComboBoxModel<ComboItem>( new ComboItem[]{ new ComboItem(1,"1"), new ComboItem(2,"2")}  ));
+	    targetRepsList.setModel(new DefaultComboBoxModel<ComboItem>( new ComboItem[]{ new ComboItem(2,"2"), new ComboItem(4,"4")}  ));
 	      targetRepsList.setSelectedIndex(0);
 	      targetRepsList.setEnabled(true);
 	       layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,number_of_sample_replicates,((ComboItem)targetRepsList.getSelectedItem()).getKey());
@@ -542,10 +542,10 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
 	      sourceLayoutLabel.setText(layoutTypes[0].toString());
 	     break;
 	 case 4:
-	     targetRepsList.setModel(new DefaultComboBoxModel<ComboItem>( new ComboItem[]{ new ComboItem(1,"1")}  ));
+	     targetRepsList.setModel(new DefaultComboBoxModel<ComboItem>( new ComboItem[]{ new ComboItem(1,"1"), new ComboItem(2,"2") }  ));
 	  
 	     targetRepsList.setSelectedIndex(0);
-	      targetRepsList.setEnabled(false);
+	      targetRepsList.setEnabled(true);
 	       layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,number_of_sample_replicates,((ComboItem)targetRepsList.getSelectedItem()).getKey());
 	       //layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes  );
 	       //layoutList.setModel(layout_names_list_model);
@@ -558,31 +558,11 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
      }
 
          if (e.getSource() == targetRepsList) {
-
-	     	 int number_of_target_replicates = ((ComboItem)targetRepsList.getSelectedItem()).getKey();
-	 switch(number_of_target_replicates){
-	 case 1:
 	    
 	      	ComboItem[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,((ComboItem)sampleRepsList.getSelectedItem()).getKey(),((ComboItem)targetRepsList.getSelectedItem()).getKey());
-		//layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes  );
-		//layoutList.setModel(layout_names_list_model);
-		//layoutList.setSelectedIndex(0);
+	
 	      sourceLayoutLabel.setText(layoutTypes[0].toString());
-	     break;
-	 case 2:
-	     layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,((ComboItem)sampleRepsList.getSelectedItem()).getKey(),((ComboItem)targetRepsList.getSelectedItem()).getKey());
-	     //layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes );
-	     // layoutList.setModel(layout_names_list_model);
-	     // layoutList.setSelectedIndex(0);
-	      sourceLayoutLabel.setText(layoutTypes[0].toString());
-	     break;
-	 case 4:
-	     layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getLayoutDestinationsForSourceID(old_plate_layout_name_id,((ComboItem)sampleRepsList.getSelectedItem()).getKey(),((ComboItem)targetRepsList.getSelectedItem()).getKey());
-	     //layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutTypes  );
-	     // layoutList.setModel(layout_names_list_model);
-	     // layoutList.setSelectedIndex(0);
-	      sourceLayoutLabel.setText(layoutTypes[0].toString());
-	     break;
+	 
 
      }
 	 }
@@ -599,4 +579,4 @@ target_reps_list_model =  new DefaultComboBoxModel<ComboItem>( target_reps );
      }*/
       }
 
-      }
+      
