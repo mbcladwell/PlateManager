@@ -15,7 +15,8 @@ import java.util.Properties;
 public class Session {
 
   private int userID;
-  private String userName;
+  private String user_name;
+    private String password;
   private int userGroupID;
   private String userGroup; // admin, superuser, user
   private int projectID;
@@ -27,7 +28,11 @@ public class Session {
   private String workingDir;
   private String tempDir;
     private String help_url_prefix;  
-
+    private String postgres_ip;
+    private String db_name;
+   
+    
+    
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   private static final long serialVersionUID = 1L;
@@ -42,11 +47,15 @@ try (InputStream input = Session.class.getClassLoader().getResourceAsStream("lim
 
             // get the property value and print it out
             System.out.println(prop.getProperty("pgip"));
+	    postgres_ip = prop.getProperty("pgip");
             System.out.println(prop.getProperty("db.name"));
+	    db_name = prop.getProperty("db.name");
             System.out.println(prop.getProperty("base.help.url"));
+	    help_url_prefix = prop.getProperty("base.help.url");
             System.out.println(prop.getProperty("username"));
-            System.out.println(prop.getProperty("password"));
-
+	    user_name = prop.getProperty("username");
+	    System.out.println(prop.getProperty("password"));
+	    password = prop.getProperty("password");
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -63,11 +72,11 @@ try (InputStream input = Session.class.getClassLoader().getResourceAsStream("lim
   }
 
   public void setUserName(String _n) {
-    userName = _n;
+    user_name = _n;
   }
 
   public String getUserName() {
-    return userName;
+    return user_name;
   }
 
   public void setUserGroup(String _s) {
