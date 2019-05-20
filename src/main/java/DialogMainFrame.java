@@ -24,11 +24,10 @@ public class DialogMainFrame extends JFrame {
   private JPanel plate_card;
   private JPanel well_card;
 
-  private static final Session session = new Session();
   private static Utilities utils;
   private DatabaseManager dbm;
   private DatabaseRetriever dbr;
-    
+    private static Session session;
  
   private Long sessionID;
 
@@ -39,6 +38,7 @@ public class DialogMainFrame extends JFrame {
 
  
   public DialogMainFrame() throws SQLException {
+  session = new Session(this);
     dbm = new DatabaseManager(this);
     dbr = new DatabaseRetriever(dbm);
     utils = new Utilities(this);
@@ -49,16 +49,8 @@ public class DialogMainFrame extends JFrame {
     try {
       ImageIcon img = new ImageIcon(this.getClass().getResource("images/mwplate.png"));
       this.setIconImage(img.getImage());
-      session.setSessionID(dbm.initializeSession("admin", "welcome"));
-      session.setUserName("admin");
-      session.setUserID(1);
-      session.setUserGroupID(1);
-      session.setUserGroup("pm_admin");
-      session.setTempDir((new File(System.getProperty("java.io.tmpdir")).toString()));
-      //LOGGER.info("Temporary directory set to: " + session.getTempDir());
-      session.setWorkingDir((new File(System.getProperty("user.dir")).toString()));
-      //LOGGER.info("Working directory set to: " + session.getWorkingDir());
-
+      session.setSessionID(dbm.initializeSession(session.getUserName(), session.getPassword()));
+     
     } catch (SQLException sqle) {
       System.out.println("Invalid password");
     }

@@ -22,21 +22,21 @@ public class DialogLogin extends JDialog {
   final DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
   private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-  private DatabaseManager dbm;
+    private Session s;
   
-  public DialogLogin() {
-
+    public DialogLogin  ( Session _s, String _string, ModalityType _m) {
+	s = _s;
+	
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
-     this.dbm = dbm;
-    JPanel pane = new JPanel(new GridBagLayout());
+      JPanel pane = new JPanel(new GridBagLayout());
     pane.setBorder(BorderFactory.createRaisedBevelBorder());
 
     GridBagConstraints c = new GridBagConstraints();
     // Image img = new
     // ImageIcon(DialogAddProject.class.getResource("../resources/mwplate.png")).getImage();
     // this.setIconImage(img);
-    this.setTitle("Login to Plate Manager");
+    this.setTitle("Login to LIMS*Nucleus");
     // c.gridwidth = 2;
 
     label = new JLabel("Date:", SwingConstants.RIGHT);
@@ -91,10 +91,8 @@ public class DialogLogin extends JDialog {
     okButton.addActionListener(
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-
-            //DatabaseManager dm = new DatabaseManager();
-            //dbm.persistObject(new Project(descriptionField.getText(), ownerField.getText(), nameField.getText()));
-
+	      s.setUserName(userIDField.getText());
+	      s.setPassword(passwordField.getText());
             dispose();
           }
         }));
