@@ -14,6 +14,9 @@ import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.net.*;
+import java.awt.Desktop;
+
 import javax.swing.JOptionPane;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -350,7 +353,7 @@ public class DialogAddPlateSetData extends JDialog
     helpButton.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-    
+	      openWebpage(URI.create(dmf.getSession().getHelpURLPrefix() + "importassaydata"));
           }
         });
     helpButton.setSize(10, 10);
@@ -472,4 +475,27 @@ public class DialogAddPlateSetData extends JDialog
   public void changedUpdate(DocumentEvent e) {
     // Plain text components don't fire these events.
   }
+
+public static boolean openWebpage(URI uri) {
+    Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+    if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+        try {
+            desktop.browse(uri);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    return false;
+}
+
+    public static boolean openWebpage(URL url) {
+    try {
+        return openWebpage(url.toURI());
+    } catch (URISyntaxException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
 }
