@@ -859,6 +859,9 @@ if(num_of_plate_ids*format_id!=table.size()-1){
       int _hit_list_id,
       int _source_plate_set_id) {
 
+      int source_plate_set_id = _source_plate_set_id;
+      int hit_list_id = _hit_list_id;
+      int dest_plate_set_id =0;
     try {
       int project_id = dmf.getSession().getProjectID();
       int plate_format_id = _plate_format_id;
@@ -866,9 +869,9 @@ if(num_of_plate_ids*format_id!=table.size()-1){
       int plate_layout_id = _plate_layout_id;
          
 
-      String insertSql = "SELECT new_plate_set ( ?, ?, ?, ?, ?, ?, ?, ?);";
+      String insertSql1 = "SELECT new_plate_set ( ?, ?, ?, ?, ?, ?, ?, ?);";
       PreparedStatement insertPs =
-          conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+          conn.prepareStatement(insertSql1, Statement.RETURN_GENERATED_KEYS);
       insertPs.setString(1, _description);
       insertPs.setString(2, _name);
       insertPs.setInt(3, Integer.valueOf(_num_plates));
@@ -876,23 +879,42 @@ if(num_of_plate_ids*format_id!=table.size()-1){
       insertPs.setInt(5, plate_type_id);
       insertPs.setInt(6, project_id);
       insertPs.setInt(7, plate_layout_id);    
-      insertPs.setBoolean(8, false);
-
+      insertPs.setBoolean(8, false);      
       // LOGGER.info(insertPs.toString());
       int rowsAffected   = insertPs.executeUpdate();
        ResultSet rsKey = insertPs.getGeneratedKeys();
        rsKey.next();
-       int dest_plate_set_id = rsKey.getInt(1);
+       dest_plate_set_id = rsKey.getInt(1);
+    LOGGER.info("dest_plate_set_id: " + dest_plate_set_id);
        insertPs.close();
       //  SELECT new_plate_set ( 'descrip', 'myname', '10', '96', 'assay', 0, 't')
     } catch (SQLException sqle) {
       LOGGER.severe("Failed to create plate set: " + sqle);
     }
 
+    LOGGER.info("source_plate_set_id: " + source_plate_set_id);
+    LOGGER.info("dest_plate_set_id: " + dest_plate_set_id);
+    LOGGER.info("hit_list_id: " + hit_list_id);
+    
     //plate set has been registered, new plates/empty wells created
     //now copy samples into newly created (empty) plate
     //  SELECT rearray_transfer_samples(source_plate_set, dest_plate_set, hit_list)
-
+  try {
+      String insertSql2 = "SELECT rearray_transfer_samples( ?, ?, ?);";
+      PreparedStatement insertPs =
+          conn.prepareStatement(insertSql2, Statement.RETURN_GENERATED_KEYS);
+      insertPs.setInt(1, source_plate_set_id);
+      insertPs.setInt(2, dest_plate_set_id);
+      insertPs.setInt(3, hit_list_id);
+   int rowsAffected   = insertPs.executeUpdate();
+       ResultSet rsKey = insertPs.getGeneratedKeys();
+       rsKey.next();
+       insertPs.close();
+     
+  } catch (SQLException sqle) {
+      LOGGER.severe("Failed to create plate set: " + sqle);
+    }
+    
     
   }
     /**
