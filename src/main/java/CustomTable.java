@@ -58,12 +58,19 @@ public class CustomTable extends JTable {
     }
 
     for (int i = 1; i <= rowCount; i++) { //start at 1; 0 holds the header
-      for (int j = 0; j < colCount; j++) {
-        results[i][j] = tableModel.getValueAt(selectedRows.get(i-1), j).toString();
-      }
+	for (int j = 0; j < colCount; j++) {
+	    try{
+		results[i][j] = tableModel.getValueAt(selectedRows.get(i-1), j).toString();  
+		
+	    }catch(NullPointerException e){
+		
+	    }
+
+	    
+	}
     }
-    return results;
-  }
+	return results;
+    }
 
   class SharedListSelectionHandler implements ListSelectionListener {
     public void valueChanged(ListSelectionEvent e) {

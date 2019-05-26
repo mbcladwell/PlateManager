@@ -881,11 +881,13 @@ if(num_of_plate_ids*format_id!=table.size()-1){
       insertPs.setInt(7, plate_layout_id);    
       insertPs.setBoolean(8, false);      
       // LOGGER.info(insertPs.toString());
-      int rowsAffected   = insertPs.executeUpdate();
-       ResultSet rsKey = insertPs.getGeneratedKeys();
-       rsKey.next();
-       dest_plate_set_id = rsKey.getInt(1);
-    LOGGER.info("dest_plate_set_id: " + dest_plate_set_id);
+      insertPs.execute();  //executeUpdate() expects no returns
+      ResultSet resultSet = insertPs.getResultSet();
+      resultSet.next();
+      dest_plate_set_id = resultSet.getInt("new_plate_set");
+
+      LOGGER.info("dest_plate_set_id: " + dest_plate_set_id);
+
        insertPs.close();
       //  SELECT new_plate_set ( 'descrip', 'myname', '10', '96', 'assay', 0, 't')
     } catch (SQLException sqle) {

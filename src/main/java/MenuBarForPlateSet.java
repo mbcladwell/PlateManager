@@ -100,6 +100,29 @@ public class MenuBarForPlateSet extends JMenuBar {
         });
     utilitiesMenu.add(menuItem);
 
+    menuItem = new JMenuItem("Worklist");
+    menuItem.setMnemonic(KeyEvent.VK_W);
+    menuItem.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+	    if(!plate_set_table.getSelectionModel().isSelectionEmpty()){
+		
+		Object[][] results = plate_set_table.getSelectedRowsAndHeaderAsStringArray();
+		try{
+	       	int worklist_id = Integer.parseInt((String)results[1][7]); 
+		}catch(NumberFormatException nfe){
+		    JOptionPane.showMessageDialog(dmf, "Plate Set must have an associated worklist!");   
+		}
+	     
+	    }
+	    else{
+	      JOptionPane.showMessageDialog(dmf, "Select a Plate Set with an associated worklist!");	      
+	    }
+          }
+        });
+    utilitiesMenu.add(menuItem);
+
+    
     menuItem = new JMenuItem("Export", KeyEvent.VK_E);
     // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
     menuItem.getAccessibleContext().setAccessibleDescription("Export as .csv.");
