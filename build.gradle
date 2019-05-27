@@ -33,8 +33,8 @@ dependencies {
 	compile(group: 'org.postgresql', name: 'postgresql', version: '42.2.5')
 
 	//Help system
-	compile 'javax.help:javahelp:2.0.05'
-	implementation 'javax.help:javahelp:2.0.05'
+//	compile 'javax.help:javahelp:2.0.05'
+//	implementation 'javax.help:javahelp:2.0.05'
 compile 'javax.swing:jlfgr:1.0'
 implementation 'javax.swing:jlfgr:1.0'
 
@@ -55,19 +55,19 @@ compile  'org.apache.poi:ooxml-schemas:1.4'
 implementation   'org.apache.poi:ooxml-schemas:1.4'
 
 
-       compile 'net.stihie:bllm:0.1'
-    implementation 'net.stihie:bllm:0.1'
-    compile 'javax.swing:jnlp:1.0'
-    implementation 'javax.swing:jnlp:1.0'
+//       compile 'net.stihie:bllm:0.1'
+ //   implementation 'net.stihie:bllm:0.1'
+//    compile 'javax.swing:jnlp:1.0'
+//    implementation 'javax.swing:jnlp:1.0'
     
 //JSON parsing
 compile 'com.google.code.gson:gson:2.8.5'
 
 //QR code library
-        compile 'com.google.zxing:core:3.3.3'
-        implementation 'com.google.zxing:core:3.3.3'
-        compile 'com.google.zxing:javase:3.3.3'
-        implementation 'com.google.zxing:javase:3.3.3'
+//        compile 'com.google.zxing:core:3.3.3'
+ //       implementation 'com.google.zxing:core:3.3.3'
+ //       compile 'com.google.zxing:javase:3.3.3'
+ //       implementation 'com.google.zxing:javase:3.3.3'
 	
 }
 
@@ -220,7 +220,7 @@ task prep {
 	   // commandLine 'psql','-Upm_admin', '-h192.168.1.7', '-dpmdb'
 	//}
 	exec{
-	    commandLine 'gnome-terminal','--command=emacs &'
+	    commandLine 'gnome-terminal','--command=emacs'
 	}
    
     }

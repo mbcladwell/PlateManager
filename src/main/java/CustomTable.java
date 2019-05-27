@@ -72,6 +72,14 @@ public class CustomTable extends JTable {
 	return results;
     }
 
+    /**
+     * Used to select all rows when querying a worklist
+     */
+    public void setSelectedRows( Vector<Integer> _selected_rows) {
+	
+	selectedRows = _selected_rows;
+    }
+
   class SharedListSelectionHandler implements ListSelectionListener {
     public void valueChanged(ListSelectionEvent e) {
       listSelectionModel.removeListSelectionListener(sharedListSelectionHandler);

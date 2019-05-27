@@ -1,10 +1,10 @@
 package pm;
 
-import bllm.*;
+//import bllm.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.logging.*;
-import javax.help.*;
+//import javax.help.*;
 import javax.swing.*;
 import javax.swing.JComponent.*;
 
@@ -24,11 +24,11 @@ public class HelpMenu extends JMenu {
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            new OpenHelpDialog();
+	      //            new OpenHelpDialog();
           }
         });
     this.add(menuItem);
-
+    /*
     menuItem = new JMenuItem("License", KeyEvent.VK_L);
     menuItem.addActionListener(
         new ActionListener() {
@@ -38,7 +38,8 @@ public class HelpMenu extends JMenu {
           }
         });
     this.add(menuItem);
-
+    */
+    
     menuItem = new JMenuItem("About LIMS*Nucleus", KeyEvent.VK_A);
     // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
 

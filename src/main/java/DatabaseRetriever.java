@@ -804,27 +804,28 @@ int plate_layout_name_id = _plate_layout_name_id;
 
       public CustomTable getSampleReplicatesLayout(int _plate_layout_name_id) {
       CustomTable table = null;
-int plate_layout_name_id = _plate_layout_name_id;
-    try {
-      PreparedStatement pstmt =
-          conn.prepareStatement(
-              "SELECT well_by_col, replicates  FROM plate_layout WHERE plate_layout_name_id = ? ORDER BY well_by_col;");
+      int plate_layout_name_id = _plate_layout_name_id;
+      try {
+	  PreparedStatement pstmt =
+	      conn.prepareStatement(
+				    "SELECT well_by_col, replicates  FROM plate_layout WHERE plate_layout_name_id = ? ORDER BY well_by_col;");
 
-      pstmt.setInt(1, plate_layout_name_id);
-      ResultSet rs = pstmt.executeQuery();
-
+	  pstmt.setInt(1, plate_layout_name_id);
+	  ResultSet rs = pstmt.executeQuery();
+	  
       table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
-       LOGGER.info("Got plate table " + table);
+      // LOGGER.info("Got plate table " + table);
       rs.close();
       pstmt.close();
     
 
-    } catch (SQLException sqle) {
- LOGGER.severe("Failed to retrieve plate_layout table: " + sqle);
-    }
-    return table;
-  }
+      } catch (SQLException sqle) {
+	  LOGGER.severe("Failed to retrieve plate_layout table: " + sqle);
+      }
+      return table;
+      }
 
+        
       public CustomTable getTargetReplicatesLayout(int _plate_layout_name_id) {
       CustomTable table = null;
 int plate_layout_name_id = _plate_layout_name_id;
@@ -848,7 +849,7 @@ int plate_layout_name_id = _plate_layout_name_id;
     return table;
   }
 
-
+    
     public int getPlateLayoutNameIDForPlateSetID(int _plate_set_id){
 
 	int plate_set_id = _plate_set_id;
@@ -875,6 +876,60 @@ int plate_layout_name_id = _plate_layout_name_id;
 	}
 
 	return plate_layout_name_id;
+    }
+
+
+    
+
+    public String[][] getWorklist(int _worklist_id){
+
+	int worklist_id = _worklist_id;
+	CustomTable ct;
+	String sqlstring = "SELECT sample_id, source_plate, source_well, dest_plate, dest_well FROM worklists WHERE rearray_pairs_id = ?;";
+	//LOGGER.info("SQL : " + sqlstring);
+
+	try {
+	    PreparedStatement preparedStatement =
+		conn.prepareStatement(sqlstring, Statement.RETURN_GENERATED_KEYS);
+	    preparedStatement.setInt(1, worklist_id);
+	    preparedStatement.executeQuery(); // executeUpdate expects no returns!!!
+	    ResultSet rs = preparedStatement.getResultSet();
+	     ResultSetMetaData metaData = rs.getMetaData();
+
+    // names of columns
+    Vector<String> columnNames = new Vector<String>();
+    int columnCount = metaData.getColumnCount();
+    for (int column = 1; column <= columnCount; column++) {
+        columnNames.add(metaData.getColumnName(column));
+    }
+
+    //set up a row counter which will generate a vector of selected row indices
+    //used to select all rows for export to a spreadsheet
+    Integer row_counter = 0;
+    Vector<Integer> selected_rows = new Vector<Integer>();
+    // data of the table
+    Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+    while (rs.next()) {
+        Vector<Object> vector = new Vector<Object>();
+        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+            vector.add(rs.getObject(columnIndex));
+        }
+        data.add(vector);
+	selected_rows.add(row_counter);
+	row_counter = row_counter + 1;
+    }
+
+    ct = new CustomTable( dmf, new DefaultTableModel(data, columnNames));
+    ct.setSelectedRows(selected_rows);
+
+    return ct.getSelectedRowsAndHeaderAsStringArray();
+    
+	    // LOGGER.info("resultset: " + result);
+
+	} catch (SQLException sqle) {
+	    LOGGER.warning("SQLE at getPlateLayoutNameIDforPlateSetID: " + sqle);
+	}
+	return null;
     }
 
 

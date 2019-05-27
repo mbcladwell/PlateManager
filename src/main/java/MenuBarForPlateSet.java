@@ -105,11 +105,20 @@ public class MenuBarForPlateSet extends JMenuBar {
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-	    if(!plate_set_table.getSelectionModel().isSelectionEmpty()){
-		
-		Object[][] results = plate_set_table.getSelectedRowsAndHeaderAsStringArray();
+	      if(!plate_set_table.getSelectionModel().isSelectionEmpty()){
+		  Object[][] results = plate_set_table.getSelectedRowsAndHeaderAsStringArray();
+  
 		try{
-	       	int worklist_id = Integer.parseInt((String)results[1][7]); 
+	       	int worklist_id = Integer.parseInt((String)results[1][7]);
+		Object[][] worklist = dmf.getDatabaseManager().getDatabaseRetriever().getWorklist(worklist_id);
+		POIUtilities poi = new POIUtilities(dmf);
+		poi.writeJTableToSpreadsheet("Plate Sets", worklist);
+		try{
+		Desktop d = Desktop.getDesktop();
+		d.open(new File("./Writesheet.xlsx"));
+		}
+		catch (IOException ioe) {
+		}
 		}catch(NumberFormatException nfe){
 		    JOptionPane.showMessageDialog(dmf, "Plate Set must have an associated worklist!");   
 		}
