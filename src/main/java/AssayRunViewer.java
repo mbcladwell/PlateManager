@@ -188,16 +188,28 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     }
 
     if (e.getSource() == exportAssayRunData) {
+
+
+ if(!assay_runs_table.getSelectionModel().isSelectionEmpty()){
+		 
 	Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(assay_runs_table);
 	if(results.length>1){
-	//   LOGGER.info("hit list table: " + results);
-	       POIUtilities poi = new POIUtilities(dmf);
-            poi.writeJTableToSpreadsheet("Assay Runs", results);
-            try {
-              Desktop d = Desktop.getDesktop();
-              d.open(new File("./Writesheet.xlsx"));
-            } catch (IOException ioe) {
-            }	 
+
+		try{
+		 String assay_runs_sys_name =  assay_runs_table.getModel().getValueAt(0, 0).toString();
+		 int  assay_runs_id = Integer.parseInt(assay_runs_sys_name.substring(3));
+
+
+		Object[][] assay_run_data = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRunData(assay_runs_id);
+		POIUtilities poi = new POIUtilities(dmf);
+		poi.writeJTableToSpreadsheet("Assay Run Data for " + assay_runs_sys_name, assay_run_data);
+		
+		Desktop d = Desktop.getDesktop();
+		d.open(new File("./Writesheet.xlsx"));
+		
+		}catch(IOException ioe){
+		    JOptionPane.showMessageDialog(dmf, "Assay Run has no data!");   
+		}    
 	
 	}else{
 	    JOptionPane.showMessageDialog(dmf, "Select one or more  Assay Runs!");	
@@ -205,7 +217,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     	
     }
 
-
+    }
     
         if (e.getSource() == viewAssayRun) {
     	    if(!assay_runs_table.getSelectionModel().isSelectionEmpty()){

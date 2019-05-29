@@ -86,7 +86,7 @@ public class ScatterPlot extends JFrame {
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     public ScatterPlot(DialogMainFrame _dmf, int _assay_run_id) {
-	super("ScatterPlot");
+	super("Scatter Plot for AR-" + String.valueOf(_assay_run_id));
 	setSize(800, 600);
 	//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	this.setLayout(new BorderLayout());
@@ -260,9 +260,9 @@ public class ScatterPlot extends JFrame {
         public void actionPerformed(ActionEvent evt) {
 	    num_hits = Integer.valueOf(numHitsField.getText()).intValue();
 	    //sorted_response_unknowns_only = selected_response.getSortedResponseUnknownsOnly();
-	    LOGGER.info("num_hits: " + num_hits);
-	    LOGGER.info("sorted_response.length: " + sorted_response_unknowns_only.length);	    
-	    LOGGER.info("sorted_response_unk_only[num_hits][0]: " + sorted_response_unknowns_only[num_hits][0]);
+	    // LOGGER.info("num_hits: " + num_hits);
+	    //LOGGER.info("sorted_response.length: " + sorted_response_unknowns_only.length);	    
+	    //LOGGER.info("sorted_response_unk_only[num_hits][0]: " + sorted_response_unknowns_only[num_hits][0]);
        	
 	    setThreshold(sorted_response_unknowns_only[num_hits][0]);	    
             

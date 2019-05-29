@@ -42,12 +42,27 @@ public class Session {
 
   public Session( DialogMainFrame _dmf) {
       dmf = _dmf;
-try (InputStream input = Session.class.getClassLoader().getResourceAsStream("limsnucleus.properties")) {
+      //try (
+
+
+    //the base folder is ./, the root of the main.properties file  
+
+    //load all the properties from this file
+    //prop.load(file);
+
+     //InputStream input = Session.class.getClassLoader().getResourceAsStream("./limsnucleus.properties")
+
+     //)
+    try{
+    String path = "./limsnucleus.properties";
+
+    //load the file handle for main.properties
+     FileInputStream file = new FileInputStream(path);
 
             Properties prop = new Properties();
 
             // load a properties file
-            prop.load(input);
+            prop.load(file);
 
             // get the property value and print it out
             System.out.println(prop.getProperty("pgip"));
@@ -66,7 +81,7 @@ try (InputStream input = Session.class.getClassLoader().getResourceAsStream("lim
 	  
 	    temp_dir = new File(System.getProperty("java.io.tmpdir")).toString();
 	    working_dir = new File(System.getProperty("user.dir")).toString();
-	    
+	      file.close();
 	 
         } catch (IOException ex) {
             ex.printStackTrace();

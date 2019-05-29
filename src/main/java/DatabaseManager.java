@@ -15,7 +15,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
-
+import org.postgresql.Driver;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;

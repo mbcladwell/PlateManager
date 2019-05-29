@@ -1,1 +1,0 @@
-java -cp ~/syncd/prog/jhelpdev-0.63/jhelpdev/jhelpdev.jar:~/syncd/prog/jhelpdev-0.63/jhelpdev/jars/jhall.jar:~/syncd/prog/jhelpdev-0.63/jhelpdev/jars/xmlenc.jar:~/syncd/prog/plate-manager/jws/pm/resources/pmhelpset -jar ~/syncd/prog/jhelpdev-0.63/jhelpdev/jhelpdev.jar ./pmhelp.xml

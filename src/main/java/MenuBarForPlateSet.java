@@ -16,6 +16,11 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.JFileChooser;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.util.Vector;
+
 
 public class MenuBarForPlateSet extends JMenuBar {
 
@@ -100,6 +105,41 @@ public class MenuBarForPlateSet extends JMenuBar {
         });
     utilitiesMenu.add(menuItem);
 
+    menuItem = new JMenuItem("Import hit list");
+    menuItem.setMnemonic(KeyEvent.VK_H);
+    menuItem.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+	      JFileChooser fileChooser = new JFileChooser();
+	      int returnVal = fileChooser.showOpenDialog(dmf);
+
+	      if (returnVal == JFileChooser.APPROVE_OPTION) {
+		  java.io.File file = fileChooser.getSelectedFile();
+		  Vector<Integer> s_ids = new Vector<Integer>();
+		  BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(
+					file));
+			String line = reader.readLine();
+			line = reader.readLine(); //skip the first header line
+			while (line != null & !line.equals("")) {
+			    s_ids.add(Integer.parseInt(line));
+				// read next line
+				line = reader.readLine();
+			}
+			reader.close();
+			
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+        // This is where a real application would open the file.
+	      }
+
+          }
+        });
+    utilitiesMenu.add(menuItem);
+
+    
     menuItem = new JMenuItem("Worklist");
     menuItem.setMnemonic(KeyEvent.VK_W);
     menuItem.addActionListener(
