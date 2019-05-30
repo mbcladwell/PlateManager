@@ -980,5 +980,66 @@ if(num_of_plate_ids*format_id!=table.size()-1){
     }
 
 	
-    }    
+    }
+
+    /**
+     * Insert a hit list read from a file.  The file text and contains one sample id per line
+     * Sample id can be SPL-100 or 100.  Method will determine which and behave appropriately.
+     * Expecting a column header, i.e. the first line of the input file is ignored.
+     */
+    public void insertHitListFromFile(int _assay_run_id, Vector<String> _s_ids_pre){
+	int assay_run_id = _assay_run_id;
+	Vector<String> s_ids_pre = _s_ids_pre;
+	//convert to an int[] array all hits
+	int[] s_ids = new int[s_ids_pre.size()];
+	Iterator value = s_ids_pre.iterator();
+	int counter = 0;
+	if(s_ids_pre.get(0).substring(0,3).equals("SPL")){
+	    while (value.hasNext()) {
+		s_ids[counter] = (int)Integer.parseInt(((String)value.next()).substring(4));
+		counter = counter +1;
+        } 
+	    
+	}else{
+	    while (value.hasNext()) {
+		s_ids[counter] = (int)Integer.parseInt((String)value.next());
+		counter = counter +1;
+             
+        }
+	    
+	}
+	new DialogNewHitListFromFile(dmf, assay_run_id, s_ids);
+    }
+
+    /**
+     * Follow up to insertHitListFromFile responding to DialogNewHitListFromFile
+     */
+    public void insertHitListFromFile2(String _name, String _description, int _num_hits, int _assay_run_id, int[] _hit_list){
+
+	Integer[] hit_list = Arrays.stream( _hit_list ).boxed().toArray( Integer[]::new );
+	//Object[] hit_list = (Integer[])_hit_list;
+	      try {
+      String insertSql = "SELECT new_hit_list ( ?, ?, ?, ?, ?);";
+      PreparedStatement insertPs =
+          conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+      insertPs.setString(1, _name);
+      insertPs.setString(2, _description);
+      insertPs.setInt(3, _num_hits);
+      insertPs.setInt(4, _assay_run_id);
+      insertPs.setArray(5, conn.createArrayOf("INTEGER", hit_list));
+   
+      LOGGER.info(insertPs.toString());
+      insertPs.executeUpdate();
+      //ResultSet resultSet = insertPs.getResultSet();
+      //resultSet.next();
+      //new_plate_set_id = resultSet.getInt("new_plate_set");
+     
+    } catch (SQLException sqle) {
+	LOGGER.warning("SQLE at inserting new plate set: " + sqle);
+    }
+
+
+      }
+
+    
 }

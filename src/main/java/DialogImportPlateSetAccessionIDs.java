@@ -75,13 +75,14 @@ public class DialogImportPlateSetAccessionIDs extends JDialog
     plate_set = new ComboItem(_plate_set_id, _plate_set_sys_name);
     format = new ComboItem(_format_id, String.valueOf(_format_id));
     plate_num = _plate_num;
-    expected_rows = plate_num*format.getKey();
+    //    expected_rows = dbr.getNumberOfSamplesForPlateSetID(_plate_set_id);
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
     this.dmf = _dmf;
     this.dbm = dmf.getDatabaseManager();
     this.dbr = dbm.getDatabaseRetriever();
     this.dbi = dbm.getDatabaseInserter();
+    expected_rows = dbr.getNumberOfSamplesForPlateSetID(_plate_set_id);
 
     //LOGGER.info("plate_set_id: " + plate_set_id);
     plate_set_description = dbr.getDescriptionForPlateSet(_plate_set_sys_name);
@@ -301,7 +302,7 @@ public class DialogImportPlateSetAccessionIDs extends JDialog
   }
 
   public void removeUpdate(DocumentEvent e) {
-    if (nameField.getText().length() > 0 & fileField.getText().length() > 0) {
+    if ( fileField.getText().length() > 0) {
       okButton.setEnabled(true);
     } else {
       okButton.setEnabled(false);

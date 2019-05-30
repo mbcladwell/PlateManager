@@ -56,16 +56,6 @@ public class MenuBarForPlate extends JMenuBar {
         });
     menu.add(menuItem);
 
-    menuItem = new JMenuItem("Import Accessions");
-    menuItem.setMnemonic(KeyEvent.VK_I);
-    menuItem.addActionListener(
-        new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-	      dmf.getDatabaseManager().getDatabaseInserter().importAccessionsByPlateSet(session.getPlateSetID());
-          }
-        });
-    menu.add(menuItem);
-
     
     menuItem = new JMenuItem("Export", KeyEvent.VK_E);
     // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));

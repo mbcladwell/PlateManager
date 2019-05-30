@@ -105,6 +105,25 @@ public class MenuBarForPlateSet extends JMenuBar {
         });
     utilitiesMenu.add(menuItem);
 
+      menuItem = new JMenuItem("Import Accessions");
+    menuItem.setMnemonic(KeyEvent.VK_I);
+    menuItem.addActionListener(
+        new ActionListener() {
+	    public void actionPerformed(ActionEvent e) {
+		if(!plate_set_table.getSelectionModel().isSelectionEmpty()){
+		    Object[][] results = plate_set_table.getSelectedRowsAndHeaderAsStringArray();	   
+		    String plate_set_sys_name = (String) results[1][0];
+		    int  plate_set_id = Integer.parseInt(plate_set_sys_name.substring(3));
+		    dmf.getDatabaseManager().getDatabaseInserter().importAccessionsByPlateSet(plate_set_id);
+		}else{
+			JOptionPane.showMessageDialog(dmf, "Select a Plate Set for which to populate with accession IDs!");	      
+		    } 
+		   
+	    }
+        });
+    utilitiesMenu.add(menuItem);
+
+    /*
     menuItem = new JMenuItem("Import hit list");
     menuItem.setMnemonic(KeyEvent.VK_H);
     menuItem.addActionListener(
@@ -115,7 +134,7 @@ public class MenuBarForPlateSet extends JMenuBar {
 
 	      if (returnVal == JFileChooser.APPROVE_OPTION) {
 		  java.io.File file = fileChooser.getSelectedFile();
-		  Vector<Integer> s_ids = new Vector<Integer>();
+		  Vector<String> s_ids = new Vector<String>();
 		  BufferedReader reader;
 		try {
 			reader = new BufferedReader(new FileReader(
@@ -123,12 +142,12 @@ public class MenuBarForPlateSet extends JMenuBar {
 			String line = reader.readLine();
 			line = reader.readLine(); //skip the first header line
 			while (line != null & !line.equals("")) {
-			    s_ids.add(Integer.parseInt(line));
+			    s_ids.add(line);
 				// read next line
 				line = reader.readLine();
 			}
 			reader.close();
-			
+			dmf.getDatabaseManager().getDatabaseInserter().insertHitListFromFile(s_ids);
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
@@ -138,7 +157,7 @@ public class MenuBarForPlateSet extends JMenuBar {
           }
         });
     utilitiesMenu.add(menuItem);
-
+    */
     
     menuItem = new JMenuItem("Worklist");
     menuItem.setMnemonic(KeyEvent.VK_W);

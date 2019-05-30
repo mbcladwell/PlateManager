@@ -23,11 +23,17 @@ import javax.swing.event.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.*;
+import javax.swing.*;
+import java.awt.event.*;
+import javax.swing.JFileChooser;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.util.Vector;
 
 
 public class AssayRunViewer extends JDialog implements java.awt.event.ActionListener {
-  static JButton exportAssayRunTable;
-  static JButton exportAssayRunData;
+  static JButton hitListFromFile;
+  static JButton exportAssayRun;
   static JButton viewAssayRun;
   static JButton exportHitListTable;
   static JButton viewHitList;
@@ -48,6 +54,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     private  JPanel hit_lists_pane;
     private JPanel arButtons;
     private JPanel hlButtons;
+    private JPopupMenu popup;
     
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
   // final EntityManager em;
@@ -104,26 +111,22 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 		projectList.setSelectedIndex(i);
 	    }
     }
+
     
     //projectList.setSelectedIndex(9);
     projectList.addActionListener(this);
-    exportAssayRunTable = new JButton("Export Table");
-    exportAssayRunTable.addActionListener(this);
-    exportAssayRunData = new JButton("Export Data");
-    exportAssayRunData.addActionListener(this);
+    exportAssayRun = new JButton("Export");
+    exportAssayRun.addActionListener(this);   
+    hitListFromFile = new JButton("New Hit List from file");
+    hitListFromFile.addActionListener(this);
     viewAssayRun = new JButton("Plot");
     viewAssayRun.addActionListener(this);
     arButtons = new JPanel(buttonLayout);
     arButtons.add(projectList);
-    arButtons.add(exportAssayRunTable);
-    arButtons.add(exportAssayRunData);
+    arButtons.add(exportAssayRun);
+    arButtons.add(hitListFromFile);
     arButtons.add(viewAssayRun);
-    assay_runs_pane.add(arButtons, BorderLayout.SOUTH);
-    
-    
-    
-    
-    
+    assay_runs_pane.add(arButtons, BorderLayout.SOUTH);    
 
     hit_lists_pane  = new JPanel(new BorderLayout());
     hit_lists_pane.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -166,72 +169,112 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     this.setVisible(true);
   }
 
-   
     public void actionPerformed(ActionEvent e) {
-	
-    if (e.getSource() == exportAssayRunTable) {
-	Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(assay_runs_table);
-	if(results.length>1){
-	//   LOGGER.info("hit list table: " + results);
-	       POIUtilities poi = new POIUtilities(dmf);
-            poi.writeJTableToSpreadsheet("Assay Runs", results);
-            try {
-              Desktop d = Desktop.getDesktop();
-              d.open(new File("./Writesheet.xlsx"));
-            } catch (IOException ioe) {
-            }	 
-	
-	}else{
-	    JOptionPane.showMessageDialog(dmf, "Select one or more  Assay Runs!");	
-	}
-    	
+    if (e.getSource() == exportAssayRun) {
+	popup = new JPopupMenu();      
+	JMenuItem menuItem = new JMenuItem("Selected rows in table");            
+	menuItem.setMnemonic(KeyEvent.VK_R);
+	menuItem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(assay_runs_table);
+		    if(results.length>1){
+			//   LOGGER.info("hit list table: " + results);
+			POIUtilities poi = new POIUtilities(dmf);
+			poi.writeJTableToSpreadsheet("Assay Runs", results);
+			try {
+			    Desktop d = Desktop.getDesktop();
+			    d.open(new File("./Writesheet.xlsx"));
+			} catch (IOException ioe) {
+			}	 
+		    }else{
+			JOptionPane.showMessageDialog(dmf, "Select one or more  Assay Runs!");	
+		    }   
+		}
+	    });
+    popup.add(menuItem);    
+    menuItem = new JMenuItem("Data for single selection");		   
+    menuItem.setMnemonic(KeyEvent.VK_D);
+    menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+		if(!assay_runs_table.getSelectionModel().isSelectionEmpty()){
+		    Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(assay_runs_table);
+		    if(results.length>1){
+
+			try{
+			    String assay_runs_sys_name =  assay_runs_table.getModel().getValueAt(0, 0).toString();
+			    int  assay_runs_id = Integer.parseInt(assay_runs_sys_name.substring(3));
+
+			    Object[][] assay_run_data = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRunData(assay_runs_id);
+			    POIUtilities poi = new POIUtilities(dmf);
+			    poi.writeJTableToSpreadsheet("Assay Run Data for " + assay_runs_sys_name, assay_run_data);
+		
+			    Desktop d = Desktop.getDesktop();
+			    d.open(new File("./Writesheet.xlsx"));
+			}catch(IOException ioe){
+			    JOptionPane.showMessageDialog(dmf, "Assay Run has no data!");   
+			}    
+		    }else{
+			JOptionPane.showMessageDialog(dmf, "Select one or more  Assay Runs!");	
+		    }
+		}
+	    }
+        });
+    popup.add(menuItem);
+    popup.show(exportAssayRun, 0, 0);
+    popup.setVisible(true);
     }
 
-    if (e.getSource() == exportAssayRunData) {
-
-
- if(!assay_runs_table.getSelectionModel().isSelectionEmpty()){
+    if (e.getSource() == hitListFromFile) {
+	if(!assay_runs_table.getSelectionModel().isSelectionEmpty()){
 		 
-	Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(assay_runs_table);
-	if(results.length>1){
+	    TableModel arModel = assay_runs_table.getModel();
+	    int row = assay_runs_table.getSelectedRow();
+	    String assay_runs_sys_name =  assay_runs_table.getModel().getValueAt(row, 0).toString();
+	    int  assay_runs_id = Integer.parseInt(assay_runs_sys_name.substring(3));
 
-		try{
-		 String assay_runs_sys_name =  assay_runs_table.getModel().getValueAt(0, 0).toString();
-		 int  assay_runs_id = Integer.parseInt(assay_runs_sys_name.substring(3));
-
-
-		Object[][] assay_run_data = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRunData(assay_runs_id);
-		POIUtilities poi = new POIUtilities(dmf);
-		poi.writeJTableToSpreadsheet("Assay Run Data for " + assay_runs_sys_name, assay_run_data);
-		
-		Desktop d = Desktop.getDesktop();
-		d.open(new File("./Writesheet.xlsx"));
-		
-		}catch(IOException ioe){
-		    JOptionPane.showMessageDialog(dmf, "Assay Run has no data!");   
-		}    
+	    JFileChooser fileChooser = new JFileChooser();
+	    int returnVal = fileChooser.showOpenDialog(dmf);
 	
-	}else{
-	    JOptionPane.showMessageDialog(dmf, "Select one or more  Assay Runs!");	
-	}
-    	
-    }
+	    if (returnVal == JFileChooser.APPROVE_OPTION) {
+		java.io.File file = fileChooser.getSelectedFile();
+		Vector<String> s_ids = new Vector<String>();
+		BufferedReader reader;
+		try {
+		    reader = new BufferedReader(new FileReader(file));
+		    String line = reader.readLine();
+		    line = reader.readLine(); //skip the first header line
+		    while (line != null & !line.equals("")) {
+			s_ids.add(line);
+			// read next line
+			line = reader.readLine();
+		    }
+		    reader.close();
+		    dmf.getDatabaseManager().getDatabaseInserter().insertHitListFromFile(assay_runs_id, s_ids);
+		} catch (IOException ioe) {
+		    ioe.printStackTrace();
+		}
+        // This is where a real application would open the file.
+	    }
+	} else{
+	    JOptionPane.showMessageDialog(dmf, "Select an Assay Run!");	      
+	}	
 
     }
     
-        if (e.getSource() == viewAssayRun) {
-    	    if(!assay_runs_table.getSelectionModel().isSelectionEmpty()){
+    if (e.getSource() == viewAssayRun) {
+	if(!assay_runs_table.getSelectionModel().isSelectionEmpty()){
 		 
-		 TableModel arModel = assay_runs_table.getModel();
-		 int row = assay_runs_table.getSelectedRow();
-		 String assay_runs_sys_name =  assay_runs_table.getModel().getValueAt(row, 0).toString();
-		 int  assay_runs_id = Integer.parseInt(assay_runs_sys_name.substring(3));
-		 new ScatterPlot(dmf, assay_runs_id);}
-	    else{
-	      JOptionPane.showMessageDialog(dmf, "Select an Assay Run!");	      
-	    }
-	
+	    TableModel arModel = assay_runs_table.getModel();
+	    int row = assay_runs_table.getSelectedRow();
+	    String assay_runs_sys_name =  assay_runs_table.getModel().getValueAt(row, 0).toString();
+	    int  assay_runs_id = Integer.parseInt(assay_runs_sys_name.substring(3));
+	    new ScatterPlot(dmf, assay_runs_id);
+	}
+	else{
+	    JOptionPane.showMessageDialog(dmf, "Select an Assay Run!");	      
+	}	
     }
+    
     if (e.getSource() == exportHitListTable) {
 	
 	Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(hit_lists_table);
