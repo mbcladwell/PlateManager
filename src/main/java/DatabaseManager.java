@@ -28,6 +28,7 @@ public class DatabaseManager {
   DatabaseInserter dbInserter;
   DatabaseRetriever dbRetriever;
   DialogMainFrame dmf;
+    Session session;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   // psql -U pm_admin -h 192.168.1.7 -d pmdb
@@ -39,15 +40,15 @@ public class DatabaseManager {
    */
   public DatabaseManager(DialogMainFrame _dmf) {
     dmf = _dmf;
-
+    session=dmf.getSession();
     try {
       Class.forName("org.postgresql.Driver");
 
 // String url = "jdbc:postgresql://localhost/postgres";
-      String url = "jdbc:postgresql://192.168.1.11/pmdb";
+      String url = session.getURL();
       Properties props = new Properties();
-      props.setProperty("user", "pm_admin");
-      props.setProperty("password", "welcome");
+      props.setProperty("user", session.getUserName());
+      props.setProperty("password", session.getPassword());
 
       conn = DriverManager.getConnection(url, props);
       dbInserter = new DatabaseInserter(this);
