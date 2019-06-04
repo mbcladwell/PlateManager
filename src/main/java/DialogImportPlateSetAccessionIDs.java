@@ -62,7 +62,8 @@ public class DialogImportPlateSetAccessionIDs extends JDialog
   private JFileChooser fileChooser;
     private JCheckBox checkBox;
     private ArrayList<String[]>  accessions; 
-    
+    private Session session;
+        
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public DialogImportPlateSetAccessionIDs(
@@ -79,7 +80,8 @@ public class DialogImportPlateSetAccessionIDs extends JDialog
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
     this.dmf = _dmf;
-    this.dbm = dmf.getDatabaseManager();
+    this.session = dmf.getSession();
+    this.dbm = session.getDatabaseManager();
     this.dbr = dbm.getDatabaseRetriever();
     this.dbi = dbm.getDatabaseInserter();
     expected_rows = dbr.getNumberOfSamplesForPlateSetID(_plate_set_id);

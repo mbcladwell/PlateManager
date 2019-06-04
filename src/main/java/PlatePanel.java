@@ -23,10 +23,12 @@ public class PlatePanel extends JPanel {
   private DialogMainFrame dmf;
   private JPanel textPanel;
   private String plateset_sys_name;
-
+    private Session session;
+    
   public PlatePanel(DialogMainFrame _dmf, CustomTable _table) {
     this.setLayout(new BorderLayout());
     dmf = _dmf;
+    session = dmf.getSession();
     table = _table;
 
     JPanel headerPanel = new JPanel();
@@ -66,7 +68,7 @@ public class PlatePanel extends JPanel {
     //LOGGER.info("table.getValueAt(0, 0)" + table.getValueAt(0, 0));
 
     plateset_sys_name =
-        dmf.getDatabaseManager()
+        session.getDatabaseManager()
             .getDatabaseRetriever()
             .getPlateSetSysNameForPlateSysName((String) table.getValueAt(0, 0));
     JLabel platesetLabel = new JLabel(plateset_sys_name, SwingConstants.LEFT);
@@ -81,7 +83,7 @@ public class PlatePanel extends JPanel {
 
     JLabel descriptionLabel =
         new JLabel(
-            dmf.getDatabaseManager()
+            session.getDatabaseManager()
                 .getDatabaseRetriever()
                 .getDescriptionForPlateSet(plateset_sys_name),
             SwingConstants.LEFT);
@@ -106,7 +108,7 @@ public class PlatePanel extends JPanel {
   public void updatePanel(String _plate_set_sys_name) {
     String plate_set_sys_name = _plate_set_sys_name;
       int plate_set_id = Integer.parseInt(plate_set_sys_name.substring(3));
-    JTable table = dmf.getDatabaseManager().getDatabaseRetriever().getDMFTableData(plate_set_id, DialogMainFrame.PLATE);
+    JTable table = session.getDatabaseManager().getDatabaseRetriever().getDMFTableData(plate_set_id, DialogMainFrame.PLATE);
     TableModel model = table.getModel();
     this.table.setModel(model);
   }

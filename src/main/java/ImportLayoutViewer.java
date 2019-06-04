@@ -57,7 +57,7 @@ public class ImportLayoutViewer extends JDialog implements java.awt.event.Action
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
     // this.em = em;
-    layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);
+    layoutNames = session.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);
     layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
     
     JPanel parentPane = new JPanel(new BorderLayout());
@@ -159,7 +159,7 @@ public class ImportLayoutViewer extends JDialog implements java.awt.event.Action
     public void actionPerformed(ActionEvent e) {
 
     if (e.getSource() == formatList) {
-       layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames((int)formatList.getSelectedItem());
+       layoutNames = session.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames((int)formatList.getSelectedItem());
        layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
        layoutList.setModel(layout_names_list_model );
        layoutList.setSelectedIndex(-1);
@@ -170,14 +170,14 @@ public class ImportLayoutViewer extends JDialog implements java.awt.event.Action
 	if(layoutList.getSelectedIndex() > -1){
 	    int plate_layout_id  = ((ComboItem)layoutList.getSelectedItem()).getKey();
 	    //  String selected = (String)layoutList.getSelectedItem();
-	    // int plate_layout_id  = dmf.getDatabaseManager().getDatabaseRetriever().getIDforLayoutName(selected);
+	    // int plate_layout_id  = session.getDatabaseManager().getDatabaseRetriever().getIDforLayoutName(selected);
 	    //this.refreshTable(plate_layout_id); 
 	}
     }
   }
     public void refreshTable(){
 	pane4.removeAll();
-	//CustomTable  table2 = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayout(_plate_layout_id);
+	//CustomTable  table2 = session.getDatabaseManager().getDatabaseRetriever().getPlateLayout(_plate_layout_id);
 	//gridData =  dmf.getUtilities().getPlateLayoutGrid(table2);
 	tableModel = new MyModel(gridData);
 	

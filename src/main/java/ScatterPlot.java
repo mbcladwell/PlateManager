@@ -82,6 +82,7 @@ public class ScatterPlot extends JFrame {
     private JPanel panel;
     private JPanel panel2;
     private JPanel panel3;
+    private Session session;
     
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
@@ -91,9 +92,10 @@ public class ScatterPlot extends JFrame {
 	//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	this.setLayout(new BorderLayout());
 	this.dmf = _dmf;
+	session = dmf.getSession();
 	assay_run_id = _assay_run_id;
     //need the assay run id
-	table = dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(assay_run_id);
+	table = session.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(assay_run_id);
 	//LOGGER.info("row count: " + table.getRowCount());	    
 
 	raw_response = new ResponseWrangler(table, ResponseWrangler.RAW);

@@ -62,7 +62,7 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
     hit_list_id = _hit_list_id;
     parent_pane = new JPanel(new BorderLayout());
 
-        hits_table = dmf.getDatabaseManager().getDatabaseRetriever().getSamplesForHitList(hit_list_id);
+        hits_table = session.getDatabaseManager().getDatabaseRetriever().getSamplesForHitList(hit_list_id);
 
     hits_pane = new JPanel(new BorderLayout());
     hits_pane.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -82,7 +82,7 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
       
       //get all the hit lists in the current project       
       current_project_id = session.getProjectID();
-      all_hit_lists_in_project = new JComboBox(dmf.getDatabaseManager().getDatabaseRetriever().getHitListsForProject(current_project_id));
+      all_hit_lists_in_project = new JComboBox(session.getDatabaseManager().getDatabaseRetriever().getHitListsForProject(current_project_id));
     for(int i=0; i < all_hit_lists_in_project.getItemCount(); i++){
 	if(((ComboItem)all_hit_lists_in_project.getItemAt(i)).getKey() == current_project_id){
 		all_hit_lists_in_project.setSelectedIndex(i);
@@ -102,7 +102,7 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
    hits_pane.add(hits_buttons, BorderLayout.SOUTH);
  
     /*
-    projectList = new JComboBox(dmf.getDatabaseManager().getDatabaseRetriever().getAllProjects());
+    projectList = new JComboBox(session.getDatabaseManager().getDatabaseRetriever().getAllProjects());
     projectList.setSelectedIndex(9);
     projectList.addActionListener(this);
     exportAssayRun = new JButton("Export");
@@ -123,7 +123,7 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
     counts_paneBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
     counts_pane.setBorder(counts_paneBorder);
 
-    counts_table = dmf.getDatabaseManager().getDatabaseRetriever().getHitCountPerPlateSet(session.getProjectID(), hit_list_id);
+    counts_table = session.getDatabaseManager().getDatabaseRetriever().getHitCountPerPlateSet(session.getProjectID(), hit_list_id);
 
     counts_scroll_pane = new JScrollPane(counts_table);
     counts_table.setFillsViewportHeight(true);
@@ -164,11 +164,11 @@ public class HitListViewer extends JDialog implements java.awt.event.ActionListe
 
     if (e.getSource() == all_hit_lists_in_project) {
 	int selected_hit_list_id = ((ComboItem)all_hit_lists_in_project.getSelectedItem()).getKey();
-	JTable new_hits_table = dmf.getDatabaseManager().getDatabaseRetriever().getSamplesForHitList(selected_hit_list_id);
+	JTable new_hits_table = session.getDatabaseManager().getDatabaseRetriever().getSamplesForHitList(selected_hit_list_id);
 	TableModel new_model = new_hits_table.getModel();
 	hits_table.setModel(new_model); 
 
-	JTable new_counts_table = dmf.getDatabaseManager().getDatabaseRetriever().getHitCountPerPlateSet(session.getProjectID(), selected_hit_list_id);
+	JTable new_counts_table = session.getDatabaseManager().getDatabaseRetriever().getHitCountPerPlateSet(session.getProjectID(), selected_hit_list_id);
 	TableModel new_model2 = new_counts_table.getModel();
 	counts_table.setModel(new_model2);
 

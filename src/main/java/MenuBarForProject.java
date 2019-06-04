@@ -19,6 +19,7 @@ public class MenuBarForProject extends JMenuBar {
 
   DialogMainFrame dmf;
   CustomTable project_table;
+    Session session;
 
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
@@ -26,7 +27,8 @@ public class MenuBarForProject extends JMenuBar {
 
     dmf = _dmf;
     project_table = _project_table;
-
+    session = dmf.getSession();
+    
     JMenu menu = new JMenu("Project");
     menu.setMnemonic(KeyEvent.VK_P);
     menu.getAccessibleContext().setAccessibleDescription("Project");
@@ -77,7 +79,7 @@ public class MenuBarForProject extends JMenuBar {
               // LOGGER.info("down button results: " + results);
                LOGGER.info("down button results: " + results[1][0]);
 
-              dmf.getDatabaseManager().updateSessionWithProject(results[1][0]);
+              session.getDatabaseManager().updateSessionWithProject(results[1][0]);
 	      dmf.setMainFrameTitle(results[1][0]);
               dmf.showPlateSetTable(results[1][0]);
             } catch (ArrayIndexOutOfBoundsException s) {

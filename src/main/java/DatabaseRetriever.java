@@ -28,13 +28,16 @@ public class DatabaseRetriever {
     DialogMainFrame dmf;
   Connection conn;
   JTable table;
+    Session session;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   /** */
   public DatabaseRetriever(DatabaseManager _dbm) {
     this.dbm = _dbm;
-    this.dmf=dbm.getDmf();
     this.conn = dbm.getConnection();
+    session = dbm.getSession();
+    dmf = session.getDialogMainFrame();
+    
   }
 
   /**
@@ -789,7 +792,7 @@ int plate_layout_name_id = _plate_layout_name_id;
       pstmt.setInt(1, plate_layout_name_id);
       ResultSet rs = pstmt.executeQuery();
 
-      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+      table = new CustomTable(dmf, dbm.buildTableModel(rs));
        LOGGER.info("Got plate table " + table);
       rs.close();
       pstmt.close();
@@ -813,7 +816,7 @@ int plate_layout_name_id = _plate_layout_name_id;
 	  pstmt.setInt(1, plate_layout_name_id);
 	  ResultSet rs = pstmt.executeQuery();
 	  
-      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+      table = new CustomTable(dmf, dbm.buildTableModel(rs));
       // LOGGER.info("Got plate table " + table);
       rs.close();
       pstmt.close();
@@ -837,7 +840,7 @@ int plate_layout_name_id = _plate_layout_name_id;
       pstmt.setInt(1, plate_layout_name_id);
       ResultSet rs = pstmt.executeQuery();
 
-      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+      table = new CustomTable(dmf, dbm.buildTableModel(rs));
        LOGGER.info("Got plate table " + table);
       rs.close();
       pstmt.close();
@@ -1153,7 +1156,7 @@ int plate_layout_name_id = _plate_layout_name_id;
 
       ResultSet rs = pstmt.executeQuery();
      
-      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+      table = new CustomTable(dmf, dbm.buildTableModel(rs));
 	
            rs.close();
       pstmt.close();
@@ -1180,7 +1183,7 @@ int project_id = _project_id;
       pstmt.setInt(1, project_id);
       ResultSet rs = pstmt.executeQuery();
 
-      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+      table = new CustomTable(dmf, dbm.buildTableModel(rs));
       //LOGGER.info("Got assay run table " + table);
       rs.close();
       pstmt.close();
@@ -1204,7 +1207,7 @@ int project_id = _project_id;
       pstmt.setInt(1, project_id);
       ResultSet rs = pstmt.executeQuery();
 
-      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+      table = new CustomTable(dmf, dbm.buildTableModel(rs));
       //LOGGER.info("Got assay run table " + table);
       rs.close();
       pstmt.close();
@@ -1228,7 +1231,7 @@ int assay_run_id = _assay_run_id;
       pstmt.setInt(1, assay_run_id);
       ResultSet rs = pstmt.executeQuery();
 
-      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+      table = new CustomTable(dmf, dbm.buildTableModel(rs));
       //LOGGER.info("Got assay run table " + table);
       rs.close();
       pstmt.close();
@@ -1261,7 +1264,7 @@ int assay_run_id = _assay_run_id;
       pstmt.setInt(1, format);
       ResultSet rs = pstmt.executeQuery();
 
-      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+      table = new CustomTable(dmf, dbm.buildTableModel(rs));
        LOGGER.info("Got layout sources table " + table);
       rs.close();
       pstmt.close();
@@ -1285,7 +1288,7 @@ int assay_run_id = _assay_run_id;
       pstmt.setInt(1, source_layout_id);
       ResultSet rs = pstmt.executeQuery();
 
-      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+      table = new CustomTable(dmf, dbm.buildTableModel(rs));
       // LOGGER.info("Got layout sources table " + table);
       rs.close();
       pstmt.close();
@@ -1316,7 +1319,7 @@ int assay_run_id = _assay_run_id;
       
       ResultSet rs = pstmt.executeQuery();
 
-      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+      table = new CustomTable(dmf, dbm.buildTableModel(rs));
       // LOGGER.info("Got layout sources table " + table);
       rs.close();
       pstmt.close();
@@ -1345,7 +1348,7 @@ int assay_run_id = _assay_run_id;
       
       ResultSet rs = pstmt.executeQuery();
 
-      table = new CustomTable(dbm.getDmf(), dbm.buildTableModel(rs));
+      table = new CustomTable(dmf, dbm.buildTableModel(rs));
       // LOGGER.info("Got layout sources table " + table);
       rs.close();
       pstmt.close();

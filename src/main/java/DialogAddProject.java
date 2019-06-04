@@ -30,7 +30,7 @@ public class DialogAddProject extends JDialog {
   public DialogAddProject(DialogMainFrame _dmf) {
     dmf = _dmf;
     session = dmf.getSession();
-    dbm = dmf.getDatabaseManager();
+    dbm = session.getDatabaseManager();
 
     JPanel pane = new JPanel(new GridBagLayout());
     pane.setBorder(BorderFactory.createRaisedBevelBorder());

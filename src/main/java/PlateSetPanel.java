@@ -17,10 +17,12 @@ public class PlateSetPanel extends JPanel {
   private DialogMainFrame dmf;
   private JPanel textPanel;
   private String project_sys_name;
+    private Session session;
 
   public PlateSetPanel(DialogMainFrame _dmf, CustomTable _table, String _project_sys_name) {
     this.setLayout(new BorderLayout());
     dmf = _dmf;
+    session = dmf.getSession();
     table = _table;
     project_sys_name = _project_sys_name;
 
@@ -55,7 +57,7 @@ public class PlateSetPanel extends JPanel {
 
     JLabel descriptionLabel =
         new JLabel(
-            dmf.getDatabaseManager()
+            session.getDatabaseManager()
                 .getDatabaseRetriever()
                 .getDescriptionForProject(project_sys_name),
             SwingConstants.LEFT);
@@ -80,7 +82,7 @@ public class PlateSetPanel extends JPanel {
   public void updatePanel(String _project_sys_name) {
     String project_sys_name = _project_sys_name;
     int project_id = Integer.parseInt(project_sys_name.substring(4));
-    JTable table = dmf.getDatabaseManager().getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.PLATESET);
+    JTable table = session.getDatabaseManager().getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.PLATESET);
     TableModel model = table.getModel();
     this.table.setModel(model);
   }

@@ -38,9 +38,10 @@ public class DatabaseManager {
    * Use 'pmdb' as the database name. Regular users will connect as ln_user and will have restricted
    * access (no delete etc.). Connect as ln_admin to get administrative priveleges.
    */
-  public DatabaseManager(DialogMainFrame _dmf) {
-      dmf = _dmf;
-      session=dmf.getSession();
+  public DatabaseManager(Session _s) {
+      
+      session=_s;
+      dmf = session.getDialogMainFrame();
       Long insertKey = 0L;
       try {
 	  Class.forName("org.postgresql.Driver");
@@ -54,7 +55,7 @@ public class DatabaseManager {
 	  conn = DriverManager.getConnection(url, props);
 	  PreparedStatement pstmt = conn.prepareStatement(
               //  "SELECT password = crypt( ?,password) FROM pmuser WHERE pmuser_name = ?;");
-              "SELECT password = ?, password FROM pmuser WHERE pmuser_name = ?;");
+              "SELECT password = ?, password FROM lnuser WHERE lnuser_name = ?;");
 	  pstmt.setString(1, session.getPassword());
 	  pstmt.setString(2, session.getUserName());
 	  LOGGER.info(pstmt.toString());
@@ -87,9 +88,7 @@ public class DatabaseManager {
       } else {
         LOGGER.info("Authentication failed, no session generated.");
       }
-
-      dbInserter = new DatabaseInserter(this);
-      dbRetriever = new DatabaseRetriever(this);
+     
     } catch (ClassNotFoundException e) {
       LOGGER.severe("Class not found: " + e);
     } catch (SQLException sqle) {
@@ -250,7 +249,7 @@ public class DatabaseManager {
       LOGGER.severe("Failed to create plate set: " + sqle);
     }
 
- this.getDmf().showPlateSetTable(this.getDmf().getSession().getProjectSysName());    
+    session.getDialogMainFrame().showPlateSetTable(session.getProjectSysName());    
   }
   /**
    * ******************************************************************
@@ -391,11 +390,12 @@ public class DatabaseManager {
     }
     }
 
-    
+    /*    
   public DialogMainFrame getDmf() {
     return this.dmf;
   }
-
+    */
+    
   public DatabaseInserter getDatabaseInserter() {
     return this.dbInserter;
   }
@@ -409,6 +409,6 @@ public class DatabaseManager {
   }
 
   public Session getSession() {
-    return dmf.getSession();
+    return session;
   }
 }

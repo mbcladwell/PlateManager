@@ -22,6 +22,7 @@ public class AdminMenu extends JMenu {
     private ArrayList<String[]> imported_layout;;    
     private JFileChooser fileChooser;
     private JMenu projectMenu;
+    private Session session;
     
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
@@ -29,7 +30,8 @@ public class AdminMenu extends JMenu {
 
       dmf = _dmf;
     project_table = _project_table;
-
+    session = dmf.getSession();
+    
     this.setText("Admin");
     this.setMnemonic(KeyEvent.VK_A);
     this.getAccessibleContext().setAccessibleDescription("Administrative activities");
@@ -113,7 +115,7 @@ public class AdminMenu extends JMenu {
 							     JOptionPane.YES_NO_OPTION);
 		      if(n == JOptionPane.YES_OPTION){
 			  int prj_id = Integer.parseInt(projectid.substring(4));
-			  dmf.getDatabaseManager().getDatabaseInserter().deleteProject(prj_id);
+			  session.getDatabaseManager().getDatabaseInserter().deleteProject(prj_id);
 			  
 		      }
 		    

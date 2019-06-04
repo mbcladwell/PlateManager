@@ -22,17 +22,20 @@ import java.io.BufferedReader;
 import java.util.Vector;
 
 
+
 public class MenuBarForPlateSet extends JMenuBar {
 
   DialogMainFrame dmf;
   CustomTable plate_set_table;
-  private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    Session session;
+    private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   public MenuBarForPlateSet(DialogMainFrame _dmf, CustomTable _plate_set_table) {
 
     dmf = _dmf;
     plate_set_table = _plate_set_table;
-
+    session = dmf.getSession();
+    
     JMenu menu = new JMenu("Plate Set");
     menu.setMnemonic(KeyEvent.VK_P);
     menu.getAccessibleContext().setAccessibleDescription("Menu items related to plate sets");
@@ -69,7 +72,7 @@ public class MenuBarForPlateSet extends JMenuBar {
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            dmf.getDatabaseManager().groupPlateSets(plate_set_table);
+            session.getDatabaseManager().groupPlateSets(plate_set_table);
           }
         });
     utilitiesMenu.add(menuItem);
@@ -79,7 +82,7 @@ public class MenuBarForPlateSet extends JMenuBar {
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            dmf.getDatabaseManager().reformatPlateSet(plate_set_table);
+            session.getDatabaseManager().reformatPlateSet(plate_set_table);
           }
         });
     utilitiesMenu.add(menuItem);
@@ -114,7 +117,7 @@ public class MenuBarForPlateSet extends JMenuBar {
 		    Object[][] results = plate_set_table.getSelectedRowsAndHeaderAsStringArray();	   
 		    String plate_set_sys_name = (String) results[1][0];
 		    int  plate_set_id = Integer.parseInt(plate_set_sys_name.substring(3));
-		    dmf.getDatabaseManager().getDatabaseInserter().importAccessionsByPlateSet(plate_set_id);
+		    session.getDatabaseManager().getDatabaseInserter().importAccessionsByPlateSet(plate_set_id);
 		}else{
 			JOptionPane.showMessageDialog(dmf, "Select a Plate Set for which to populate with accession IDs!");	      
 		    } 
@@ -147,7 +150,7 @@ public class MenuBarForPlateSet extends JMenuBar {
 				line = reader.readLine();
 			}
 			reader.close();
-			dmf.getDatabaseManager().getDatabaseInserter().insertHitListFromFile(s_ids);
+			session.getDatabaseManager().getDatabaseInserter().insertHitListFromFile(s_ids);
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
@@ -169,7 +172,7 @@ public class MenuBarForPlateSet extends JMenuBar {
   
 		try{
 	       	int worklist_id = Integer.parseInt((String)results[1][7]);
-		Object[][] worklist = dmf.getDatabaseManager().getDatabaseRetriever().getWorklist(worklist_id);
+		Object[][] worklist = session.getDatabaseManager().getDatabaseRetriever().getWorklist(worklist_id);
 		POIUtilities poi = new POIUtilities(dmf);
 		poi.writeJTableToSpreadsheet("Plate Sets", worklist);
 		try{

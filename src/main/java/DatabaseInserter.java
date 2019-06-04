@@ -36,9 +36,10 @@ public class DatabaseInserter {
     this.dbm = _dbm;
     this.conn = dbm.getConnection();
     // this.dbr = dbm.getDatabaseRetriever();
-    this.dmf = dbm.getDmf();
-    this.utils = dmf.getUtilities();
-    this.session = dmf.getSession();
+    session = dbm.getSession();
+    this.dmf = session.getDialogMainFrame();
+    // this.utils = dmf.getUtilities();
+    //this.session = dmf.getSession();
   }
 
   public void insertProject(String _name, String _description, int _pmuser_id) {
@@ -298,7 +299,7 @@ public int insertPlateSet2(
     LOGGER.info("keys: " + plate_ids);
 
     this.associatePlateIDsWithPlateSetID(all_plate_ids, new_plate_set_id);
-    dbm.getDmf().showPlateSetTable(dbm.getDmf().getSession().getProjectSysName());
+    dmf.showPlateSetTable(dmf.getSession().getProjectSysName());
   }
 
   /** Called from DialogGroupPlates from the plate panel/menubar */
@@ -361,7 +362,7 @@ public int insertPlateSet2(
     LOGGER.info("keys: " + plate_ids);
 
     this.associatePlateIDsWithPlateSetID(plate_ids, new_plate_set_id);
-    dbm.getDmf().showPlateSetTable(dbm.getDmf().getSession().getProjectSysName());
+    dmf.showPlateSetTable(dmf.getSession().getProjectSysName());
   }
 
   public void associatePlateIDsWithPlateSetID(Set<Integer> _plateIDs, int _plate_set_id) {
@@ -428,7 +429,7 @@ Integer[] plate_set_id =
         dbm.getDatabaseRetriever()
             .getIDsForSysNames(plate_set_sys_name, "plate_set", "plate_set_sys_name");
 
- int num_of_plate_ids = dmf.getDatabaseManager().getDatabaseRetriever().getAllPlateIDsForPlateSetID(plate_set_id[0]).size();
+ int num_of_plate_ids = session.getDatabaseManager().getDatabaseRetriever().getAllPlateIDsForPlateSetID(plate_set_id[0]).size();
 //check that there are the correct number of rows in the table
 if(num_of_plate_ids*format_id!=table.size()-1){
     	JOptionPane.showMessageDialog(dmf, new String("Expecting " + String.valueOf(num_of_plate_ids*format_id) + " rows but found " + (table.size()-1) + " rows." ), "Import Error", JOptionPane.ERROR_MESSAGE);
@@ -521,7 +522,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
     //Now I need to select hits if requested by user.  I have the assay_run_id, and the algorithm for hit selection.
     // stored procedure: new_hit_list(_name VARCHAR, _descr VARCHAR, _num_hits INTEGER, _assay_run_id INTEGER, hit_list integer[])
     // DialogNewHitList(DialogMainFrame _dmf, int  _assay_run_id, double[][] _selected_response, int _num_hits)
-    // table = dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(assay_run_id);
+    // table = session.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(assay_run_id);
     // 	norm_response = new ResponseWrangler(table, ResponseWrangler.NORM);
    //    double[][]  sortedResponse [response] [well] [type_id] [sample_id];
     // selected_response.getHitsAboveThreshold(threshold))
@@ -529,7 +530,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
     
     if(auto_select_hits){
 
-	ResponseWrangler rw = new ResponseWrangler(dmf.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(assay_run_id),ResponseWrangler.NORM);
+	ResponseWrangler rw = new ResponseWrangler(session.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(assay_run_id),ResponseWrangler.NORM);
 	double[][] sorted_response = rw.getSortedResponse();
 	int number_of_hits = 0;
        
@@ -779,8 +780,8 @@ if(num_of_plate_ids*format_id!=table.size()-1){
     public void importAccessionsByPlateSet(int _plate_set_id){
 	int plate_set_id = _plate_set_id;
 	String plate_set_sys_name = new String("PS-" + String.valueOf(plate_set_id));
-	int plate_num = dmf.getDatabaseManager().getDatabaseRetriever().getNumberOfPlatesForPlateSetID(plate_set_id);
-	int format_id = dmf.getDatabaseManager().getDatabaseRetriever().getFormatForPlateSetID(plate_set_id);
+	int plate_num = session.getDatabaseManager().getDatabaseRetriever().getNumberOfPlatesForPlateSetID(plate_set_id);
+	int format_id = session.getDatabaseManager().getDatabaseRetriever().getFormatForPlateSetID(plate_set_id);
 	   
 		new DialogImportPlateSetAccessionIDs(dmf, plate_set_sys_name, plate_set_id, format_id, plate_num);
 	

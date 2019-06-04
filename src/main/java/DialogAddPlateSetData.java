@@ -64,6 +64,7 @@ public class DialogAddPlateSetData extends JDialog
     private ComboItem plate_layout;
   private JFileChooser fileChooser;
     private JCheckBox checkBox;
+    private Session session;
     
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
@@ -77,11 +78,13 @@ public class DialogAddPlateSetData extends JDialog
     plate_set = new ComboItem(_plate_set_id, _plate_set_sys_name);
     format = new ComboItem(_format_id, String.valueOf(_format_id));
     plate_num = _plate_num;
+    
    
     // Create and set up the window.
     // JFrame frame = new JFrame("Add Project");
     this.dmf = _dmf;
-    this.dbm = dmf.getDatabaseManager();
+    session = dmf.getSession();
+    this.dbm = session.getDatabaseManager();
     this.dbr = dbm.getDatabaseRetriever();
     this.dbi = dbm.getDatabaseInserter();
 

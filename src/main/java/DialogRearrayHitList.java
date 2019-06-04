@@ -175,7 +175,7 @@ public class DialogRearrayHitList extends JDialog {
     formatList.addActionListener(
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-	      layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getSourcePlateLayoutNames((int)formatList.getSelectedItem());
+	      layoutNames = session.getDatabaseManager().getDatabaseRetriever().getSourcePlateLayoutNames((int)formatList.getSelectedItem());
 	      layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
 	      layoutList.setModel(layout_names_list_model );
 	      layoutList.setSelectedIndex(0);
@@ -192,7 +192,7 @@ public class DialogRearrayHitList extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    ComboItem[] plateTypes = dmf.getDatabaseManager().getDatabaseRetriever().getPlateTypes();
+    ComboItem[] plateTypes = session.getDatabaseManager().getDatabaseRetriever().getPlateTypes();
 
     typeList = new JComboBox<ComboItem>(plateTypes);
      for(int i=0; i < typeList.getItemCount(); i++){
@@ -213,7 +213,7 @@ public class DialogRearrayHitList extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    ComboItem[] layoutTypes = dmf.getDatabaseManager().getDatabaseRetriever().getSourcePlateLayoutNames((int)formatList.getSelectedItem());
+    ComboItem[] layoutTypes = session.getDatabaseManager().getDatabaseRetriever().getSourcePlateLayoutNames((int)formatList.getSelectedItem());
     //LOGGER.info("layoutTypes: " + layoutTypes[0].toString());
     layoutList = new JComboBox<ComboItem>(layoutTypes);
     layoutList.setSelectedIndex(0);
@@ -245,8 +245,8 @@ public class DialogRearrayHitList extends JDialog {
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 
-            dmf
-                .getDatabaseManager().getDatabaseInserter()
+     
+                session.getDatabaseManager().getDatabaseInserter()
                 .insertRearrayedPlateSet(
                     nameField.getText(),
                     descriptionField.getText(),
@@ -287,7 +287,7 @@ public class DialogRearrayHitList extends JDialog {
   }
 
   private void refreshPlateNumberLabel() {
-      unknowns_per_dest_plate = dmf.getDatabaseManager().getDatabaseRetriever().getUnknownCountForLayoutID(((ComboItem)layoutList.getSelectedItem()).getKey());
+      unknowns_per_dest_plate = session.getDatabaseManager().getDatabaseRetriever().getUnknownCountForLayoutID(((ComboItem)layoutList.getSelectedItem()).getKey());
       num_dest_plates = (int)Math.ceil(unknown_count/(double)unknowns_per_dest_plate);
       numberLabel.setText(String.valueOf(num_dest_plates));
   }

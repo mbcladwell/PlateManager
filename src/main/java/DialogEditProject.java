@@ -32,7 +32,7 @@ public class DialogEditProject extends JDialog {
       DialogMainFrame _dmf, String _projectid, String _name, String _description) {
     dmf = _dmf;
     session = dmf.getSession();
-    dbm = dmf.getDatabaseManager();
+    dbm = session.getDatabaseManager();
     projectID = _projectid;
 
     JPanel pane = new JPanel(new GridBagLayout());

@@ -33,7 +33,7 @@ public class DialogAddUser extends JDialog {
   public DialogAddUser(DialogMainFrame _dmf) {
     dmf = _dmf;
     session = dmf.getSession();
-    dbm = dmf.getDatabaseManager();
+    dbm = session.getDatabaseManager();
 
     JPanel pane = new JPanel(new GridBagLayout());
     pane.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -98,7 +98,7 @@ public class DialogAddUser extends JDialog {
     c.gridheight = 1;
     pane.add(passwordField, c);
 
-    ComboItem[] groups = dmf.getDatabaseManager().getDatabaseRetriever().getUserGroups();
+    ComboItem[] groups = session.getDatabaseManager().getDatabaseRetriever().getUserGroups();
 
     groupList = new JComboBox<ComboItem>(groups);
     groupList.setSelectedIndex(0);

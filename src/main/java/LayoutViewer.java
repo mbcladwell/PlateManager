@@ -77,7 +77,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
     this.dmf = _dmf;
     this.session = dmf.getSession();
     owner = session.getUserName();
-    //layoutNames = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);
+    //layoutNames = session.getDatabaseManager().getDatabaseRetriever().getPlateLayoutNames(96);
     //    layout_names_list_model = new DefaultComboBoxModel<ComboItem>( layoutNames );
     
     parentPane = new JPanel(new BorderLayout());
@@ -150,7 +150,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
    javax.swing.border.TitledBorder sourceLayoutBorder = BorderFactory.createTitledBorder("Source:");
     sourceLayoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
     pane3.setBorder(sourceLayoutBorder);
-    sourceTable = dmf.getDatabaseManager().getDatabaseRetriever().getSourceForLayout(96);
+    sourceTable = session.getDatabaseManager().getDatabaseRetriever().getSourceForLayout(96);
     sourceTable.getSelectionModel().addListSelectionListener(						     
 	  new ListSelectionListener() {
 	      public void valueChanged(ListSelectionEvent e) {
@@ -161,7 +161,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 			
 			int source_layout_id = Integer.parseInt(( (String)sourceTable.getModel().getValueAt(row,0)).substring(4));
 			//LOGGER.info("source_layout_id: " + source_layout_id);
-			destTable.setModel(dmf.getDatabaseManager()
+			destTable.setModel(session.getDatabaseManager()
 					   .getDatabaseRetriever()
 					   .getDestForLayout(source_layout_id).getModel());
 			refreshLayoutTable(source_layout_id);
@@ -185,7 +185,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 
     destLayoutBorder.setTitlePosition(javax.swing.border.TitledBorder.TOP);
     pane4.setBorder(destLayoutBorder);
-    destTable = dmf.getDatabaseManager().getDatabaseRetriever().getDestForLayout(1);
+    destTable = session.getDatabaseManager().getDatabaseRetriever().getDestForLayout(1);
     destTable.getSelectionModel().addListSelectionListener(						     
 	  new ListSelectionListener() {
 	      public void valueChanged(ListSelectionEvent e) {
@@ -237,7 +237,7 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 
     if (e.getSource() == formatList) {
       
-	sourceTable.setModel(dmf.getDatabaseManager()
+	sourceTable.setModel(session.getDatabaseManager()
 			     .getDatabaseRetriever()
 			     .getSourceForLayout((int)formatList.getSelectedItem()).getModel());
       
@@ -254,13 +254,13 @@ public class LayoutViewer extends JDialog implements java.awt.event.ActionListen
 	CustomTable  table2 = null;
 	switch(displayList.getSelectedIndex()){
 	case 0:
-	table2 = dmf.getDatabaseManager().getDatabaseRetriever().getPlateLayout(_plate_layout_id);
+	table2 = session.getDatabaseManager().getDatabaseRetriever().getPlateLayout(_plate_layout_id);
 	    break;
 	case 1:
-	table2 = dmf.getDatabaseManager().getDatabaseRetriever().getSampleReplicatesLayout(_plate_layout_id);
+	table2 = session.getDatabaseManager().getDatabaseRetriever().getSampleReplicatesLayout(_plate_layout_id);
 	    break;
 	case 2:
-	table2 = dmf.getDatabaseManager().getDatabaseRetriever().getTargetReplicatesLayout(_plate_layout_id);
+	table2 = session.getDatabaseManager().getDatabaseRetriever().getTargetReplicatesLayout(_plate_layout_id);
 	    break;
 
 	    

@@ -9,6 +9,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.sql.SQLException;
+
 /**
  * Upon insert session gains a timestamp
  *
@@ -32,30 +34,23 @@ public class Session {
     private String help_url_prefix;  
     private String URL;
     private String dbname;
+    private DatabaseManager dbm;
     private DialogMainFrame dmf;
     private String host;
     private String port;
     private String sslmode;
     private String source;
+    private DatabaseInserter dbi;
+    private DatabaseRetriever dbr;
+    
     
     
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
   private static final long serialVersionUID = 1L;
 
-  public Session( DialogMainFrame _dmf) {
-      dmf = _dmf;
-      //try (
-
-
-    //the base folder is ./, the root of the main.properties file  
-
-    //load all the properties from this file
-    //prop.load(file);
-
-     //InputStream input = Session.class.getClassLoader().getResourceAsStream("./limsnucleus.properties")
-
-     //)
+  public Session() {
+     
     try{
     String path = "./limsnucleus.properties";
 
@@ -111,8 +106,15 @@ public class Session {
 		  LOGGER.info("URL: " + URL);
 
         }
-
-     
+    try{    
+    dbm = new DatabaseManager( this );   
+    dbi = new DatabaseInserter(dbm);
+    dbr = new DatabaseRetriever(dbm);
+    dmf = new DialogMainFrame(this);
+   
+    }catch(SQLException sqle){
+		  LOGGER.info("SQL exception creating DatabaseManager: " + sqle);
+    }
   }
 
   public void setUserID(int _id) {
@@ -226,4 +228,17 @@ public class Session {
     public String getHost(){
 	return host;
     }
+    public DatabaseManager getDatabaseManager(){
+	return dbm;
+    }
+    public DatabaseRetriever getDatabaseRetriever(){
+	return dbr;
+    }
+    public DatabaseInserter getDatabaseInserter(){
+	return dbi;
+    }
+    public DialogMainFrame getDialogMainFrame(){
+	return dmf;
+    }
+    
 }

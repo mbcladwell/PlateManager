@@ -18,7 +18,8 @@ public class ProjectPanel extends JPanel {
   private DialogMainFrame dmf;
   private JPanel textPanel;
   private ListSelectionModel listSelectionModel;
-  // private SharedListSelectionHandler sharedListSelectionHandler;
+    private Session session;
+      // private SharedListSelectionHandler sharedListSelectionHandler;
   /**
    * To accomodate all components place panels within panels.
    *
@@ -33,6 +34,7 @@ public class ProjectPanel extends JPanel {
   public ProjectPanel(DialogMainFrame _dmf, CustomTable _table) {
     this.setLayout(new BorderLayout());
     dmf = _dmf;
+    session = dmf.getSession();
     table = _table;
 
     /*
@@ -101,8 +103,8 @@ public class ProjectPanel extends JPanel {
   }
 
   public void updatePanel() {
-      //CustomTable table = dmf.getDatabaseManager().getProjectTableData();
-      CustomTable table = dmf.getDatabaseManager().getDatabaseRetriever().getDMFTableData(0, DialogMainFrame.PROJECT);
+      //CustomTable table = session.getDatabaseManager().getProjectTableData();
+      CustomTable table = session.getDatabaseManager().getDatabaseRetriever().getDMFTableData(0, DialogMainFrame.PROJECT);
     DefaultTableModel model = (DefaultTableModel) table.getModel();
     this.table.setModel(model);
   }

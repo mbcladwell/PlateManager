@@ -76,7 +76,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     assay_runs_pane_border.setTitlePosition(javax.swing.border.TitledBorder.TOP);
     assay_runs_pane.setBorder(assay_runs_pane_border);
 
-    assay_runs_table = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRuns(session.getProjectID());
+    assay_runs_table = session.getDatabaseManager().getDatabaseRetriever().getAssayRuns(session.getProjectID());
   assay_runs_table.getSelectionModel().addListSelectionListener(						     
 	  new ListSelectionListener() {
 	      public void valueChanged(ListSelectionEvent e) {
@@ -87,7 +87,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 			int assay_run_id = Integer.parseInt(( (String)assay_runs_table.getModel().getValueAt(row,0)).substring(3));
 
 			//LOGGER.info("source_layout_id: " + source_layout_id);
-			hit_lists_table.setModel(dmf.getDatabaseManager()
+			hit_lists_table.setModel(session.getDatabaseManager()
 					   .getDatabaseRetriever()
 						.getHitListsForAssayRun(assay_run_id).getModel());
 			//
@@ -105,7 +105,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     assay_runs_pane.add(assay_runs_scroll_pane, BorderLayout.CENTER);
 
     GridLayout buttonLayout = new GridLayout(1,4,5,5);
-    projectList = new JComboBox(dmf.getDatabaseManager().getDatabaseRetriever().getAllProjects());
+    projectList = new JComboBox(session.getDatabaseManager().getDatabaseRetriever().getAllProjects());
     for(int i=0; i < projectList.getItemCount(); i++){
 	if(((ComboItem)projectList.getItemAt(i)).getKey() == project_id){
 		projectList.setSelectedIndex(i);
@@ -134,7 +134,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     hit_lists_pane_border.setTitlePosition(javax.swing.border.TitledBorder.TOP);
     hit_lists_pane.setBorder(hit_lists_pane_border);
 
-    hit_lists_table = dmf.getDatabaseManager().getDatabaseRetriever().getHitLists(session.getProjectID());
+    hit_lists_table = session.getDatabaseManager().getDatabaseRetriever().getHitLists(session.getProjectID());
 
     hit_lists_scroll_pane = new JScrollPane(hit_lists_table);
     hit_lists_table.setFillsViewportHeight(true);
@@ -204,7 +204,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 			    String assay_runs_sys_name =  assay_runs_table.getModel().getValueAt(0, 0).toString();
 			    int  assay_runs_id = Integer.parseInt(assay_runs_sys_name.substring(3));
 
-			    Object[][] assay_run_data = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRunData(assay_runs_id);
+			    Object[][] assay_run_data = session.getDatabaseManager().getDatabaseRetriever().getAssayRunData(assay_runs_id);
 			    POIUtilities poi = new POIUtilities(dmf);
 			    poi.writeJTableToSpreadsheet("Assay Run Data for " + assay_runs_sys_name, assay_run_data);
 		
@@ -249,7 +249,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 			line = reader.readLine();
 		    }
 		    reader.close();
-		    dmf.getDatabaseManager().getDatabaseInserter().insertHitListFromFile(assay_runs_id, s_ids);
+		    session.getDatabaseManager().getDatabaseInserter().insertHitListFromFile(assay_runs_id, s_ids);
 		} catch (IOException ioe) {
 		    ioe.printStackTrace();
 		}
@@ -322,12 +322,12 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 
     public void refreshTables(){
        
-	CustomTable arTable = dmf.getDatabaseManager().getDatabaseRetriever().getAssayRuns(project_id);
+	CustomTable arTable = session.getDatabaseManager().getDatabaseRetriever().getAssayRuns(project_id);
 	TableModel arModel = arTable.getModel();
 	assay_runs_table.setModel(arModel);	
 
 		//LOGGER.info("project: " + project_id);
-	CustomTable hlTable = dmf.getDatabaseManager().getDatabaseRetriever().getHitLists(project_id);
+	CustomTable hlTable = session.getDatabaseManager().getDatabaseRetriever().getHitLists(project_id);
 	TableModel hlModel = hlTable.getModel();
 	hit_lists_table.setModel(hlModel);
 	
@@ -335,7 +335,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 
     public void refreshHitListsTable(){
 	int selected_project_id = ((ComboItem)projectList.getSelectedItem()).getKey();
-	CustomTable hlTable = dmf.getDatabaseManager().getDatabaseRetriever().getHitLists(selected_project_id);
+	CustomTable hlTable = session.getDatabaseManager().getDatabaseRetriever().getHitLists(selected_project_id);
 	TableModel hlModel = hlTable.getModel();
 	hit_lists_table.setModel(hlModel);
 

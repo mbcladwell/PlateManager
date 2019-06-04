@@ -51,7 +51,7 @@ public class MenuBarForPlate extends JMenuBar {
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            dmf.getDatabaseManager().groupPlates(plate_table);
+            session.getDatabaseManager().groupPlates(plate_table);
           }
         });
     menu.add(menuItem);

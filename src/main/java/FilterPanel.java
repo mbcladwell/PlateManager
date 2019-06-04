@@ -27,7 +27,7 @@ public class FilterPanel extends JPanel {
     private int entity_type;
     private int id;
     private JTextField textField;
-    
+    private Session session;    
 
   /**
    * @param id the project/plateset/plate etc id for fetching the main table
@@ -35,6 +35,7 @@ public class FilterPanel extends JPanel {
     public FilterPanel(DialogMainFrame _parent, JTable _table, int _id, int _entity_type) {
     this.setLayout(new GridBagLayout());
     parent = _parent;
+    session = parent.getSession();
     table = _table;
     id = _id;
     entity_type = _entity_type;
@@ -61,7 +62,7 @@ public class FilterPanel extends JPanel {
     refreshButton.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-	      JTable table2 =  parent.getDatabaseManager().getDatabaseRetriever().getDMFTableData(id, entity_type );
+	      JTable table2 =  session.getDatabaseManager().getDatabaseRetriever().getDMFTableData(id, entity_type );
 	       TableModel model = table2.getModel();
 	       table.setModel(model);
           }

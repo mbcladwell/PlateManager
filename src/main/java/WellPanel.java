@@ -19,13 +19,14 @@ public class WellPanel extends JPanel {
   private JPanel textPanel;
   private String plateset_sys_name;
   private String plate_sys_name;
-    
+    private Session session;    
 
   public WellPanel(DialogMainFrame _dmf, CustomTable _table) {
     this.setLayout(new BorderLayout());
     dmf = _dmf;
     table = _table;
-
+    session = dmf.getSession();
+    
     JPanel headerPanel = new JPanel();
     headerPanel.setLayout(new BorderLayout());
     headerPanel.add(new MenuBarForWell(dmf, table), BorderLayout.NORTH);
@@ -63,7 +64,7 @@ public class WellPanel extends JPanel {
     plate_sys_name = (String) table.getValueAt(1, 0);
     
     plateset_sys_name =
-        dmf.getDatabaseManager()
+        session.getDatabaseManager()
             .getDatabaseRetriever()
 	.getPlateSetSysNameForPlateSysName(plate_sys_name);
 
@@ -80,7 +81,7 @@ public class WellPanel extends JPanel {
 
     JLabel descriptionLabel =
         new JLabel(
-            dmf.getDatabaseManager()
+            session.getDatabaseManager()
                 .getDatabaseRetriever()
                 .getDescriptionForPlateSet(plateset_sys_name),
             SwingConstants.LEFT);
@@ -105,7 +106,7 @@ public class WellPanel extends JPanel {
     public void updatePanel(String _plate_sys_name) {
     String plate_sys_name = _plate_sys_name;
       int plate_id = Integer.parseInt(plate_sys_name.substring(4));
-    JTable table = dmf.getDatabaseManager().getDatabaseRetriever().getDMFTableData(plate_id, DialogMainFrame.WELL);
+    JTable table = session.getDatabaseManager().getDatabaseRetriever().getDMFTableData(plate_id, DialogMainFrame.WELL);
     TableModel model = table.getModel();
     this.table.setModel(model);
   }
