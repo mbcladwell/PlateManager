@@ -180,16 +180,35 @@ task myJavadocs(type: Javadoc) {
   source = sourceSets.main.allJava
 }
 
-/*
+
 task copyJavaDocsToWeb(type: Copy, dependsOn: [myJavadocs]) {
    // from configurations.runtime
     from("build/docs/.")
-    //into("/home/mbc/syncd/stihie/source/_posts/2018-08-09-bllmlkg")
+    into("/home/mbc/syncd/labsolns/public")
     include('*.html', '*.js', '*.js')
     include('javadoc/**')
     
 }
-*/
+
+
+task getSchema(type: JavaExec) {
+    main = "-jar";
+    args "/home/mbc/temp/schemaspy/schemaspy-6.1.0-SNAPSHOT.jar","-configFile", "/home/mbc/temp/schemaspy/schemaspy.properties","-dp","/home/mbc/temp/schemaspy/postgresql-42.2.5.jar"
+ }
+
+task copySchemaDocsToWeb(type: Copy, dependsOn: [getSchema]) {
+   // from configurations.runtime
+    from("./output")
+   // include('*.html', '*.js', '*.css','*.png','*.txt','*.xml')
+    into("/home/mbc/syncd/labsolns/public/schema")
+    
+    
+}
+
+task makeHelp(type: Copy, dependsOn: [copyJavaDocsToWeb, copySchemaDocsToWeb]){
+    
+}
+
 
 task getDeps(type: Exec) {
     configurations.testRuntime.files

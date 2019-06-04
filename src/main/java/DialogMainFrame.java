@@ -38,23 +38,22 @@ public class DialogMainFrame extends JFrame {
 
  
   public DialogMainFrame() throws SQLException {
-  session = new Session(this);
-    dbm = new DatabaseManager(this);
-    dbr = new DatabaseRetriever(dbm);
-    utils = new Utilities(this);
+      session = new Session(this);
+      dbm = new DatabaseManager(this);
+     utils = new Utilities(this);
       this.setTitle("LIMS*Nucleus");
-    // new DialogLogin();
-    // Create and set up the window.
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      ImageIcon img = new ImageIcon(this.getClass().getResource("images/mwplate.png"));
+      this.setIconImage(img.getImage());
+      /*    
     try {
       ImageIcon img = new ImageIcon(this.getClass().getResource("images/mwplate.png"));
       this.setIconImage(img.getImage());
-      session.setSessionID(dbm.initializeSession(session.getUserName(), session.getPassword()));
      
     } catch (SQLException sqle) {
       System.out.println("Invalid password");
     }
-    //    ImageIcon ii = new ImageIcon(getResource("images/mwplate.png"));
+      */
     /////////////////////////////////////////////
     // set up the project table
    

@@ -35,22 +35,59 @@ public class DatabaseManager {
 
 
   /**
-   * Use 'pmdb' as the database name. Regular users will connect as pm_user and will have restricted
-   * access (no delete etc.). Connect as pm_admin to get administrative priveleges.
+   * Use 'pmdb' as the database name. Regular users will connect as ln_user and will have restricted
+   * access (no delete etc.). Connect as ln_admin to get administrative priveleges.
    */
   public DatabaseManager(DialogMainFrame _dmf) {
-    dmf = _dmf;
-    session=dmf.getSession();
-    try {
-      Class.forName("org.postgresql.Driver");
+      dmf = _dmf;
+      session=dmf.getSession();
+      Long insertKey = 0L;
+      try {
+	  Class.forName("org.postgresql.Driver");
 
-// String url = "jdbc:postgresql://localhost/postgres";
-      String url = session.getURL();
-      Properties props = new Properties();
-      props.setProperty("user", session.getUserName());
-      props.setProperty("password", session.getPassword());
+	  // String url = "jdbc:postgresql://localhost/postgres";
+	  String url = session.getURL();
+	  Properties props = new Properties();
+	  props.setProperty("user", session.getUserName());
+	  props.setProperty("password", session.getPassword());
 
-      conn = DriverManager.getConnection(url, props);
+	  conn = DriverManager.getConnection(url, props);
+	  PreparedStatement pstmt = conn.prepareStatement(
+              //  "SELECT password = crypt( ?,password) FROM pmuser WHERE pmuser_name = ?;");
+              "SELECT password = ?, password FROM pmuser WHERE pmuser_name = ?;");
+	  pstmt.setString(1, session.getPassword());
+	  pstmt.setString(2, session.getUserName());
+	  LOGGER.info(pstmt.toString());
+	  ResultSet rs = pstmt.executeQuery();
+	  rs.next();
+	  boolean pass = rs.getBoolean(1);
+	  LOGGER.info("pass : " + pass);
+
+	  rs.close();
+	  pstmt.close();
+
+      if (pass) {
+        // LOGGER.info("pass is true; user: " + _user);
+        String insertSql =
+            "INSERT INTO lnsession (lnuser_id) SELECT id FROM lnuser WHERE lnuser_name = ?;";
+        PreparedStatement insertPs =
+            conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+        insertPs.setString(1, session.getUserName());
+        LOGGER.info(insertPs.toString());
+        insertPs.executeUpdate();
+        ResultSet rsKey = insertPs.getGeneratedKeys();
+
+        if (rsKey.next()) {
+          insertKey = rsKey.getLong(1);
+	  session.setSessionID(insertKey);
+
+          // LOGGER.info("rsKey: " + insertKey);
+        }
+
+      } else {
+        LOGGER.info("Authentication failed, no session generated.");
+      }
+
       dbInserter = new DatabaseInserter(this);
       dbRetriever = new DatabaseRetriever(this);
     } catch (ClassNotFoundException e) {
@@ -60,80 +97,7 @@ public class DatabaseManager {
     }
   }
 
-  /**
-   * Initializes a session that remains active and provides user id information throughout database
-   * activity. All regular users connected with pm_user priveleges.
-   *
-   * @param _user user name managed by plate_manager
-   * @param _password password controlled by user
-   */
-  public Long initializeSession(String _user, String _password) throws SQLException {
-    // return session ID
-    Long insertKey = 0L;
-    try {
-      // LOGGER.info("in init : ");
 
-      PreparedStatement pstmt =
-          conn.prepareStatement(
-              //  "SELECT password = crypt( ?,password) FROM pmuser WHERE pmuser_name = ?;");
-              "SELECT password = ?, password FROM pmuser WHERE pmuser_name = ?;");
-      pstmt.setString(1, _password);
-      pstmt.setString(2, _user);
-      LOGGER.info(pstmt.toString());
-      ResultSet rs = pstmt.executeQuery();
-      rs.next();
-      boolean pass = rs.getBoolean(1);
-      LOGGER.info("pass : " + pass);
-
-      rs.close();
-      pstmt.close();
-
-      if (pass) {
-        // LOGGER.info("pass is true; user: " + _user);
-        String insertSql =
-            "INSERT INTO pmsession (pmuser_id) SELECT id FROM pmuser WHERE pmuser_name = ?;";
-        PreparedStatement insertPs =
-            conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
-        insertPs.setString(1, _user);
-        LOGGER.info(insertPs.toString());
-        insertPs.executeUpdate();
-        ResultSet rsKey = insertPs.getGeneratedKeys();
-
-        if (rsKey.next()) {
-          insertKey = rsKey.getLong(1);
-          // LOGGER.info("rsKey: " + insertKey);
-        }
-
-      } else {
-        LOGGER.info("Authentication failed, no session generated.");
-      }
-
-    } catch (SQLException sqle) {
-      throw sqle;
-    }
-    return insertKey;
-  }
-
-    /*
-  public CustomTable getPlateSetTableData(String _project_sys_name) {
-    try {
-      PreparedStatement pstmt =
-          conn.prepareStatement(
-              "SELECT plate_set.plate_set_sys_name AS \"PlateSetID\", plate_set_name As \"Name\", format AS \"Format\", num_plates AS \"# plates\" , plate_type.plate_type_name AS \"Type\", plate_layout_name.name AS \"Layout\"   , plate_set.descr AS \"Description\" FROM plate_set, plate_format, plate_type, plate_layout_name WHERE plate_format.id = plate_set.plate_format_id AND plate_set.plate_layout_name_id = plate_layout_name.id  AND plate_set.plate_type_id = plate_type.id AND project_id = (select id from project where project_sys_name like ?) ORDER BY plate_set.id DESC;");
-
-      pstmt.setString(1, _project_sys_name);
-      ResultSet rs = pstmt.executeQuery();
-
-      CustomTable table = new CustomTable(dmf, buildTableModel(rs));
-      rs.close();
-      pstmt.close();
-      return table;
-    } catch (SQLException sqle) {
-
-    }
-    return null;
-  }
-    */
   public void updateSessionWithProject(String _project_sys_name) {
     int results = 0;
     String project_sys_name = _project_sys_name;
