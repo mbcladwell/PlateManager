@@ -227,7 +227,7 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
         (new ActionListener() {
 		 public void actionPerformed(ActionEvent e) {
 		//temp_data is Object[][] of 2 columns, well, type, both integers
-		     session.getDatabaseManager().getDatabaseInserter().importPlateLayout(temp_data, nameField.getText(), descriptionField.getText(), control_location.getText(),  Integer.parseInt(num_controls_label.getText()), Integer.parseInt(num_unk_label.getText()), format, num_edge);
+		     session.getDatabaseInserter().importPlateLayout(temp_data, nameField.getText(), descriptionField.getText(), control_location.getText(),  Integer.parseInt(num_controls_label.getText()), Integer.parseInt(num_unk_label.getText()), format, num_edge);
             dispose();
           }
         }));
@@ -326,13 +326,13 @@ public class DialogImportLayoutViewer extends JDialog implements java.awt.event.
 	CustomTable  table2 = null;
 	switch(displayList.getSelectedIndex()){
 	case 0:
-	table2 = session.getDatabaseManager().getDatabaseRetriever().getPlateLayout(_plate_layout_id);
+	table2 = session.getDatabaseRetriever().getPlateLayout(_plate_layout_id);
 	    break;
 	case 1:
-	table2 = session.getDatabaseManager().getDatabaseRetriever().getSampleReplicatesLayout(_plate_layout_id);
+	table2 = session.getDatabaseRetriever().getSampleReplicatesLayout(_plate_layout_id);
 	    break;
 	case 2:
-	table2 = session.getDatabaseManager().getDatabaseRetriever().getTargetReplicatesLayout(_plate_layout_id);
+	table2 = session.getDatabaseRetriever().getTargetReplicatesLayout(_plate_layout_id);
 	    break;
 
 	    

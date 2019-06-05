@@ -98,7 +98,7 @@ public class DialogAddUser extends JDialog {
     c.gridheight = 1;
     pane.add(passwordField, c);
 
-    ComboItem[] groups = session.getDatabaseManager().getDatabaseRetriever().getUserGroups();
+    ComboItem[] groups = session.getDatabaseRetriever().getUserGroups();
 
     groupList = new JComboBox<ComboItem>(groups);
     groupList.setSelectedIndex(0);

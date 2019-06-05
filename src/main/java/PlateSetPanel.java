@@ -57,8 +57,7 @@ public class PlateSetPanel extends JPanel {
 
     JLabel descriptionLabel =
         new JLabel(
-            session.getDatabaseManager()
-                .getDatabaseRetriever()
+            session.getDatabaseRetriever()
                 .getDescriptionForProject(project_sys_name),
             SwingConstants.LEFT);
     c.gridx = 1;

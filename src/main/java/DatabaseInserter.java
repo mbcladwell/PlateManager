@@ -42,7 +42,7 @@ public class DatabaseInserter {
     //this.session = dmf.getSession();
   }
 
-  public void insertProject(String _name, String _description, int _pmuser_id) {
+  public void insertProject(String _name, String _description, int _lnuser_id) {
 
     String insertSql = "SELECT new_project(?, ?, ?);";
     PreparedStatement insertPs;
@@ -50,7 +50,7 @@ public class DatabaseInserter {
       insertPs = conn.prepareStatement(insertSql);
       insertPs.setString(1, _description);
       insertPs.setString(2, _name);
-      insertPs.setInt(3, _pmuser_id);
+      insertPs.setInt(3, _lnuser_id);
       int i = insertPs.executeUpdate();
    
       //      insertPreparedStatement(insertPs);
@@ -299,7 +299,7 @@ public int insertPlateSet2(
     LOGGER.info("keys: " + plate_ids);
 
     this.associatePlateIDsWithPlateSetID(all_plate_ids, new_plate_set_id);
-    dmf.showPlateSetTable(dmf.getSession().getProjectSysName());
+    dmf.showPlateSetTable(session.getProjectSysName());
   }
 
   /** Called from DialogGroupPlates from the plate panel/menubar */
@@ -362,7 +362,7 @@ public int insertPlateSet2(
     LOGGER.info("keys: " + plate_ids);
 
     this.associatePlateIDsWithPlateSetID(plate_ids, new_plate_set_id);
-    dmf.showPlateSetTable(dmf.getSession().getProjectSysName());
+    dmf.showPlateSetTable(session.getProjectSysName());
   }
 
   public void associatePlateIDsWithPlateSetID(Set<Integer> _plateIDs, int _plate_set_id) {
@@ -429,7 +429,7 @@ Integer[] plate_set_id =
         dbm.getDatabaseRetriever()
             .getIDsForSysNames(plate_set_sys_name, "plate_set", "plate_set_sys_name");
 
- int num_of_plate_ids = session.getDatabaseManager().getDatabaseRetriever().getAllPlateIDsForPlateSetID(plate_set_id[0]).size();
+ int num_of_plate_ids = session.getDatabaseRetriever().getAllPlateIDsForPlateSetID(plate_set_id[0]).size();
 //check that there are the correct number of rows in the table
 if(num_of_plate_ids*format_id!=table.size()-1){
     	JOptionPane.showMessageDialog(dmf, new String("Expecting " + String.valueOf(num_of_plate_ids*format_id) + " rows but found " + (table.size()-1) + " rows." ), "Import Error", JOptionPane.ERROR_MESSAGE);
@@ -522,7 +522,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
     //Now I need to select hits if requested by user.  I have the assay_run_id, and the algorithm for hit selection.
     // stored procedure: new_hit_list(_name VARCHAR, _descr VARCHAR, _num_hits INTEGER, _assay_run_id INTEGER, hit_list integer[])
     // DialogNewHitList(DialogMainFrame _dmf, int  _assay_run_id, double[][] _selected_response, int _num_hits)
-    // table = session.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(assay_run_id);
+    // table = session.getDatabaseRetriever().getDataForScatterPlot(assay_run_id);
     // 	norm_response = new ResponseWrangler(table, ResponseWrangler.NORM);
    //    double[][]  sortedResponse [response] [well] [type_id] [sample_id];
     // selected_response.getHitsAboveThreshold(threshold))
@@ -530,7 +530,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
     
     if(auto_select_hits){
 
-	ResponseWrangler rw = new ResponseWrangler(session.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(assay_run_id),ResponseWrangler.NORM);
+	ResponseWrangler rw = new ResponseWrangler(session.getDatabaseRetriever().getDataForScatterPlot(assay_run_id),ResponseWrangler.NORM);
 	double[][] sorted_response = rw.getSortedResponse();
 	int number_of_hits = 0;
        
@@ -659,7 +659,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
       resultSet.next();
       dest_plate_set_id = resultSet.getInt("reformat_plate_set");
       
-      dmf.showPlateSetTable(dmf.getSession().getProjectSysName());
+      dmf.showPlateSetTable(session.getProjectSysName());
     } catch (SQLException sqle) {
 	LOGGER.warning("SQLE at reformat plate set: " + sqle);
     }
@@ -780,8 +780,8 @@ if(num_of_plate_ids*format_id!=table.size()-1){
     public void importAccessionsByPlateSet(int _plate_set_id){
 	int plate_set_id = _plate_set_id;
 	String plate_set_sys_name = new String("PS-" + String.valueOf(plate_set_id));
-	int plate_num = session.getDatabaseManager().getDatabaseRetriever().getNumberOfPlatesForPlateSetID(plate_set_id);
-	int format_id = session.getDatabaseManager().getDatabaseRetriever().getFormatForPlateSetID(plate_set_id);
+	int plate_num = session.getDatabaseRetriever().getNumberOfPlatesForPlateSetID(plate_set_id);
+	int format_id = session.getDatabaseRetriever().getFormatForPlateSetID(plate_set_id);
 	   
 		new DialogImportPlateSetAccessionIDs(dmf, plate_set_sys_name, plate_set_id, format_id, plate_num);
 	
@@ -864,7 +864,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
       int hit_list_id = _hit_list_id;
       int dest_plate_set_id =0;
     try {
-      int project_id = dmf.getSession().getProjectID();
+      int project_id = session.getProjectID();
       int plate_format_id = _plate_format_id;
       int plate_type_id = _plate_type_id;
       int plate_layout_id = _plate_layout_id;
@@ -1042,5 +1042,53 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 
       }
 
-    
+      /**
+   * Incoming variables: ( 'plate set name' 'description' '10' '96' 'assay')
+   *
+   * <p>Method signature in Postgres: CREATE OR REPLACE FUNCTION new_plate_set(_descr
+   * VARCHAR(30),_plate_set_name VARCHAR(30), _num_plates INTEGER, _plate_format_id INTEGER,
+   * _plate_type_id INTEGER, _project_id INTEGER, _with_samples boolean)
+   */
+  public void insertPlateSet(
+      String _name,
+      String _description,
+      String _num_plates,
+      String _plate_format_id,
+      int _plate_type_id,
+      int _plate_layout_id) {
+
+    try {
+      int project_id = session.getProjectID();
+      int plate_format_id =
+          Integer.parseInt(_plate_format_id);
+      int plate_type_id = _plate_type_id;
+      int plate_layout_id = _plate_layout_id;
+         
+
+      String insertSql = "SELECT new_plate_set ( ?, ?, ?, ?, ?, ?, ?, ?);";
+      PreparedStatement insertPs =
+          conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+      insertPs.setString(1, _description);
+      insertPs.setString(2, _name);
+      insertPs.setInt(3, Integer.valueOf(_num_plates));
+      insertPs.setInt(4, plate_format_id);
+      insertPs.setInt(5, plate_type_id);
+      insertPs.setInt(6, project_id);
+      insertPs.setInt(7, plate_layout_id);    
+      insertPs.setBoolean(8, true);
+
+      // LOGGER.info(insertPs.toString());
+      int rowsAffected   = insertPs.executeUpdate();
+       ResultSet rsKey = insertPs.getGeneratedKeys();
+       rsKey.next();
+       int new_ps_id = rsKey.getInt(1);
+       insertPs.close();
+      //  SELECT new_plate_set ( 'descrip', 'myname', '10', '96', 'assay', 0, 't')
+    } catch (SQLException sqle) {
+      LOGGER.severe("Failed to create plate set: " + sqle);
+    }
+
+    session.getDialogMainFrame().showPlateSetTable(session.getProjectSysName());    
+  }
+
 }

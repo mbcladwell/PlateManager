@@ -187,7 +187,7 @@ public class DialogGroupPlateSet extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
 
-    ComboItem[] plateTypes = session.getDatabaseManager().getDatabaseRetriever().getPlateTypes();
+    ComboItem[] plateTypes = session.getDatabaseRetriever().getPlateTypes();
 
     typeList = new JComboBox<ComboItem>(plateTypes);
     typeList.setSelectedIndex(0);
@@ -206,7 +206,7 @@ public class DialogGroupPlateSet extends JDialog {
     c.anchor = GridBagConstraints.LINE_END;
     pane.add(label, c);
     LOGGER.info("format: " + format);
-    ComboItem[] plateLayouts = session.getDatabaseManager().getDatabaseRetriever().getSourcePlateLayoutNames(Integer.parseInt(format));
+    ComboItem[] plateLayouts = session.getDatabaseRetriever().getSourcePlateLayoutNames(Integer.parseInt(format));
     LOGGER.info("plateLayout: " + plateLayouts);
 
     layoutList = new JComboBox<ComboItem>(plateLayouts);
@@ -232,7 +232,7 @@ public class DialogGroupPlateSet extends JDialog {
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
 
-            session.getDatabaseManager()
+            session
                 .getDatabaseInserter()
                 .groupPlateSetsIntoNewPlateSet(
                     descriptionField.getText(),

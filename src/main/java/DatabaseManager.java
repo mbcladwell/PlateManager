@@ -25,8 +25,8 @@ import javax.swing.table.TableModel;
 public class DatabaseManager {
   Connection conn;
   // CustomTable table;
-  DatabaseInserter dbInserter;
-  DatabaseRetriever dbRetriever;
+     DatabaseInserter dbInserter;
+    DatabaseRetriever dbRetriever;
   DialogMainFrame dmf;
     Session session;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -35,13 +35,12 @@ public class DatabaseManager {
 
 
   /**
-   * Use 'pmdb' as the database name. Regular users will connect as ln_user and will have restricted
-   * access (no delete etc.). Connect as ln_admin to get administrative priveleges.
+   * Use 'lndb' as the database name. Regular users will connect as ln_user and will have restricted
+   * access (no delete etc.). Connect as ln_admin to get administrative privileges.
    */
   public DatabaseManager(Session _s) {
       
       session=_s;
-      dmf = session.getDialogMainFrame();
       Long insertKey = 0L;
       try {
 	  Class.forName("org.postgresql.Driver");
@@ -49,8 +48,8 @@ public class DatabaseManager {
 	  // String url = "jdbc:postgresql://localhost/postgres";
 	  String url = session.getURL();
 	  Properties props = new Properties();
-	  props.setProperty("user", session.getUserName());
-	  props.setProperty("password", session.getPassword());
+	  props.setProperty("user", "ln_admin");
+	  props.setProperty("password", "welcome");
 
 	  conn = DriverManager.getConnection(url, props);
 	  PreparedStatement pstmt = conn.prepareStatement(
@@ -68,12 +67,16 @@ public class DatabaseManager {
 	  pstmt.close();
 
       if (pass) {
-        // LOGGER.info("pass is true; user: " + _user);
+	  
+	  session.setUserID( getUserIDForUserName(session.getUserName()));
+        
         String insertSql =
-            "INSERT INTO lnsession (lnuser_id) SELECT id FROM lnuser WHERE lnuser_name = ?;";
+	    "INSERT INTO lnsession (lnuser_id) values (?);";
+       
+	// "INSERT INTO lnsession (lnuser_id) SELECT id FROM lnuser WHERE lnuser_name = ?;";
         PreparedStatement insertPs =
             conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
-        insertPs.setString(1, session.getUserName());
+        insertPs.setInt(1, session.getUserID());
         LOGGER.info(insertPs.toString());
         insertPs.executeUpdate();
         ResultSet rsKey = insertPs.getGeneratedKeys();
@@ -88,7 +91,10 @@ public class DatabaseManager {
       } else {
         LOGGER.info("Authentication failed, no session generated.");
       }
-     
+
+      //This is the first initialization of  DatabaseRetriever, DatabaseInserter
+      dbRetriever = new DatabaseRetriever(this);
+      dbInserter = new DatabaseInserter(this);
     } catch (ClassNotFoundException e) {
       LOGGER.severe("Class not found: " + e);
     } catch (SQLException sqle) {
@@ -100,7 +106,7 @@ public class DatabaseManager {
   public void updateSessionWithProject(String _project_sys_name) {
     int results = 0;
     String project_sys_name = _project_sys_name;
-    this.getSession().setProjectSysName(project_sys_name);
+    session.setProjectSysName(project_sys_name);
 
     try {
       String query =
@@ -203,54 +209,6 @@ public class DatabaseManager {
     return null;
   }
 
-  /**
-   * Incoming variables: ( 'plate set name' 'description' '10' '96' 'assay')
-   *
-   * <p>Method signature in Postgres: CREATE OR REPLACE FUNCTION new_plate_set(_descr
-   * VARCHAR(30),_plate_set_name VARCHAR(30), _num_plates INTEGER, _plate_format_id INTEGER,
-   * _plate_type_id INTEGER, _project_id INTEGER, _with_samples boolean)
-   */
-  public void insertPlateSet(
-      String _name,
-      String _description,
-      String _num_plates,
-      String _plate_format_id,
-      int _plate_type_id,
-      int _plate_layout_id) {
-
-    try {
-      int project_id = dmf.getSession().getProjectID();
-      int plate_format_id =
-          Integer.parseInt(_plate_format_id);
-      int plate_type_id = _plate_type_id;
-      int plate_layout_id = _plate_layout_id;
-         
-
-      String insertSql = "SELECT new_plate_set ( ?, ?, ?, ?, ?, ?, ?, ?);";
-      PreparedStatement insertPs =
-          conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
-      insertPs.setString(1, _description);
-      insertPs.setString(2, _name);
-      insertPs.setInt(3, Integer.valueOf(_num_plates));
-      insertPs.setInt(4, plate_format_id);
-      insertPs.setInt(5, plate_type_id);
-      insertPs.setInt(6, project_id);
-      insertPs.setInt(7, plate_layout_id);    
-      insertPs.setBoolean(8, true);
-
-      // LOGGER.info(insertPs.toString());
-      int rowsAffected   = insertPs.executeUpdate();
-       ResultSet rsKey = insertPs.getGeneratedKeys();
-       rsKey.next();
-       int new_ps_id = rsKey.getInt(1);
-       insertPs.close();
-      //  SELECT new_plate_set ( 'descrip', 'myname', '10', '96', 'assay', 0, 't')
-    } catch (SQLException sqle) {
-      LOGGER.severe("Failed to create plate set: " + sqle);
-    }
-
-    session.getDialogMainFrame().showPlateSetTable(session.getProjectSysName());    
-  }
   /**
    * ******************************************************************
    *
@@ -395,6 +353,36 @@ public class DatabaseManager {
     return this.dmf;
   }
     */
+
+    /**
+     * In DatabaseManager (instead of DatabaseRetriever) because this is an early query
+     * prior to instantiation of DatabaseRetriever.
+     */
+  public int getUserIDForUserName(String _user_name) {
+    String user_name = _user_name;
+    // int plate_set_id;
+
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+              "SELECT lnuser.id FROM lnuser WHERE lnuser_name = ?;");
+
+      pstmt.setString(1, user_name);
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      int lnuser_id = Integer.valueOf(rs.getString("id"));
+
+      // LOGGER.info("result: " + plate_set_id);
+      rs.close();
+      pstmt.close();
+      return lnuser_id;
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting plateset_id: " + sqle);
+    }
+    int dummy = -1;
+    return dummy;
+  }
     
   public DatabaseInserter getDatabaseInserter() {
     return this.dbInserter;

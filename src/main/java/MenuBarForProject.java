@@ -73,15 +73,18 @@ public class MenuBarForProject extends JMenuBar {
           public void actionPerformed(ActionEvent e) {
 
             try {
-              // int i = project_table.convertRowIndexToModel(project_table.getSelectedRow());
-              // String project_sys_name = (String) project_table.getValueAt(i, 0);
-              String results[][] = project_table.getSelectedRowsAndHeaderAsStringArray();
+              int i = project_table.convertRowIndexToModel(project_table.getSelectedRow());
+              String project_sys_name = (String) project_table.getValueAt(i, 0);
+		//  String results[][] = project_table.getSelectedRowsAndHeaderAsStringArray();
               // LOGGER.info("down button results: " + results);
-               LOGGER.info("down button results: " + results[1][0]);
-
-              session.getDatabaseManager().updateSessionWithProject(results[1][0]);
-	      dmf.setMainFrameTitle(results[1][0]);
-              dmf.showPlateSetTable(results[1][0]);
+              // LOGGER.info("down button results: " + results[1][0]);
+	      //session.getDatabaseManager().updateSessionWithProject(results[1][0]);
+	      //dmf.setMainFrameTitle(results[1][0]);
+              //dmf.showPlateSetTable(results[1][0]);
+	     
+              session.getDatabaseManager().updateSessionWithProject(project_sys_name);
+	      dmf.setMainFrameTitle(project_sys_name);
+              dmf.showPlateSetTable(project_sys_name);
             } catch (ArrayIndexOutOfBoundsException s) {
             }
           }

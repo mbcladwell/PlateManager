@@ -251,7 +251,7 @@ task prep {
 	exec{
 	   workingDir '/home/mbc'
 	//    commandLine 'gnome-terminal psql -U pm_admin -h 192.168.1.7 -d pmdb'
-	    commandLine 'gnome-terminal', '--command=/usr/bin/psql -U pm_admin -h 192.168.1.11 -d pmdb'
+	    commandLine 'gnome-terminal', '--command=/usr/bin/psql -U ln_admin -h 192.168.1.11 -d lndb'
 	}
 	//exec{
 	  // workingDir '/home/mbc'

@@ -61,13 +61,10 @@ public class DatabaseRetriever {
 
       switch(desired_table){
       case DialogMainFrame.PROJECT:
-	  sql_statement = "SELECT project_sys_name AS \"ProjectID\", project_name As \"Name\", pmuser_name AS \"Owner\", descr AS \"Description\" FROM project, pmuser WHERE pmuser_id = pmuser.id ORDER BY project.id DESC;";
+	  sql_statement = "SELECT project_sys_name AS \"ProjectID\", project_name As \"Name\", lnuser_name AS \"Owner\", descr AS \"Description\" FROM project, lnuser WHERE lnuser_id = lnuser.id ORDER BY project.id DESC;";
 	  break;
 
-	  /*      case DialogMainFrame.PLATESET:
-	  sql_statement = "SELECT plate_set.plate_set_sys_name AS \"PlateSetID\", plate_set_name As \"Name\", format AS \"Format\", num_plates AS \"# plates\" , plate_type.plate_type_name AS \"Type\", plate_layout_name.name AS \"Layout\"   , plate_set.descr AS \"Description\" FROM plate_set, plate_format, plate_type, plate_layout_name WHERE plate_format.id = plate_set.plate_format_id AND plate_set.plate_layout_name_id = plate_layout_name.id  AND plate_set.plate_type_id = plate_type.id AND project_id = ? ORDER BY plate_set.id DESC;";
-	  break;
-	  */
+	 
       case DialogMainFrame.PLATESET:
  
 	  sql_statement = "SELECT plate_set.plate_set_sys_name AS \"PlateSetID\", plate_set_name As \"Name\", format AS \"Format\", num_plates AS \"# plates\" , plate_type.plate_type_name AS \"Type\", plate_layout_name.name AS \"Layout\", plate_set.descr AS \"Description\", rearray_pairs.ID AS \"Worklist\" FROM  plate_format, plate_type, plate_layout_name, plate_set FULL outer JOIN rearray_pairs ON plate_set.id= rearray_pairs.dest WHERE plate_format.id = plate_set.plate_format_id AND plate_set.plate_layout_name_id = plate_layout_name.id  AND plate_set.plate_type_id = plate_type.id  AND project_id = ? ORDER BY plate_set.id DESC;";
@@ -84,7 +81,6 @@ public class DatabaseRetriever {
       java.sql.PreparedStatement pstmt =  conn.prepareStatement(sql_statement);
       if(desired_table != DialogMainFrame.PROJECT){
 	  pstmt.setInt(1, id);
-LOGGER.info("pstmt: " + pstmt);
       }
 
       ResultSet rs =  pstmt.executeQuery();
@@ -359,6 +355,8 @@ LOGGER.info("pstmt: " + pstmt);
     return plate_IDs;
   }
 
+
+    
   /**
    * ******************************************************************
    *
@@ -399,7 +397,7 @@ LOGGER.info("pstmt: " + pstmt);
  
     try {
       PreparedStatement pstmt =
-          conn.prepareStatement("SELECT id, usergroup from pmuser_groups;");
+          conn.prepareStatement("SELECT id, usergroup from lnuser_groups;");
 
       ResultSet rs = pstmt.executeQuery();
       while (rs.next()) {

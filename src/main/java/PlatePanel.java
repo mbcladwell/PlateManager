@@ -68,8 +68,7 @@ public class PlatePanel extends JPanel {
     //LOGGER.info("table.getValueAt(0, 0)" + table.getValueAt(0, 0));
 
     plateset_sys_name =
-        session.getDatabaseManager()
-            .getDatabaseRetriever()
+        session.getDatabaseRetriever()
             .getPlateSetSysNameForPlateSysName((String) table.getValueAt(0, 0));
     JLabel platesetLabel = new JLabel(plateset_sys_name, SwingConstants.LEFT);
     c.gridx = 1;
@@ -83,8 +82,7 @@ public class PlatePanel extends JPanel {
 
     JLabel descriptionLabel =
         new JLabel(
-            session.getDatabaseManager()
-                .getDatabaseRetriever()
+            session.getDatabaseRetriever()
                 .getDescriptionForPlateSet(plateset_sys_name),
             SwingConstants.LEFT);
     c.gridx = 1;

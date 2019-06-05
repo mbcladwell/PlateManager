@@ -115,7 +115,7 @@ public class AdminMenu extends JMenu {
 							     JOptionPane.YES_NO_OPTION);
 		      if(n == JOptionPane.YES_OPTION){
 			  int prj_id = Integer.parseInt(projectid.substring(4));
-			  session.getDatabaseManager().getDatabaseInserter().deleteProject(prj_id);
+			  session.getDatabaseInserter().deleteProject(prj_id);
 			  
 		      }
 		    

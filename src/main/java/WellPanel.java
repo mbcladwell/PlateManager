@@ -64,8 +64,7 @@ public class WellPanel extends JPanel {
     plate_sys_name = (String) table.getValueAt(1, 0);
     
     plateset_sys_name =
-        session.getDatabaseManager()
-            .getDatabaseRetriever()
+        session.getDatabaseRetriever()
 	.getPlateSetSysNameForPlateSysName(plate_sys_name);
 
     
@@ -81,8 +80,7 @@ public class WellPanel extends JPanel {
 
     JLabel descriptionLabel =
         new JLabel(
-            session.getDatabaseManager()
-                .getDatabaseRetriever()
+            session.getDatabaseRetriever()
                 .getDescriptionForPlateSet(plateset_sys_name),
             SwingConstants.LEFT);
     c.gridx = 1;

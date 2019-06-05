@@ -4,8 +4,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.logging.*;
 import java.io.File;
-
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -42,26 +43,39 @@ public class Session {
     private String source;
     private DatabaseInserter dbi;
     private DatabaseRetriever dbr;
-    
-    
-    
-  private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-
-  private static final long serialVersionUID = 1L;
+    private FileInputStream file;
+    private  Properties prop = new Properties();
+    private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private static final long serialVersionUID = 1L;
 
   public Session() {
-     
-    try{
-    String path = "./limsnucleus.properties";
+    	String path = "./limsnucleus.properties";   
+	try{
+	    file = new FileInputStream(path);
+	    loadProperties();
+	if(user.equals("null")){
+	    new DialogLogin(this, "", java.awt.Dialog.ModalityType.APPLICATION_MODAL);
+	    //postLoadProperties();
+	}else{
+	    postLoadProperties();
 
-    //load the file handle for main.properties
-     FileInputStream file = new FileInputStream(path);
+	}
+	    
+	}catch(FileNotFoundException fnfe){
+	    new DialogPropertiesNotFound(this);	   
+	}   
 
-            Properties prop = new Properties();
 
-            // load a properties file
-            prop.load(file);
+  }
+  
+    /**
+     * Define class variables with contents of properties file
+     * File has been determined at this point.
+     */
+    public void loadProperties(){
 
+	try{
+	    prop.load(file);
             // get the property value and print it out
             System.out.println(prop.getProperty("host"));
 	    host = prop.getProperty("host");
@@ -75,48 +89,59 @@ public class Session {
             System.out.println(prop.getProperty("password"));
 	    password = prop.getProperty("password");
 	    System.out.println(prop.getProperty("user"));
-	    user = prop.getProperty("user");
-	    if(user.equals("null")){
-			new DialogLogin(this, "", Dialog.ModalityType.DOCUMENT_MODAL);
-	    }
-	  
+	    user = prop.getProperty("user");	  
 	    temp_dir = new File(System.getProperty("java.io.tmpdir")).toString();
 	    working_dir = new File(System.getProperty("user.dir")).toString();
-	      file.close();
-	      
-	      switch (source){
-	      case "heroku":
-		  URL = new String("postgres://" + user + ":" + password + "@" + host + ":" + port + "/" + dbname );
-		  LOGGER.info("URL: " + URL);
-	      case "local":
-		  URL = new String("jdbc:postgresql://" + host + "/" + dbname);
-	      }
-	 
-        } catch (IOException ex) {
-	//if properties file is missing, set up for Heroku
-	host = "ec2-50-19-114-27.compute-1.amazonaws.com";
-	    port = "5432";
-	    sslmode = "require";
-	    source = "heroku";
-	    dbname = "d6dmueahka0hch";
-	    help_url_prefix = "http://labsolns.com/software/";
-	    password = "c5644d221fa636d8d8065d336014723f66df0c6b78e7a5390453c4a18c9b20b2";
-	    user = "dpstpnuvjslqch";
-	      URL = new String("jdbc:postgresql://" + host + ":" + port + "/" + dbname + "?sslmode=require&user=" + user + "&password=" +password );
-		  LOGGER.info("URL: " + URL);
-
-        }
-    try{    
-    dbm = new DatabaseManager( this );   
-    dbi = new DatabaseInserter(dbm);
-    dbr = new DatabaseRetriever(dbm);
-    dmf = new DialogMainFrame(this);
-   
-    }catch(SQLException sqle){
-		  LOGGER.info("SQL exception creating DatabaseManager: " + sqle);
+	    file.close();
+	}catch(IOException ioe){
+		
+	}    
+	    
     }
-  }
 
+    /**
+     * Continuation of login; at this point user has been determined either from properties or login dialog
+     * Have to separate so that the proper username is used i.e. null might have been entered in properties file
+     */
+    public void postLoadProperties(){
+	try{
+	    
+	    switch (source){
+	case "heroku":
+	    URL = new String("postgres://" + user + ":" + password + "@" + host + ":" + port + "/" + dbname );
+	    break;
+	case "local":
+	    URL = new String("jdbc:postgresql://" + host + "/" + dbname);
+	    break;
+	}
+	 LOGGER.info("URL: " + URL);
+
+	dbm = new DatabaseManager( this );   
+	dbr = dbm.getDatabaseRetriever();
+	dbi = dbm.getDatabaseInserter();
+	dmf = new DialogMainFrame(this);
+	}
+    catch(SQLException sqle){
+	LOGGER.info("SQL exception creating DatabaseManager: " + sqle);
+    }
+	
+    }
+
+    public void setupHeroku(){
+	host = "ec2-50-19-114-27.compute-1.amazonaws.com";
+	port = "5432";
+	sslmode = "require";
+	source = "heroku";
+	dbname = "d6dmueahka0hch";
+	help_url_prefix = "http://labsolns.com/software/";
+	password = "c5644d221fa636d8d8065d336014723f66df0c6b78e7a5390453c4a18c9b20b2";
+	user = "dpstpnuvjslqch";
+	URL = new String("jdbc:postgresql://" + host + ":" + port + "/" + dbname + "?sslmode=require&user=" + user + "&password=" +password );
+	
+	this.postLoadProperties();
+	
+    }
+    
   public void setUserID(int _id) {
     user_id = _id;
   }
@@ -239,6 +264,12 @@ public class Session {
     }
     public DialogMainFrame getDialogMainFrame(){
 	return dmf;
+    }
+    public void setPropertiesFile(FileInputStream _f){
+	file=_f;
+    }
+    public FileInputStream getPropertiesFile(){
+	return file;
     }
     
 }

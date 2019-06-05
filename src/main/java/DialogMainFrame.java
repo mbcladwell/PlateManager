@@ -47,7 +47,7 @@ public class DialogMainFrame extends JFrame {
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       ImageIcon img = new ImageIcon(this.getClass().getResource("images/mwplate.png"));
       this.setIconImage(img.getImage());
-      //dbr = session.getDatabaseManager().getDatabaseRetriever();
+      //dbr = session.getDatabaseRetriever();
    
     /////////////////////////////////////////////
     // set up the project table

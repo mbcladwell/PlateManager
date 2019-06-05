@@ -108,7 +108,7 @@ public class DialogAddProject extends JDialog {
             // DatabaseManager dm = new DatabaseManager();
             // dbm.persistObject(new Project(descriptionField.getText(), ownerField.getText(),
             // nameField.getText()));
-            dbm.getDatabaseInserter()
+            session.getDatabaseInserter()
                 .insertProject(
                     nameField.getText(), descriptionField.getText(), session.getUserID());
             dmf.getProjectPanel().updatePanel();
