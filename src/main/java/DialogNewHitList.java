@@ -49,9 +49,9 @@ public class DialogNewHitList extends JDialog {
     private double[][] selected_response;
     private int num_hits;
 
-    public DialogNewHitList(DialogMainFrame _dmf, int  _assay_run_id, double[][] _selected_response, int _num_hits) {
-    this.dmf = _dmf;
-    this.session = dmf.getSession();
+    public DialogNewHitList(Session _session, int  _assay_run_id, double[][] _selected_response, int _num_hits) {
+    this.session = _session;
+    this.dmf = session.getDialogMainFrame();
     owner = session.getUserName();
     assay_run_id = _assay_run_id;
     selected_response = _selected_response;

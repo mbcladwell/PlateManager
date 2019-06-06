@@ -69,6 +69,8 @@ public class DatabaseManager {
       if (pass) {
 	  
 	  session.setUserID( getUserIDForUserName(session.getUserName()));
+	  session.setUserGroup( getUserGroupForUserName(session.getUserName()));
+	  session.setAuthenticated( true);
         
         String insertSql =
 	    "INSERT INTO lnsession (lnuser_id) values (?);";
@@ -90,6 +92,8 @@ public class DatabaseManager {
 
       } else {
         LOGGER.info("Authentication failed, no session generated.");
+
+	
       }
 
       //This is the first initialization of  DatabaseRetriever, DatabaseInserter
@@ -383,7 +387,37 @@ public class DatabaseManager {
     int dummy = -1;
     return dummy;
   }
-    
+
+        /**
+     * In DatabaseManager (instead of DatabaseRetriever) because this is an early query
+     * prior to instantiation of DatabaseRetriever.
+     */
+  public String getUserGroupForUserName(String _user_name) {
+    String user_name = _user_name;
+    // int plate_set_id;
+
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+              "SELECT lnuser_groups.usergroup FROM lnuser, lnuser_groups WHERE lnuser.lnuser_name = ? AND lnuser.usergroup=lnuser_groups.id;");
+
+      pstmt.setString(1, user_name);
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      String usergroup = rs.getString("usergroup");
+
+      // LOGGER.info("result: " + plate_set_id);
+      rs.close();
+      pstmt.close();
+      return usergroup;
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting plateset_id: " + sqle);
+    }
+    String dummy = "error";
+    return dummy;
+  }
+
   public DatabaseInserter getDatabaseInserter() {
     return this.dbInserter;
   }

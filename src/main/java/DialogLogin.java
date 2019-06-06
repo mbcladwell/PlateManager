@@ -42,41 +42,54 @@ public class DialogLogin extends JDialog {
     this.setTitle("Login to LIMS*Nucleus");
     // c.gridwidth = 2;
 
-    label = new JLabel("Date:", SwingConstants.RIGHT);
+    label = new JLabel("LIMS*Nucleus v0.1-2019");
+    // c.fill = GridBagConstraints.HORIZONTAL;
+    c.gridx = 1;
+    c.gridy = 0;
+    c.anchor = GridBagConstraints.LINE_START;
+
+    c.insets = new Insets(5, 5, 2, 2);
+    pane1.add(label, c);
+
+    label = new JLabel("Date:");
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 0;
-    c.gridy = 0;
+    c.gridy = 1;
+        c.anchor = GridBagConstraints.LINE_END;
+
     c.insets = new Insets(5, 5, 2, 2);
     pane1.add(label, c);
 
     label = new JLabel(df.format(Date.from(instant)));
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 1;
-    c.gridy = 0;
+    c.gridy = 1;
+    c.anchor = GridBagConstraints.LINE_START;
     pane1.add(label, c);
 
     label = new JLabel("Name:", SwingConstants.RIGHT);
     // c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 0;
-    c.gridy = 1;
+    c.gridy = 2;
+        c.anchor = GridBagConstraints.LINE_END;
     pane1.add(label, c);
 
     label = new JLabel("Password:", SwingConstants.RIGHT);
     c.gridx = 0;
-    c.gridy = 2;
+    c.gridy = 3;
     pane1.add(label, c);
 
    
     userIDField = new JTextField(30);
     c.gridx = 1;
-    c.gridy = 1;
+    c.gridy = 2;
     c.gridwidth = 2;
     c.gridheight = 1;
     pane1.add(userIDField, c);
 
     passwordField = new JTextField(30);
     c.gridx = 1;
-    c.gridy = 2;
+    c.gridy = 3;
     pane1.add(passwordField, c);
 
   
@@ -135,12 +148,13 @@ public class DialogLogin extends JDialog {
     } catch (Exception ex) {
       LOGGER.severe(ex + " down image not found");
     }
+    /*
     label = new JLabel("LIMS*Nucleus v0.1-2019");
      c.gridy=1;
     c.gridx=2;
       c.gridwidth=1;
     pane2.add(label, c);
-    
+    */
     this.getContentPane().add(parent_pane, BorderLayout.CENTER);
     parent_pane.add(pane1, BorderLayout.SOUTH);
     parent_pane.add(pane2, BorderLayout.NORTH);

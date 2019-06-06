@@ -6,6 +6,7 @@ import java.util.logging.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import javax.swing.JOptionPane;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +47,7 @@ public class Session {
     private FileInputStream file;
     private  Properties prop = new Properties();
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private boolean authenticated= false;
     private static final long serialVersionUID = 1L;
 
   public Session() {
@@ -116,10 +118,17 @@ public class Session {
 	}
 	 LOGGER.info("URL: " + URL);
 
-	dbm = new DatabaseManager( this );   
-	dbr = dbm.getDatabaseRetriever();
-	dbi = dbm.getDatabaseInserter();
-	dmf = new DialogMainFrame(this);
+	dbm = new DatabaseManager( this );
+	if(authenticated){
+	    dbr = dbm.getDatabaseRetriever();
+	    dbi = dbm.getDatabaseInserter();
+	    dmf = new DialogMainFrame(this);
+	}else{
+	    	JOptionPane.showMessageDialog(null,
+			      "Invalid username or password.  Session terminated.",
+				      "Authentication Failure!",
+			      JOptionPane.ERROR_MESSAGE);
+	}
 	}
     catch(SQLException sqle){
 	LOGGER.info("SQL exception creating DatabaseManager: " + sqle);
@@ -270,6 +279,12 @@ public class Session {
     }
     public FileInputStream getPropertiesFile(){
 	return file;
+    }
+    public void setAuthenticated(boolean _b){
+	authenticated = _b;
+    }
+    public boolean getAuthenticated(){
+	return authenticated;
     }
     
 }

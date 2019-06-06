@@ -46,6 +46,7 @@ public class DatabaseInserter {
 
     String insertSql = "SELECT new_project(?, ?, ?);";
     PreparedStatement insertPs;
+
     try {
       insertPs = conn.prepareStatement(insertSql);
       insertPs.setString(1, _description);
@@ -547,7 +548,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 	    number_of_hits =  rw.getHitsAboveThreshold(rw.getMean_neg_3_sd() );
 	    break;	    	    
 	}
-	DialogNewHitList dnhl = new DialogNewHitList(dmf, assay_run_id, sorted_response, number_of_hits);
+	DialogNewHitList dnhl = new DialogNewHitList(session, assay_run_id, sorted_response, number_of_hits);
 	
     }
   
@@ -611,6 +612,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
     }
+    session.getDialogMainFrame().showProjectTable();
   }
 
 
@@ -1009,7 +1011,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
         }
 	    
 	}
-	new DialogNewHitListFromFile(dmf, assay_run_id, s_ids);
+	new DialogNewHitListFromFile(session, assay_run_id, s_ids);
     }
 
     /**
