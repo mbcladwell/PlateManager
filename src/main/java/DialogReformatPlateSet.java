@@ -76,7 +76,7 @@ public int new_plate_format_id;
    * @param _format number of wells per plate
    */
   public DialogReformatPlateSet(
-      DialogMainFrame _dmf,
+      Session _session,
       int _plate_set_id,
       String _plate_set_sys_name,
       String _descr,
@@ -85,8 +85,8 @@ public int new_plate_format_id;
       String _plate_type,
       String _plate_format,
       int _plate_layout_name_id) {
-    this.dmf = _dmf;
-    this.session = dmf.getSession();
+    this.session = _session;
+      this.dmf = session.getDialogMainFrame();
     owner = session.getUserName();
     old_plate_set_id = _plate_set_id;
     //  HashMap<String, String> plate_set_num_plates = _plate_set_num_plates;

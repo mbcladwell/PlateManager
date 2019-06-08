@@ -79,18 +79,13 @@ public class Session {
 	try{
 	    prop.load(file);
             // get the property value and print it out
-            System.out.println(prop.getProperty("host"));
-	    host = prop.getProperty("host");
+            host = prop.getProperty("host");
 	    port = prop.getProperty("port");
 	    sslmode = prop.getProperty("sslmode");
 	    source = prop.getProperty("source");
-            System.out.println(prop.getProperty("dbname"));
-	    dbname = prop.getProperty("dbname");
-            System.out.println(prop.getProperty("base.help.url"));
-	    help_url_prefix = prop.getProperty("base.help.url");
-            System.out.println(prop.getProperty("password"));
-	    password = prop.getProperty("password");
-	    System.out.println(prop.getProperty("user"));
+            dbname = prop.getProperty("dbname");
+            help_url_prefix = prop.getProperty("base.help.url");
+            password = prop.getProperty("password");
 	    user = prop.getProperty("user");	  
 	    temp_dir = new File(System.getProperty("java.io.tmpdir")).toString();
 	    working_dir = new File(System.getProperty("user.dir")).toString();

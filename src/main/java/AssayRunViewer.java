@@ -172,7 +172,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     public void actionPerformed(ActionEvent e) {
     if (e.getSource() == exportAssayRun) {
 	popup = new JPopupMenu();      
-	JMenuItem menuItem = new JMenuItem("Selected rows in table");            
+	JMenuItem menuItem = new JMenuItem("Selected rows this table");            
 	menuItem.setMnemonic(KeyEvent.VK_R);
 	menuItem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -192,21 +192,25 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 		}
 	    });
     popup.add(menuItem);    
-    menuItem = new JMenuItem("Data for single selection");		   
+    menuItem = new JMenuItem("Underlying data");		   
     menuItem.setMnemonic(KeyEvent.VK_D);
     menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 		if(!assay_runs_table.getSelectionModel().isSelectionEmpty()){
 		    Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(assay_runs_table);
 		    if(results.length>1){
-
+			String[] assay_run_ids = new String[results.length];
 			try{
-			    String assay_runs_sys_name =  assay_runs_table.getModel().getValueAt(0, 0).toString();
-			    int  assay_runs_id = Integer.parseInt(assay_runs_sys_name.substring(3));
+			    
+			    for(int i=0; i < results.length-1; i++){
+			    assay_run_ids[i] =  assay_runs_table.getModel().getValueAt(i, 0).toString().substring(3);
+			    }
 
-			    Object[][] assay_run_data = session.getDatabaseRetriever().getAssayRunData(assay_runs_id);
+			    Object[][] assay_run_data = session.getDatabaseRetriever().getAssayRunData(assay_run_ids);
 			    POIUtilities poi = new POIUtilities(dmf);
-			    poi.writeJTableToSpreadsheet("Assay Run Data for " + assay_runs_sys_name, assay_run_data);
+			    
+			    poi.writeJTableToSpreadsheet("Assay Run Data", assay_run_data);
+			    //poi.writeJTableToSpreadsheet("Assay Run Data for " + assay_runs_sys_name, assay_run_data);
 		
 			    Desktop d = Desktop.getDesktop();
 			    d.open(new File("./Writesheet.xlsx"));
@@ -299,7 +303,6 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 		 int row = hit_lists_table.getSelectedRow();
 		 String hit_list_sys_name =  hit_lists_table.getModel().getValueAt(row, 0).toString();
 		 int  hit_list_id = Integer.parseInt(hit_list_sys_name.substring(3));
-		 LOGGER.info("hit_list_id: " + hit_list_id);
 		 new HitListViewer( dmf, hit_list_id);}
   else{
 	      JOptionPane.showMessageDialog(dmf, "Select a Hit List!");	      
@@ -315,6 +318,8 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     if (e.getSource() == projectList) {
 	if(projectList.getSelectedIndex() > -1){
 	    project_id  = ((ComboItem)projectList.getSelectedItem()).getKey();
+	    session.setProjectID(project_id);
+	    session.setProjectSysName(((ComboItem)projectList.getSelectedItem()).toString());
 	    this.refreshTables(); 
 	}
     }  

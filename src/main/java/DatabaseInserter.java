@@ -245,11 +245,11 @@ public int insertPlateSet2(
 
     //LOGGER.info(
     //  "set: "
-    //      + dmf.getUtilities().getStringArrayForStringSet(new HashSet<String>(plate_sys_names)));
+    //      + session.getDialogMainFrame().getUtilities().getStringArrayForStringSet(new HashSet<String>(plate_sys_names)));
     Integer[] plate_ids =
         dbm.getDatabaseRetriever()
             .getIDsForSysNames(
-                dmf.getUtilities().getStringArrayForStringSet(new HashSet<String>(plate_sys_names)),
+			       session.getDialogMainFrame().getUtilities().getStringArrayForStringSet(new HashSet<String>(plate_sys_names)),
                 "plate",
                 "plate_sys_name");
 
@@ -300,7 +300,7 @@ public int insertPlateSet2(
     LOGGER.info("keys: " + plate_ids);
 
     this.associatePlateIDsWithPlateSetID(all_plate_ids, new_plate_set_id);
-    dmf.showPlateSetTable(session.getProjectSysName());
+    session.getDialogMainFrame().showPlateSetTable(session.getProjectSysName());
   }
 
   /** Called from DialogGroupPlates from the plate panel/menubar */
@@ -363,14 +363,14 @@ public int insertPlateSet2(
     LOGGER.info("keys: " + plate_ids);
 
     this.associatePlateIDsWithPlateSetID(plate_ids, new_plate_set_id);
-    dmf.showPlateSetTable(session.getProjectSysName());
+    session.getDialogMainFrame().showPlateSetTable(session.getProjectSysName());
   }
 
   public void associatePlateIDsWithPlateSetID(Set<Integer> _plateIDs, int _plate_set_id) {
     Set<Integer> plateIDs = _plateIDs;
     int plate_set_id = _plate_set_id;
     Integer[] plate_ids =
-        Arrays.stream(dmf.getUtilities().getIntArrayForIntegerSet(plateIDs))
+        Arrays.stream(session.getDialogMainFrame().getUtilities().getIntArrayForIntegerSet(plateIDs))
             .boxed()
             .toArray(Integer[]::new);
 
@@ -393,7 +393,7 @@ public int insertPlateSet2(
           plate_set_sys_name,
           (ComboItem) assayTypes.getSelectedItem().getKey(),
           (ComboItem) plateLayouts.getSelectedItem().getKey(),
-          dmf.getUtilities().loadDataFile(fileField.getText()),
+          session.getDialogMainFrame().getUtilities().loadDataFile(fileField.getText()),
           checkBox.isSelected()
           (ComboItem) algoritmList.getSelectedItem().getKey());
   */
@@ -433,7 +433,7 @@ Integer[] plate_set_id =
  int num_of_plate_ids = session.getDatabaseRetriever().getAllPlateIDsForPlateSetID(plate_set_id[0]).size();
 //check that there are the correct number of rows in the table
 if(num_of_plate_ids*format_id!=table.size()-1){
-    	JOptionPane.showMessageDialog(dmf, new String("Expecting " + String.valueOf(num_of_plate_ids*format_id) + " rows but found " + (table.size()-1) + " rows." ), "Import Error", JOptionPane.ERROR_MESSAGE);
+    	JOptionPane.showMessageDialog(session.getDialogMainFrame(), new String("Expecting " + String.valueOf(num_of_plate_ids*format_id) + " rows but found " + (table.size()-1) + " rows." ), "Import Error", JOptionPane.ERROR_MESSAGE);
 	return;
 }
 
@@ -471,7 +471,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
     } catch (SQLException sqle) {
       LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
       JOptionPane.showMessageDialog(
-          dmf, "Problems parsing data file!.", "Error", JOptionPane.ERROR_MESSAGE);
+          session.getDialogMainFrame(), "Problems parsing data file!.", "Error", JOptionPane.ERROR_MESSAGE);
       return;
     }
 
@@ -522,7 +522,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 
     //Now I need to select hits if requested by user.  I have the assay_run_id, and the algorithm for hit selection.
     // stored procedure: new_hit_list(_name VARCHAR, _descr VARCHAR, _num_hits INTEGER, _assay_run_id INTEGER, hit_list integer[])
-    // DialogNewHitList(DialogMainFrame _dmf, int  _assay_run_id, double[][] _selected_response, int _num_hits)
+    // DialogNewHitList(DialogMainFrame _session.getDialogMainFrame(), int  _assay_run_id, double[][] _selected_response, int _num_hits)
     // table = session.getDatabaseRetriever().getDataForScatterPlot(assay_run_id);
     // 	norm_response = new ResponseWrangler(table, ResponseWrangler.NORM);
    //    double[][]  sortedResponse [response] [well] [type_id] [sample_id];
@@ -661,7 +661,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
       resultSet.next();
       dest_plate_set_id = resultSet.getInt("reformat_plate_set");
       
-      dmf.showPlateSetTable(session.getProjectSysName());
+      session.getDialogMainFrame().showPlateSetTable(session.getProjectSysName());
     } catch (SQLException sqle) {
 	LOGGER.warning("SQLE at reformat plate set: " + sqle);
     }
@@ -694,9 +694,9 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 	String name = _name;
 	String descr = _descr;
 	int format = 0;
-	ArrayList<String[]> data = dmf.getUtilities().loadDataFile(_file_name);
+	ArrayList<String[]> data = session.getDialogMainFrame().getUtilities().loadDataFile(_file_name);
 
-	Object[][]  dataObject = dmf.getUtilities().getObjectArrayForArrayList(data); 
+	Object[][]  dataObject = session.getDialogMainFrame().getUtilities().getObjectArrayForArrayList(data); 
 
 	switch(data.size()-1){
 	case 96:
@@ -712,7 +712,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 	    
 	    break;
 	default:
-	    JOptionPane.showMessageDialog( dmf, "Expecting 96, 384, or 1536 lines of data. Found " + (data.size()-1) +  "!", "Error", JOptionPane.ERROR_MESSAGE);	    
+	    JOptionPane.showMessageDialog( session.getDialogMainFrame(), "Expecting 96, 384, or 1536 lines of data. Found " + (data.size()-1) +  "!", "Error", JOptionPane.ERROR_MESSAGE);	    
 	}
 	      
 	    String sqlString = "SELECT new_plate_layout(?,?, ?, ?)";
@@ -785,7 +785,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 	int plate_num = session.getDatabaseRetriever().getNumberOfPlatesForPlateSetID(plate_set_id);
 	int format_id = session.getDatabaseRetriever().getFormatForPlateSetID(plate_set_id);
 	   
-		new DialogImportPlateSetAccessionIDs(dmf, plate_set_sys_name, plate_set_id, format_id, plate_num);
+		new DialogImportPlateSetAccessionIDs(session.getDialogMainFrame(), plate_set_sys_name, plate_set_id, format_id, plate_num);
 	
 	
     }
@@ -827,7 +827,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
     }
     }else{
     JOptionPane.showMessageDialog(
-				  dmf, "Expecting the headers \"plate\", \"well\", and \"accs.id\", but found\n" + accessions.get(0)[0] + ", " +  accessions.get(0)[1] +  ", and " + accessions.get(0)[2] + "." , "Error", JOptionPane.ERROR_MESSAGE);
+				  session.getDialogMainFrame(), "Expecting the headers \"plate\", \"well\", and \"accs.id\", but found\n" + accessions.get(0)[0] + ", " +  accessions.get(0)[1] +  ", and " + accessions.get(0)[2] + "." , "Error", JOptionPane.ERROR_MESSAGE);
     return;
   	
     }

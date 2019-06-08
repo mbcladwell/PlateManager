@@ -57,11 +57,9 @@ public class DatabaseManager {
               "SELECT password = ?, password FROM lnuser WHERE lnuser_name = ?;");
 	  pstmt.setString(1, session.getPassword());
 	  pstmt.setString(2, session.getUserName());
-	  LOGGER.info(pstmt.toString());
 	  ResultSet rs = pstmt.executeQuery();
 	  rs.next();
 	  boolean pass = rs.getBoolean(1);
-	  LOGGER.info("pass : " + pass);
 
 	  rs.close();
 	  pstmt.close();
@@ -79,7 +77,6 @@ public class DatabaseManager {
         PreparedStatement insertPs =
             conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
         insertPs.setInt(1, session.getUserID());
-        LOGGER.info(insertPs.toString());
         insertPs.executeUpdate();
         ResultSet rsKey = insertPs.getGeneratedKeys();
 
@@ -266,7 +263,7 @@ public class DatabaseManager {
       for (Iterator<String> it = plateFormatSet.iterator(); it.hasNext(); ) {
         format = it.next();
       }
-      new DialogGroupPlateSet(dmf, numberOfPlatesInPlateSets, format, plateSet);
+      new DialogGroupPlateSet(session, numberOfPlatesInPlateSets, format, plateSet);
     } else {
       JOptionPane.showMessageDialog(
           dmf,
@@ -337,10 +334,10 @@ public class DatabaseManager {
 	    LOGGER.info("plate_set_id[0]: " + plate_set_id[0]);
 	    switch(format){
 	    case "96":
-			DialogReformatPlateSet drps = new DialogReformatPlateSet( dmf, (int)plate_set_id[0], plate_set_sys_name[0], descr, num_plates, num_samples, plate_type, format, plate_layout_name_id);
+			DialogReformatPlateSet drps = new DialogReformatPlateSet( session, (int)plate_set_id[0], plate_set_sys_name[0], descr, num_plates, num_samples, plate_type, format, plate_layout_name_id);
 		
 		    break;
-	    case "384":	 drps = new DialogReformatPlateSet( dmf, (int)plate_set_id[0], plate_set_sys_name[0], descr, num_plates, num_samples, plate_type, format, plate_layout_name_id);
+	    case "384":	 drps = new DialogReformatPlateSet( session, (int)plate_set_id[0], plate_set_sys_name[0], descr, num_plates, num_samples, plate_type, format, plate_layout_name_id);
 		
 		    break;
 	    case "1536":  JOptionPane.showMessageDialog(dmf,

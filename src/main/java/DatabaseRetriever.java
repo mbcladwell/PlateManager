@@ -333,12 +333,12 @@ public class DatabaseRetriever {
     // for each plate_set_sys_name get the plate_set.id
     HashMap<String, String> plate_set_sys_names = _plate_set_sys_names;
     Set<Integer> plate_set_IDs = new TreeSet<Integer>();
-    LOGGER.info("plate_set_sys_names: " + plate_set_sys_names);
+    //LOGGER.info("plate_set_sys_names: " + plate_set_sys_names);
 
     Iterator it = plate_set_sys_names.entrySet().iterator();
     while (it.hasNext()) {
       HashMap.Entry pair = (HashMap.Entry) it.next();
-      LOGGER.info("id: " + this.getIDForSysName((String) pair.getKey(), "plate_set"));
+      //  LOGGER.info("id: " + this.getIDForSysName((String) pair.getKey(), "plate_set"));
 
       plate_set_IDs.add(this.getIDForSysName((String) pair.getKey(), "plate_set"));
       it.remove(); // avoids a ConcurrentModificationException
@@ -534,7 +534,7 @@ public class DatabaseRetriever {
     try {
       PreparedStatement pstmt = conn.prepareStatement(custom_statement);
       pstmt.setString(1, sys_name);
-      LOGGER.info("prepared statement: " + pstmt);
+      //  LOGGER.info("prepared statement: " + pstmt);
 
       ResultSet rs = pstmt.executeQuery();
       rs.next();
@@ -562,7 +562,7 @@ public class DatabaseRetriever {
     Integer[] sys_ids = new Integer[sys_names.length];
 
     String sqlstring = "SELECT get_ids_for_sys_names (?, ?, ?);";
-      LOGGER.info("SQL at getIDsForSysNames: " + sqlstring);
+    // LOGGER.info("SQL at getIDsForSysNames: " + sqlstring);
 
     try {
       PreparedStatement preparedStatement =
@@ -591,7 +591,7 @@ public class DatabaseRetriever {
     int id = 0;
 
     String sqlstring = "SELECT id FROM plate_layout_name WHERE name = ?;";
-      LOGGER.info("SQL : " + sqlstring);
+    //   LOGGER.info("SQL : " + sqlstring);
 
     try {
       PreparedStatement preparedStatement =
@@ -705,7 +705,7 @@ public class DatabaseRetriever {
   public ComboItem getPlateLayoutNameAndID(int _plate_layout_name_id) {
     ComboItem output = null;
     Array results = null;
-    LOGGER.info("plate_layout_name_id: " + _plate_layout_name_id);
+    //LOGGER.info("plate_layout_name_id: " + _plate_layout_name_id);
     // ArrayList<ComboItem> combo_items = new ArrayList<ComboItem>();
     try {
       PreparedStatement pstmt =
@@ -746,7 +746,7 @@ public class DatabaseRetriever {
     int source_reps = _source_reps;
     int target_reps = _target_reps;
     String replication = String.valueOf(source_reps) + "S" + String.valueOf(target_reps) + "T";
-    LOGGER.info(replication);
+    //LOGGER.info(replication);
     ArrayList<ComboItem> combo_items = new ArrayList<ComboItem>();
     try {
       PreparedStatement pstmt =
@@ -791,7 +791,7 @@ int plate_layout_name_id = _plate_layout_name_id;
       ResultSet rs = pstmt.executeQuery();
 
       table = new CustomTable(dmf, dbm.buildTableModel(rs));
-       LOGGER.info("Got plate table " + table);
+      //LOGGER.info("Got plate table " + table);
       rs.close();
       pstmt.close();
     
@@ -839,7 +839,7 @@ int plate_layout_name_id = _plate_layout_name_id;
       ResultSet rs = pstmt.executeQuery();
 
       table = new CustomTable(dmf, dbm.buildTableModel(rs));
-       LOGGER.info("Got plate table " + table);
+      //  LOGGER.info("Got plate table " + table);
       rs.close();
       pstmt.close();
     
@@ -857,7 +857,7 @@ int plate_layout_name_id = _plate_layout_name_id;
 	int plate_layout_name_id = 0;
 
 	String sqlstring = "SELECT plate_layout_name_id FROM plate_set WHERE id = ?;";
-	LOGGER.info("SQL : " + sqlstring);
+	//	LOGGER.info("SQL : " + sqlstring);
 
 	try {
 	    PreparedStatement preparedStatement =
@@ -934,6 +934,91 @@ int plate_layout_name_id = _plate_layout_name_id;
     }
 
 
+    /**
+     *  String sql_statement = new String("INSERT INTO temp_accs_id (plate_order, by_col, accs_id) VALUES ");
+    //LOGGER.info(accessions.get(0)[0] + " " + accessions.get(0)[1] + " " +accessions.get(0)[2] );	
+    if (accessions.get(0)[0].equals("plate") & accessions.get(0)[1].equals("well") & accessions.get(0)[2].equals("accs.id")) {
+
+    accessions.remove(0); // get rid of the header
+    for (String[] row : accessions) {
+      sql_statement =
+          sql_statement
+	  + "("
+	  + Integer.parseInt(row[0])
+	  + ", "
+	  + Integer.parseInt(row[1])
+	  + ", '"
+	  + row[2]
+	  + "'), ";
+     */
+
+    /**
+     * Called from 
+     */
+   public String[][] getAssayRunData(String[] _assay_run_id){
+
+	String assay_run_id[] = _assay_run_id;
+	CustomTable ct;
+	String sqlstring_pre = "SELECT plate_set.plate_set_sys_name as \"Plate SET\", plate.plate_sys_name as \"Plate\", assay_result.well, assay_result.response, assay_result.bkgrnd_sub,   assay_result.norm,  assay_result.norm_pos  FROM assay_result, assay_run, plate_plate_set, plate_set, plate WHERE assay_run.plate_set_id=plate_plate_set.plate_set_id and assay_result.assay_run_id=assay_run.id AND plate_plate_set.plate_order=assay_result.plate_order AND plate_plate_set.plate_set_id=plate_set.id AND plate_plate_set.plate_id=plate.ID and assay_run.id IN (";
+
+	String sqlstring_mid  = new String();
+
+	for (int i =0; i < assay_run_id.length; i++){
+	    sqlstring_mid = sqlstring_mid +  assay_run_id[i] + ",";	    
+	}
+       
+	sqlstring_mid = sqlstring_mid.substring(0,sqlstring_mid.length()-1);
+	String sqlstring_post = ");";
+	String sqlstring = sqlstring_pre + sqlstring_mid + sqlstring_post;
+	//LOGGER.info("SQL : " + sqlstring);
+
+	try {
+	    PreparedStatement preparedStatement =
+		conn.prepareStatement(sqlstring, Statement.RETURN_GENERATED_KEYS);
+	    //preparedStatement.setInt(1, assay_run_id);
+	    preparedStatement.executeQuery(); // executeUpdate expects no returns!!!
+	    ResultSet rs = preparedStatement.getResultSet();
+	     ResultSetMetaData metaData = rs.getMetaData();
+
+    // names of columns
+    Vector<String> columnNames = new Vector<String>();
+    int columnCount = metaData.getColumnCount();
+    for (int column = 1; column <= columnCount; column++) {
+        columnNames.add(metaData.getColumnName(column));
+    }
+
+    //set up a row counter which will generate a vector of selected row indices
+    //used to select all rows for export to a spreadsheet
+    Integer row_counter = 0;
+    Vector<Integer> selected_rows = new Vector<Integer>();
+    // data of the table
+    Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+    while (rs.next()) {
+        Vector<Object> vector = new Vector<Object>();
+        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+            vector.add(rs.getObject(columnIndex));
+        }
+        data.add(vector);
+	selected_rows.add(row_counter);
+	row_counter = row_counter + 1;
+    }
+
+    ct = new CustomTable( dmf, new DefaultTableModel(data, columnNames));
+    ct.setSelectedRows(selected_rows);
+
+    return ct.getSelectedRowsAndHeaderAsStringArray();
+    
+	    // LOGGER.info("resultset: " + result);
+
+	} catch (SQLException sqle) {
+	    LOGGER.warning("SQLE at getPlateLayoutNameIDforPlateSetID: " + sqle);
+	}
+	return null;
+    }
+
+
+    /*  Before converting to handling int array
+    
     public String[][] getAssayRunData(int _assay_run_id){
 
 	int assay_run_id = _assay_run_id;
@@ -985,7 +1070,7 @@ int plate_layout_name_id = _plate_layout_name_id;
 	return null;
     }
 
-
+    */
     
     
     
@@ -1023,7 +1108,7 @@ int plate_layout_name_id = _plate_layout_name_id;
       ResultSet rs = pstmt.executeQuery();
       rs.next();
       result = rs.getInt("id");
-      LOGGER.info("resuklt plate layout name: " + result);
+      // LOGGER.info("resuklt plate layout name: " + result);
       rs.close();
       pstmt.close();
 

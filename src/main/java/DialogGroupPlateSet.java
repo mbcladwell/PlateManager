@@ -56,12 +56,13 @@ public class DialogGroupPlateSet extends JDialog {
    * @param _format number of wells per plate
    */
   public DialogGroupPlateSet(
-      DialogMainFrame _dmf,
+      Session _session,
       HashMap<String, String> _plate_set_num_plates,
       String _format,
       ArrayList<String> _plate_sys_names) {
-    this.dmf = _dmf;
-    this.session = dmf.getSession();
+    this.session = _session;
+    this.dmf = session.getDialogMainFrame();
+    
     owner = session.getUserName();
     HashMap<String, String> plate_set_num_plates = _plate_set_num_plates;
     String format = _format;
