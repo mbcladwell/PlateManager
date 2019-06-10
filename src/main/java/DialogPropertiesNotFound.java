@@ -49,7 +49,7 @@ public class DialogPropertiesNotFound extends JDialog
   static JTextField nField;
     
   static JButton okButton;
-  static JButton heroku;
+  static JButton elephantsql;
 
   static JButton select;
   static JButton cancelButton;
@@ -88,17 +88,26 @@ public class DialogPropertiesNotFound extends JDialog
    
   
 
-    heroku =  new JButton( "Connect to Heroku");
-    heroku.setMnemonic(KeyEvent.VK_H);
+    elephantsql =  new JButton( "Connect to ElephantSQL");
+    elephantsql.setMnemonic(KeyEvent.VK_E);
     
-    heroku.setEnabled(true);
+    elephantsql.setEnabled(true);
     c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 0;
     c.gridy = 0;
     c.gridwidth = 1;
     c.gridheight = 1;
-    heroku.addActionListener(this);
-    pane.add(heroku, c);
+    elephantsql.addActionListener(this);
+    pane.add(elephantsql, c);
+
+    label = new JLabel("for evaluation purposes only - no personal data.");
+    c.gridx = 1;
+    c.gridy = 0;
+    c.gridwidth = 3;
+    c.gridheight = 1;
+    c.insets = new Insets(5, 5, 2, 2);
+  pane.add(label, c);
+
     
     select =
         new JButton(
@@ -220,8 +229,8 @@ public class DialogPropertiesNotFound extends JDialog
 	}
     }
 	
-  if (e.getSource() == heroku) {
-      session.setupHeroku();
+  if (e.getSource() == elephantsql) {
+      session.setupElephantSQL();
       this.dispose();
   }
     
@@ -243,20 +252,20 @@ public class DialogPropertiesNotFound extends JDialog
 
     if ( fileField.getText().length() > 0) {
       okButton.setEnabled(true);
-      heroku.setEnabled(false);
+      elephantsql.setEnabled(false);
     } else {
       okButton.setEnabled(false);
-      heroku.setEnabled(true);
+      elephantsql.setEnabled(true);
     }
   }
 
   public void removeUpdate(DocumentEvent e) {
     if ( fileField.getText().length() > 0) {
       okButton.setEnabled(true);
-      heroku.setEnabled(false);
+      elephantsql.setEnabled(false);
     } else {
       okButton.setEnabled(false);
-      heroku.setEnabled(true);
+      elephantsql.setEnabled(true);
     }
   }
 

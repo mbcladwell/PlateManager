@@ -52,6 +52,7 @@ public class DatabaseManager {
 	  props.setProperty("password", "welcome");
 
 	  conn = DriverManager.getConnection(url, props);
+	  LOGGER.info("conn: " + conn);
 	  PreparedStatement pstmt = conn.prepareStatement(
               //  "SELECT password = crypt( ?,password) FROM pmuser WHERE pmuser_name = ?;");
               "SELECT password = ?, password FROM lnuser WHERE lnuser_name = ?;");

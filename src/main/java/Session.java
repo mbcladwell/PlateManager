@@ -104,12 +104,15 @@ public class Session {
 	try{
 	    
 	    switch (source){
-	case "heroku":
-	    URL = new String("postgres://" + user + ":" + password + "@" + host + ":" + port + "/" + dbname );
+	    case "heroku":
+		URL = new String("postgres://" + user + ":" + password + "@" + host + ":" + port + "/" + dbname );
 	    break;
-	case "local":
-	    URL = new String("jdbc:postgresql://" + host + "/" + dbname);
+	    case "local":
+		URL = new String("jdbc:postgresql://" + host + "/" + dbname);
 	    break;
+	    case "elephantsql":
+	    	URL = new String("jdbc:postgresql://" + host + ":" + port + "/" + dbname + "?user=" + user + "&password=" +password + "&SSL=true" );
+		break;
 	}
 	 LOGGER.info("URL: " + URL);
 
@@ -141,6 +144,20 @@ public class Session {
 	password = "c5644d221fa636d8d8065d336014723f66df0c6b78e7a5390453c4a18c9b20b2";
 	user = "dpstpnuvjslqch";
 	URL = new String("jdbc:postgresql://" + host + ":" + port + "/" + dbname + "?sslmode=require&user=" + user + "&password=" +password );
+	
+	this.postLoadProperties();
+	
+    }
+
+    public void setupElephantSQL(){
+	host = "raja.db.elephantsql.com";
+	port = "5432";
+	sslmode = "none";
+	source = "elephantsql";
+	dbname = "klohymim";
+	help_url_prefix = "http://labsolns.com/software/";
+	password = "hwc3v4_rbkT-1EL2KI-JBaqFq0thCXM_";
+	user = "klohymim";
 	
 	this.postLoadProperties();
 	
