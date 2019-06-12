@@ -1016,6 +1016,70 @@ int plate_layout_name_id = _plate_layout_name_id;
 	return null;
     }
 
+    /**
+     * Called from MenuBarForPlateSet; provides underlying data for multi selection
+     */
+   public String[][] getPlateSetData(String[] _plate_set_id){
+
+	String plate_set_id[] = _plate_set_id;
+	CustomTable ct;
+	String sqlstring_pre = "SELECT plate_set.plate_set_sys_name as \"Plate Set\", plate.plate_sys_name as \"Plate\", well.by_col as \"Well\", sample.sample_sys_name as \"Sample\", sample.accs_id as \"Accession\"  FROM  plate_plate_set, plate_set, plate, well, well_sample, sample WHERE  plate_plate_set.plate_set_id=plate_set.id AND plate_plate_set.plate_id=plate.ID and plate.id=well.plate_id and well_sample.well_id=well.id and well_sample.sample_id=sample.id  and plate_set.id IN (";
+
+	String sqlstring_mid  = new String();
+
+	for (int i =0; i < plate_set_id.length; i++){
+	    sqlstring_mid = sqlstring_mid +  plate_set_id[i] + ",";	    
+	}
+       
+	sqlstring_mid = sqlstring_mid.substring(0,sqlstring_mid.length()-1);
+	String sqlstring_post = ") order by plate_set.plate_set_sys_name, plate.plate_sys_name, well.by_col;";
+	String sqlstring = sqlstring_pre + sqlstring_mid + sqlstring_post;
+	LOGGER.info("SQL : " + sqlstring);
+
+	try {
+	    PreparedStatement preparedStatement =
+		conn.prepareStatement(sqlstring, Statement.RETURN_GENERATED_KEYS);
+	    //preparedStatement.setInt(1, plate_set_id);
+	    preparedStatement.executeQuery(); // executeUpdate expects no returns!!!
+	    ResultSet rs = preparedStatement.getResultSet();
+	     ResultSetMetaData metaData = rs.getMetaData();
+
+    // names of columns
+    Vector<String> columnNames = new Vector<String>();
+    int columnCount = metaData.getColumnCount();
+    for (int column = 1; column <= columnCount; column++) {
+        columnNames.add(metaData.getColumnName(column));
+    }
+
+    //set up a row counter which will generate a vector of selected row indices
+    //used to select all rows for export to a spreadsheet
+    Integer row_counter = 0;
+    Vector<Integer> selected_rows = new Vector<Integer>();
+    // data of the table
+    Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+    while (rs.next()) {
+        Vector<Object> vector = new Vector<Object>();
+        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+            vector.add(rs.getObject(columnIndex));
+        }
+        data.add(vector);
+	selected_rows.add(row_counter);
+	row_counter = row_counter + 1;
+    }
+
+    ct = new CustomTable( dmf, new DefaultTableModel(data, columnNames));
+    ct.setSelectedRows(selected_rows);
+
+    return ct.getSelectedRowsAndHeaderAsStringArray();
+    
+	    // LOGGER.info("resultset: " + result);
+
+	} catch (SQLException sqle) {
+	    LOGGER.warning("SQLE at getPlateLayoutNameIDforPlateSetID: " + sqle);
+	}
+	return null;
+    }
+
 
     /*  Before converting to handling int array
     

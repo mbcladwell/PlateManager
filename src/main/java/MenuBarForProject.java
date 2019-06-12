@@ -7,7 +7,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
-
+import javax.swing.JOptionPane;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -86,6 +86,11 @@ public class MenuBarForProject extends JMenuBar {
 	      dmf.setMainFrameTitle(project_sys_name);
               dmf.showPlateSetTable(project_sys_name);
             } catch (ArrayIndexOutOfBoundsException s) {
+		JOptionPane.showMessageDialog(session.getDialogMainFrame(),
+					      "Select a row!","Error",JOptionPane.ERROR_MESSAGE);
+            } catch (IndexOutOfBoundsException s) {
+		JOptionPane.showMessageDialog(session.getDialogMainFrame(),
+					      "Select a row!","Error",JOptionPane.ERROR_MESSAGE);
             }
           }
         });
@@ -101,7 +106,7 @@ public class MenuBarForProject extends JMenuBar {
 
      this.add(Box.createHorizontalGlue());
 
-    menu = new HelpMenu();
+    menu = new HelpMenu(session);
 
     this.add(menu);
   }

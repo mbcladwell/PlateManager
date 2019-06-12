@@ -126,41 +126,6 @@ public class MenuBarForPlateSet extends JMenuBar {
         });
     utilitiesMenu.add(menuItem);
 
-    /*
-    menuItem = new JMenuItem("Import hit list");
-    menuItem.setMnemonic(KeyEvent.VK_H);
-    menuItem.addActionListener(
-        new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-	      JFileChooser fileChooser = new JFileChooser();
-	      int returnVal = fileChooser.showOpenDialog(dmf);
-
-	      if (returnVal == JFileChooser.APPROVE_OPTION) {
-		  java.io.File file = fileChooser.getSelectedFile();
-		  Vector<String> s_ids = new Vector<String>();
-		  BufferedReader reader;
-		try {
-			reader = new BufferedReader(new FileReader(
-					file));
-			String line = reader.readLine();
-			line = reader.readLine(); //skip the first header line
-			while (line != null & !line.equals("")) {
-			    s_ids.add(line);
-				// read next line
-				line = reader.readLine();
-			}
-			reader.close();
-			session.getDatabaseManager().getDatabaseInserter().insertHitListFromFile(s_ids);
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
-        // This is where a real application would open the file.
-	      }
-
-          }
-        });
-    utilitiesMenu.add(menuItem);
-    */
     
     menuItem = new JMenuItem("Worklist");
     menuItem.setMnemonic(KeyEvent.VK_W);
@@ -193,26 +158,70 @@ public class MenuBarForPlateSet extends JMenuBar {
         });
     utilitiesMenu.add(menuItem);
 
+     menu = new JMenu("Export");
+     utilitiesMenu.add(menu);    
     
-    menuItem = new JMenuItem("Export", KeyEvent.VK_E);
+    menuItem = new JMenuItem("Selected rows this table", KeyEvent.VK_S);
     // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
     menuItem.getAccessibleContext().setAccessibleDescription("Export as .csv.");
-    menuItem.putClientProperty("mf", dmf);
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
+		    Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(plate_set_table);
+		    if(results.length>1){
+			//   LOGGER.info("hit list table: " + results);
+			POIUtilities poi = new POIUtilities(dmf);
+			poi.writeJTableToSpreadsheet("Plate Sets", results);
+			try {
+			    Desktop d = Desktop.getDesktop();
+			    d.open(new File("./Writesheet.xlsx"));
+			} catch (IOException ioe) {
+			}	 
+		    }else{
+			JOptionPane.showMessageDialog(dmf, "Select one or more rows!");	
+		    }   
 
-            Object[][] results = plate_set_table.getSelectedRowsAndHeaderAsStringArray();
-            POIUtilities poi = new POIUtilities(dmf);
-            poi.writeJTableToSpreadsheet("Plate Sets", results);
-            try {
-              Desktop d = Desktop.getDesktop();
-              d.open(new File("./Writesheet.xlsx"));
-            } catch (IOException ioe) {
-            }
           }
         });
-    utilitiesMenu.add(menuItem);
+    menu.add(menuItem);
+
+    
+    menuItem = new JMenuItem("Underlying data", KeyEvent.VK_U);
+    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
+    menuItem.getAccessibleContext().setAccessibleDescription("Export as .csv.");   
+    menuItem.addActionListener(
+        new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+		if(!plate_set_table.getSelectionModel().isSelectionEmpty()){
+		    Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(plate_set_table);
+		    if(results.length>1){
+			String[] plate_set_ids = new String[results.length];
+			try{
+			    
+			    for(int i=0; i < results.length-1; i++){
+			    plate_set_ids[i] =  plate_set_table.getModel().getValueAt(i, 0).toString().substring(3);
+			    LOGGER.info("psid: " + plate_set_ids[i] );
+			    }
+
+			    Object[][] plate_set_data = session.getDatabaseRetriever().getPlateSetData(plate_set_ids);
+			    POIUtilities poi = new POIUtilities(dmf);
+			    
+			    poi.writeJTableToSpreadsheet("Plate Set Information", plate_set_data);
+			    //poi.writeJTableToSpreadsheet("Assay Run Data for " + assay_runs_sys_name, assay_run_data);
+		
+			    Desktop d = Desktop.getDesktop();
+			    d.open(new File("./Writesheet.xlsx"));
+			}catch(IOException ioe){
+			    JOptionPane.showMessageDialog(dmf, "IOException!: " + ioe);   
+			}    
+		    }else{
+			JOptionPane.showMessageDialog(dmf, "Select one or more  Plate Sets!");	
+		    }
+		}
+	  
+          }
+        });
+    menu.add(menuItem);
 
 
     
@@ -237,6 +246,12 @@ public class MenuBarForPlateSet extends JMenuBar {
               //System.out.println("plate_set_sys_name: " + plate_set_sys_name);
               dmf.showPlateTable(plate_set_sys_name);
             } catch (ArrayIndexOutOfBoundsException s) {
+			JOptionPane.showMessageDialog(session.getDialogMainFrame(),
+					      "Select a row!","Error",JOptionPane.ERROR_MESSAGE);
+          
+            } catch (IndexOutOfBoundsException s) {
+		JOptionPane.showMessageDialog(session.getDialogMainFrame(),
+					      "Select a row!","Error",JOptionPane.ERROR_MESSAGE);
             }
           }
         });
@@ -265,7 +280,7 @@ public class MenuBarForPlateSet extends JMenuBar {
    
     this.add(Box.createHorizontalGlue());
 
-    menu = new HelpMenu();
+    menu = new HelpMenu(session);
     this.add(menu);
   }
 }

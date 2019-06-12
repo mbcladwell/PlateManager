@@ -69,19 +69,11 @@ dependencies {
     extraLibs group: 'org.apache.poi', name: 'ooxml-schemas', version: '1.4'
 
 
-//       compile 'net.stihie:bllm:0.1'
- //   implementation 'net.stihie:bllm:0.1'
 //    compile 'javax.swing:jnlp:1.0'
 //    implementation 'javax.swing:jnlp:1.0'
     
 //JSON parsing
     compile 'com.google.code.gson:gson:2.8.5'
-
-//QR code library
-//        compile 'com.google.zxing:core:3.3.3'
- //       implementation 'com.google.zxing:core:3.3.3'
- //       compile 'com.google.zxing:javase:3.3.3'
- //       implementation 'com.google.zxing:javase:3.3.3'
 	
 }
 
@@ -92,9 +84,6 @@ repositories {
     // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
-//	maven {
-  //  url 'http://m2.objectdb.com'
- // }
     mavenLocal()
     mavenCentral()
 
@@ -107,61 +96,25 @@ task showMeCache doLast{
 }
 
 
-
-
-
 task runMain(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
-  //main = 'pm.DialogMainFrame'
-  //classpath = src.test.java
-  
   main = 'pm.Main'
-    
-  // arguments to pass to the application
-  //args 'appArg1'
 }
 
-
-task printSourceSetOutputDir {
-    doLast {
-        println sourceSets.main.java.outputDir
-    }
-}
-
-
-// psql -U postgres -h 192.168.1.7 -f ~/syncd/prog/plate-manager/pm/postgres/create_tables.sql
-
-
+// note the Class-Path entry is to add ohter jars to classpath
 jar {
     manifest {
         attributes(
                 'Main-Class': mainClassName,
                 'Implementation-Title': 'LIMS*Nucleus',
                 'Implementation-Version': version,
-                'provider': 'gradle'
+            'provider': 'gradle'
+	   
         )
     }
     from {
-//configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
-}
-}
-
-
-
-task initializePostgres(type:Exec) {
-
-executable '/usr/bin/psql -U postgres -h 192.168.1.11'
-args '-f ~/syncd/prog/plate-manager/pm/postgres/create_tables.sql'
-outputs.upToDateWhen { false }
-
-
-}
-
-
-task refreshLicense(type: Copy) {
-    from("/home/mbc/LitecoinLicenses/license/DkFzn23a")
-    into(".")
-    include("*.ser")
+	configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 
@@ -187,6 +140,7 @@ task getSchema(type: JavaExec) {
 
 task copySchemaDocsToWeb(type: Copy, dependsOn: [getSchema]) {
    // from configurations.runtime
+ new File('/home/mbc/syncd/labsolns/public/schema').mkdirs()
     from("./output")
    // include('*.html', '*.js', '*.css','*.png','*.txt','*.xml')
     into("/home/mbc/syncd/labsolns/public/schema")
@@ -255,15 +209,16 @@ task copyDependencies(type: Copy) {
 
 task customFatJar(type: Jar) {
     manifest {
-        attributes 'Main-Class': 'com.baeldung.fatjar.Application'
+        attributes 'Main-Class': mainClassName
     }
     baseName = 'ln-uber'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
 
-
-task copyFiles(type: Copy, dependsOn: [customFatJar]) {
+/////////////////////////////////////////////////////////////
+//Run makeUberJar to create the Uber jar
+task makeUberJar(type: Copy, dependsOn: [jar]) {
     
 //    from configurations.runtime
     from("build/libs")
@@ -275,7 +230,7 @@ task copyFiles(type: Copy, dependsOn: [customFatJar]) {
 
 
     
-task signAll(dependsOn: [copyFiles]) {
+task signAll(dependsOn: []) {
     doLast{
     new File('webstart/signed').mkdirs()
     def libFiles = files { file('webstart/libs').listFiles() }

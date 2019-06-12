@@ -15,10 +15,10 @@ public class MenuBarForPlate extends JMenuBar {
   CustomTable plate_table;
     Session session;
 
-  public MenuBarForPlate(DialogMainFrame _dmf, CustomTable _table) {
+  public MenuBarForPlate(Session _s, CustomTable _table) {
+    session = _s;
     plate_table = _table;
-    dmf = _dmf;
-    session = dmf.getSession();
+    dmf = session.getDialogMainFrame();
     // Create the menu bar.
     // JMenuBar menuBar = new JMenuBar();
     //    this.em = em;
@@ -101,6 +101,12 @@ public class MenuBarForPlate extends JMenuBar {
   
               dmf.showWellTable(plate_sys_name);
             } catch (ArrayIndexOutOfBoundsException s) {
+			JOptionPane.showMessageDialog(session.getDialogMainFrame(),
+					      "Select a row!","Error",JOptionPane.ERROR_MESSAGE);
+          
+            } catch (IndexOutOfBoundsException s) {
+		JOptionPane.showMessageDialog(session.getDialogMainFrame(),
+					      "Select a row!","Error",JOptionPane.ERROR_MESSAGE);
             }
           }
         });
@@ -129,9 +135,9 @@ public class MenuBarForPlate extends JMenuBar {
 
     this.add(Box.createHorizontalGlue());
 
-    menu = new JMenu("Help");
-    menu.setMnemonic(KeyEvent.VK_H);
-    menu.getAccessibleContext().setAccessibleDescription("Launch help system");
+        menu = new HelpMenu(session);
     this.add(menu);
+  
+
   }
 }

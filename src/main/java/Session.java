@@ -33,7 +33,8 @@ public class Session {
   private Long session_id;
   private String working_dir;
   private String temp_dir;
-    private String help_url_prefix;  
+    //DialogProperties not found has a help button that needs a help_url_prefix
+    private String help_url_prefix = "http://labsolns.com/software/";  
     private String URL;
     private String dbname;
     private DatabaseManager dbm;
@@ -96,6 +97,36 @@ public class Session {
 	    
     }
 
+    public void setupHeroku(){
+		host = "ec2-50-19-114-27.compute-1.amazonaws.com";
+		port = "5432";
+		sslmode = "require";	   
+		dbname = "d6dmueahka0hch";
+		help_url_prefix = "http://labsolns.com/software/";
+		password = "c5644d221fa636d8d8065d336014723f66df0c6b78e7a5390453c4a18c9b20b2";
+		user = "dpstpnuvjslqch";
+		//URL = new String("jdbc:postgresql://" + host + ":" + port + "/" + dbname + "?sslmode=require&user=" + user + "&password=" +password );
+	
+	this.postLoadProperties();
+	
+    }
+    public void setupElephantSQL(){
+		host = "raja.db.elephantsql.com";
+		port = "5432";
+		sslmode = "require";	      
+		dbname = "klohymim";
+		source = "elephantsql";
+		help_url_prefix = "http://labsolns.com/software/";
+		password = "hwc3v4_rbkT-1EL2KI-JBaqFq0thCXM_";
+		user = "klohymim";
+	    	URL = new String("jdbc:postgresql://" + host + ":" + port + "/" + dbname + "?user=" + user + "&password=" +password + "&SSL=true" );
+
+		this.postLoadProperties();
+
+	
+    }
+
+    
     /**
      * Continuation of login; at this point user has been determined either from properties or login dialog
      * Have to separate so that the proper username is used i.e. null might have been entered in properties file
@@ -105,16 +136,17 @@ public class Session {
 	    
 	    switch (source){
 	    case "heroku":
-		URL = new String("postgres://" + user + ":" + password + "@" + host + ":" + port + "/" + dbname );
-	    break;
+		URL = new String("jdbc:postgresql://" + host + ":" + port + "/" + dbname + "?sslmode=require&user=" + user + "&password=" +password );
+		break;
 	    case "local":
 		URL = new String("jdbc:postgresql://" + host + "/" + dbname);
 	    break;
 	    case "elephantsql":
+	
 	    	URL = new String("jdbc:postgresql://" + host + ":" + port + "/" + dbname + "?user=" + user + "&password=" +password + "&SSL=true" );
 		break;
 	}
-	 LOGGER.info("URL: " + URL);
+	    //	 LOGGER.info("URL: " + URL);
 
 	dbm = new DatabaseManager( this );
 	if(authenticated){
@@ -134,34 +166,6 @@ public class Session {
 	
     }
 
-    public void setupHeroku(){
-	host = "ec2-50-19-114-27.compute-1.amazonaws.com";
-	port = "5432";
-	sslmode = "require";
-	source = "heroku";
-	dbname = "d6dmueahka0hch";
-	help_url_prefix = "http://labsolns.com/software/";
-	password = "c5644d221fa636d8d8065d336014723f66df0c6b78e7a5390453c4a18c9b20b2";
-	user = "dpstpnuvjslqch";
-	URL = new String("jdbc:postgresql://" + host + ":" + port + "/" + dbname + "?sslmode=require&user=" + user + "&password=" +password );
-	
-	this.postLoadProperties();
-	
-    }
-
-    public void setupElephantSQL(){
-	host = "raja.db.elephantsql.com";
-	port = "5432";
-	sslmode = "none";
-	source = "elephantsql";
-	dbname = "klohymim";
-	help_url_prefix = "http://labsolns.com/software/";
-	password = "hwc3v4_rbkT-1EL2KI-JBaqFq0thCXM_";
-	user = "klohymim";
-	
-	this.postLoadProperties();
-	
-    }
     
   public void setUserID(int _id) {
     user_id = _id;

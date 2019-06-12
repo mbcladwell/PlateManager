@@ -152,7 +152,7 @@ public class DialogPropertiesNotFound extends JDialog
     helpButton.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-	      openWebpage(URI.create(dmf.getSession().getHelpURLPrefix() + "props"));
+	      openWebpage(URI.create(session.getHelpURLPrefix() + "login"));
           }
         });
     helpButton.setSize(10, 10);

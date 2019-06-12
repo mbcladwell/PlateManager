@@ -137,7 +137,7 @@ public class DialogLogin extends JDialog {
     try {
       ImageIcon logo =
           new ImageIcon(
-              this.getClass().getResource("./images/las.png"));
+              this.getClass().getResource("images/las.png"));
       JLabel logolabel = new JLabel(logo, JLabel.CENTER);
 
       c.gridx=0;
@@ -146,7 +146,7 @@ public class DialogLogin extends JDialog {
       
       pane2.add(logolabel, c);
     } catch (Exception ex) {
-      LOGGER.severe(ex + " down image not found");
+      LOGGER.severe(ex + " las image not found");
     }
     /*
     label = new JLabel("LIMS*Nucleus v0.1-2019");

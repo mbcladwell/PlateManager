@@ -12,10 +12,12 @@ public class MenuBarForWell extends JMenuBar {
   private static final long serialVersionUID = 1L;
   DialogMainFrame dmf;
   CustomTable well_table;
+    Session session;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-  public MenuBarForWell(DialogMainFrame _dmf, CustomTable _table) {
-    dmf = _dmf;
+  public MenuBarForWell(Session _s, CustomTable _table) {
+      session = _s;
+      dmf = session.getDialogMainFrame();
     well_table = _table;
     // Create the menu bar.
     // JMenuBar menuBar = new JMenuBar();
@@ -90,9 +92,8 @@ public class MenuBarForWell extends JMenuBar {
 
     this.add(Box.createHorizontalGlue());
 
-    menu = new JMenu("Help");
-    menu.setMnemonic(KeyEvent.VK_H);
-    menu.getAccessibleContext().setAccessibleDescription("Launch help system");
+          menu = new HelpMenu(session);
     this.add(menu);
-  }
+  
+   }
 }

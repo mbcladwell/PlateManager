@@ -11,6 +11,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.logging.Logger;
+import java.net.*;
+import java.awt.Desktop;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -237,7 +239,8 @@ public class DialogImportPlateSetAccessionIDs extends JDialog
     helpButton.addActionListener(
         (new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            dispose();
+	      openWebpage(URI.create(session.getHelpURLPrefix() + "accesionids"));
+            
           }
         }));
 
@@ -314,4 +317,27 @@ public class DialogImportPlateSetAccessionIDs extends JDialog
   public void changedUpdate(DocumentEvent e) {
     // Plain text components don't fire these events.
   }
+
+    public static boolean openWebpage(URI uri) {
+    Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+    if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+        try {
+            desktop.browse(uri);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    return false;
+}
+
+    public static boolean openWebpage(URL url) {
+    try {
+        return openWebpage(url.toURI());
+    } catch (URISyntaxException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
 }

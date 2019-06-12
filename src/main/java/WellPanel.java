@@ -29,7 +29,7 @@ public class WellPanel extends JPanel {
     
     JPanel headerPanel = new JPanel();
     headerPanel.setLayout(new BorderLayout());
-    headerPanel.add(new MenuBarForWell(dmf, table), BorderLayout.NORTH);
+    headerPanel.add(new MenuBarForWell(session, table), BorderLayout.NORTH);
 
     textPanel = new JPanel();
     textPanel.setLayout(new GridBagLayout());
@@ -42,19 +42,21 @@ public class WellPanel extends JPanel {
     c.insets = new Insets(5, 5, 2, 2);
     textPanel.add(label, c);
 
-    label = new JLabel("Project: ", SwingConstants.RIGHT);
+    /*    label = new JLabel("Project: ", SwingConstants.RIGHT);
     c.gridx = 2;
     c.gridy = 0;
     c.anchor = GridBagConstraints.LINE_END;
     textPanel.add(label, c);
-
+    
+    
     JLabel projectLabel = new JLabel(dmf.getSession().getProjectSysName(), SwingConstants.LEFT);
     c.gridx = 3;
     c.gridy = 0;
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_START;
     textPanel.add(projectLabel, c);
-
+*/
+	
     label = new JLabel("Description:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 1;

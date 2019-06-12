@@ -33,7 +33,7 @@ public class PlatePanel extends JPanel {
 
     JPanel headerPanel = new JPanel();
     headerPanel.setLayout(new BorderLayout());
-    headerPanel.add(new MenuBarForPlate(dmf, table), BorderLayout.NORTH);
+    headerPanel.add(new MenuBarForPlate(session, table), BorderLayout.NORTH);
 
     textPanel = new JPanel();
     textPanel.setLayout(new GridBagLayout());
@@ -45,7 +45,7 @@ public class PlatePanel extends JPanel {
     c.weightx = 0.1;
     c.insets = new Insets(5, 5, 2, 2);
     textPanel.add(label, c);
-
+    /*
     label = new JLabel("Project: ", SwingConstants.RIGHT);
     c.gridx = 2;
     c.gridy = 0;
@@ -58,7 +58,8 @@ public class PlatePanel extends JPanel {
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_START;
     textPanel.add(projectLabel, c);
-
+*/
+	
     label = new JLabel("Description:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 1;
