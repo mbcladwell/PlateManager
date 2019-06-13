@@ -31,7 +31,7 @@ public class DatabaseManager {
     Session session;
   private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-  // psql -U pm_admin -h 192.168.1.7 -d pmdb
+  // psql -U ln_admin -h 192.168.1.11 -d lndb
 
 
   /**

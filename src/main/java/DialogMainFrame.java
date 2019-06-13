@@ -20,9 +20,9 @@ public class DialogMainFrame extends JFrame {
   private CardLayout card_layout;
 
   private ProjectPanel project_card;
-  private JPanel plate_set_card;
-  private JPanel plate_card;
-  private JPanel well_card;
+  private PlateSetPanel plate_set_card;
+  private PlatePanel plate_card;
+  private WellPanel well_card;
 
   private static Utilities utils;
     //private DatabaseManager dbm;
@@ -68,7 +68,11 @@ public class DialogMainFrame extends JFrame {
   public ProjectPanel getProjectPanel() {
     return project_card;
   }
-    
+
+      public PlateSetPanel getPlateSetPanel() {
+    return plate_set_card;
+  }
+
 
   public void showProjectTable() {
     project_card = new ProjectPanel(this, session.getDatabaseRetriever().getDMFTableData(0, DialogMainFrame.PROJECT));

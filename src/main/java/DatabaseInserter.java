@@ -75,6 +75,22 @@ public class DatabaseInserter {
     }
   }
 
+  public void updatePlateSet(String _name, String _description, String _plate_set_sys_name) {
+
+    String sqlstring = "UPDATE plate_set SET plate_set_name = ?, descr = ? WHERE plate_set_sys_name = ?;";
+    PreparedStatement preparedStatement;
+    try {
+      preparedStatement = conn.prepareStatement(sqlstring, Statement.RETURN_GENERATED_KEYS);
+      preparedStatement.setString(1, _name);
+      preparedStatement.setString(2, _description);
+      preparedStatement.setString(3, _plate_set_sys_name);
+      preparedStatement.executeUpdate();
+    } catch (SQLException sqle) {
+      LOGGER.warning("Failed to properly prepare  prepared statement: " + sqle);
+    }
+  }
+
+    
   public void insertPreparedStatement(PreparedStatement _preparedStatement) {
     PreparedStatement preparedStatement = _preparedStatement;
     LOGGER.info(preparedStatement.toString());

@@ -53,12 +53,38 @@ public class MenuBarForPlateSet extends JMenuBar {
         });
     menu.add(menuItem);
 
-    menuItem = new JMenuItem("Edit plate set");
+    menuItem = new JMenuItem("Edit plate set ");
     menuItem.setMnemonic(KeyEvent.VK_E);
     menuItem.addActionListener(
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            // new DialogEditPlateSetData();
+               try{
+		  int rowIndex = plate_set_table.getSelectedRow();
+		  String plate_set_sys_name = plate_set_table.getValueAt(rowIndex, 0).toString();
+		  String name = plate_set_table.getValueAt(rowIndex, 1).toString();
+		  //String owner = plate_set_table.getValueAt(rowIndex, 2).toString();
+		  String description = plate_set_table.getValueAt(rowIndex, 6).toString();
+		      new DialogEditPlateSet(dmf, plate_set_sys_name, name, description);
+
+		  /*
+		  if (owner.equals(dmf.getSession().getUserName())) {
+		      new DialogEditPlateSet(dmf, plate_set_sys_name, name, description);
+	      } else {
+                JOptionPane.showMessageDialog(
+                    dmf,
+                    "Only the owner can modify a plate set.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+		    }   */
+		  
+            } catch(ArrayIndexOutOfBoundsException aioob) {
+              JOptionPane.showMessageDialog(
+                  dmf, "Please select a plate set!", "Error", JOptionPane.ERROR_MESSAGE);
+            }catch(IndexOutOfBoundsException ioob) {
+              JOptionPane.showMessageDialog(
+                  dmf, "Please select a plate set!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+	 	
           }
         });
     menu.add(menuItem);
@@ -270,7 +296,7 @@ public class MenuBarForPlateSet extends JMenuBar {
         new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             dmf.flipToProjectTable();
-	    	      dmf.setMainFrameTitle("");
+	    	    	      dmf.setMainFrameTitle("");
 
           }
         });
