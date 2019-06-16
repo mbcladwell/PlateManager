@@ -73,6 +73,7 @@ public class ScatterPlot extends JFrame {
     private ResponseWrangler norm_response;
     private ResponseWrangler norm_pos_response;
     private ResponseWrangler selected_response;
+    private ResponseWrangler p_enhanced_response;
     private int assay_run_id;
     private ScatterPlotSlider slider;
 
@@ -208,7 +209,7 @@ public class ScatterPlot extends JFrame {
     c.anchor = GridBagConstraints.LINE_END;
     panel2.add(label, c);
 
-    ComboItem[] responseTypes = new ComboItem[]{ new ComboItem(1,"raw"), new ComboItem(2,"norm"), new ComboItem(3,"norm_pos")};
+    ComboItem[] responseTypes = new ComboItem[]{ new ComboItem(1,"raw"), new ComboItem(2,"norm"), new ComboItem(3,"norm_pos"), new ComboItem(3,"% enhancement")};
     
     responseList = new JComboBox<ComboItem>(responseTypes);
     responseList.setSelectedIndex(1);
@@ -231,6 +232,10 @@ public class ScatterPlot extends JFrame {
 		break;
 	    case 3:
 		selected_response = norm_pos_response;
+		updateAllVariables();
+		break;
+	    case 4:
+		selected_response = p_enhanced_response;
 		updateAllVariables();
 		break;
 	    }

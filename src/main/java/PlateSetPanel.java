@@ -78,11 +78,14 @@ public class PlateSetPanel extends JPanel {
     return table;
   }
 
-  public void updatePanel(String _plate_set_sys_name) {
-    String plate_set_sys_name = _plate_set_sys_name;
-    int plate_set_id = Integer.parseInt(plate_set_sys_name.substring(3));
-    JTable table = session.getDatabaseManager().getDatabaseRetriever().getDMFTableData(plate_set_id, DialogMainFrame.PLATESET);
+  public void updatePanel(String _project_sys_name) {
+    String project_sys_name = _project_sys_name;
+    int project_id = Integer.parseInt(project_sys_name.substring(4));
+    JTable table = session.getDatabaseManager().getDatabaseRetriever().getDMFTableData(project_id, DialogMainFrame.PLATESET);
     TableModel model = table.getModel();
+
+
+
     this.table.setModel(model);
   }
 }

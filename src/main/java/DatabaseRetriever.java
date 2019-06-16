@@ -61,7 +61,7 @@ public class DatabaseRetriever {
 
       switch(desired_table){
       case DialogMainFrame.PROJECT:
-	  sql_statement = "SELECT project_sys_name AS \"ProjectID\", project_name As \"Name\", lnuser_name AS \"Owner\", descr AS \"Description\" FROM project, lnuser WHERE lnuser_id = lnuser.id ORDER BY project.id DESC;";
+	  sql_statement = "SELECT project_sys_name AS \"ProjectID\", project_name As \"Name\", lnuser_name AS \"Owner\", descr AS \"Description\" FROM project, lnuser, lnsession  WHERE project.lnsession_id=lnsession.id AND lnuser.id=lnsession.lnuser_id ORDER BY project.id DESC;";
 	  break;
 
 	 
@@ -1628,4 +1628,58 @@ int assay_run_id = _assay_run_id;
     return null;
   }
 
+
+  public int getUserIDForSessionID(int _session_id) {
+    int session_id = _session_id;
+
+    try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+              "SELECT lnuser_id FROM lnsession WHERE lnsession.id = ?;");
+
+      pstmt.setInt(1, session_id);
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      int user_id = Integer.valueOf(rs.getString("id"));
+
+      // LOGGER.info("result: " + plateTypeID);
+      rs.close();
+      pstmt.close();
+      return user_id;
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting plateset_id: " + sqle);
+    }
+    int dummy = -1;
+    return dummy;
+  }
+
+    public int getPlateSetOwnerID( int _plate_set_id){
+	
+	int plate_set_id = _plate_set_id;
+	
+	try {
+      PreparedStatement pstmt =
+          conn.prepareStatement(
+              "SELECT lnuser_id FROM lnuser, lnsession, plate_set WHERE plate_set.lnsession_id = lnsession.id AND lnsession.lnuser_id = lnuser.id AND  plate_set.id = ?;");
+
+      pstmt.setInt(1, plate_set_id);
+      ResultSet rs = pstmt.executeQuery();
+      rs.next();
+      int owner_id = Integer.valueOf(rs.getString("lnuser_id"));
+
+      // LOGGER.info("result: " + plateTypeID);
+      rs.close();
+      pstmt.close();
+      return owner_id;
+
+    } catch (SQLException sqle) {
+      LOGGER.severe("SQL exception getting plateset_id: " + sqle);
+    }
+    int dummy = -1;
+    return dummy;
+
+	
+    }
+    
 }

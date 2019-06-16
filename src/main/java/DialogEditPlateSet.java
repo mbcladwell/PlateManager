@@ -20,6 +20,8 @@ public class DialogEditPlateSet extends JDialog {
   static JButton okButton;
   static JButton cancelButton;
   static String plate_set_sys_name;
+  static String project_sys_name;
+    
   final Instant instant = Instant.now();
   static DialogMainFrame dmf;
   private static Session session;
@@ -32,6 +34,7 @@ public class DialogEditPlateSet extends JDialog {
       DialogMainFrame _dmf, String _plate_set_sys_name, String _name, String _description) {
     dmf = _dmf;
     session = dmf.getSession();
+    project_sys_name = session.getProjectSysName();
     dbm = session.getDatabaseManager();
     plate_set_sys_name = _plate_set_sys_name;
 
@@ -42,7 +45,7 @@ public class DialogEditPlateSet extends JDialog {
     // Image img = new
     // ImageIcon(DialogAddProject.class.getResource("../resources/mwplate.png")).getImage();
     // this.setIconImage(img);
-    this.setTitle("Edit Project");
+    this.setTitle("Edit Plate Set " + plate_set_sys_name);
     // c.gridwidth = 2;
 
     label = new JLabel("Date:", SwingConstants.RIGHT);
@@ -59,7 +62,7 @@ public class DialogEditPlateSet extends JDialog {
     c.gridy = 1;
     pane.add(label, c);
 
-    label = new JLabel("Project Name:", SwingConstants.RIGHT);
+    label = new JLabel("Plate Set Name:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 2;
     pane.add(label, c);
@@ -115,7 +118,7 @@ public class DialogEditPlateSet extends JDialog {
             // nameField.getText()));
             dbm.getDatabaseInserter()
                 .updatePlateSet(nameField.getText(), descriptionField.getText(), plate_set_sys_name);
-            dmf.getPlateSetPanel().updatePanel(plate_set_sys_name);
+            dmf.getPlateSetPanel().updatePanel(project_sys_name); //the plate set table needs the project id
             dispose();
           }
         }));
@@ -145,5 +148,5 @@ public class DialogEditPlateSet extends JDialog {
     this.setVisible(true);
   }
 
-  private void addToDB() {}
+
 }

@@ -20,19 +20,19 @@ import java.sql.SQLException;
  */
 public class Session {
 
-  private int user_id;
-  private String user;
+    private int user_id;
+    private String user;
     private String password;
-  private int user_group_id;
-  private String user_group; // admin, superuser, user
-  private int project_id;
-  private String project_sys_name;
-  private String plate_set_sys_name;
+    private int user_group_id;
+    private String user_group; // admin, superuser, user
+    private int project_id;
+    private String project_sys_name;
+    private String plate_set_sys_name;
     private int plate_set_id;
     private int plate_id;
-  private Long session_id;
-  private String working_dir;
-  private String temp_dir;
+    private Long session_id;
+    private String working_dir;
+    private String temp_dir;
     //DialogProperties not found has a help button that needs a help_url_prefix
     private String help_url_prefix = "http://labsolns.com/software/";  
     private String URL;

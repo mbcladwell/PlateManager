@@ -61,13 +61,12 @@ public class MenuBarForPlateSet extends JMenuBar {
                try{
 		  int rowIndex = plate_set_table.getSelectedRow();
 		  String plate_set_sys_name = plate_set_table.getValueAt(rowIndex, 0).toString();
+		  int plate_set_id = Integer.valueOf(plate_set_sys_name.substring(3));
 		  String name = plate_set_table.getValueAt(rowIndex, 1).toString();
-		  //String owner = plate_set_table.getValueAt(rowIndex, 2).toString();
+		  int plate_set_owner_id = session.getDatabaseRetriever().getPlateSetOwnerID(plate_set_id);
 		  String description = plate_set_table.getValueAt(rowIndex, 6).toString();
-		      new DialogEditPlateSet(dmf, plate_set_sys_name, name, description);
-
-		  /*
-		  if (owner.equals(dmf.getSession().getUserName())) {
+	  
+		  if ( plate_set_owner_id == session.getUserID()) {
 		      new DialogEditPlateSet(dmf, plate_set_sys_name, name, description);
 	      } else {
                 JOptionPane.showMessageDialog(
@@ -75,7 +74,7 @@ public class MenuBarForPlateSet extends JMenuBar {
                     "Only the owner can modify a plate set.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
-		    }   */
+		    }   
 		  
             } catch(ArrayIndexOutOfBoundsException aioob) {
               JOptionPane.showMessageDialog(
