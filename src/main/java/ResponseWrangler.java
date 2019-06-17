@@ -30,6 +30,8 @@ public class ResponseWrangler {
     private double threshold;
     private double mean_neg_3_sd;
     private double mean_neg_2_sd;
+    private double mean_pos_3_sd;
+    private double mean_pos_2_sd;
     private int format;
     private int num_plates;
     private int num_hits=0;
@@ -51,14 +53,16 @@ public class ResponseWrangler {
     public static final int RAW = 0;
     public static final int NORM = 1;
     public static final int NORM_POS = 2;
+    public static final int P_ENHANCE = 3;
+    
       private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     
     
     /**
      * 
      *	 Array looks like
-     * plate, well, response, bkgrnd_sub,   norm,   norm_pos ,  well_type_id,  replicates, target 
-     * 1,1,0.293825507,0.293825507,0.434007883,0.511445642,1,1,a
+     * plate, well, response, bkgrnd_sub,   norm,   norm_pos, p_enhance,  well_type_id,  replicates, target 
+     * 1,1,0.293825507,0.293825507,0.434007883,0.511445642, -89.01, 1,1,a
      * class org.postgresql.jdbc.PgArray
      * set up some variable with data limits
      *
@@ -82,13 +86,15 @@ public class ResponseWrangler {
 	    Double bkgrnd = Double.valueOf((float)dtm.getValueAt(row, 3));
 	    Double norm = Double.valueOf((float)dtm.getValueAt(row, 4));
 	    Double normpos = Double.valueOf((float)dtm.getValueAt(row, 5));
-	    int well_type_id = (int)dtm.getValueAt(row, 6);
-	    sorted_response[row][2] = (int)dtm.getValueAt(row, 6);
-	    int replicates = (int)dtm.getValueAt(row, 7);
-	    int target = (int)dtm.getValueAt(row, 8);
+	    Double p_enhance = Double.valueOf((float)dtm.getValueAt(row, 6));
+	    
+	    int well_type_id = (int)dtm.getValueAt(row, 7);
+	    sorted_response[row][2] = (int)dtm.getValueAt(row, 7);
+	    int replicates = (int)dtm.getValueAt(row, 8);
+	    int target = (int)dtm.getValueAt(row, 9);
 	    int sample_id = 0;
-	    if(dtm.getValueAt(row, 9) != null){
-		sample_id = (int)dtm.getValueAt(row, 9);
+	    if(dtm.getValueAt(row, 10) != null){
+		sample_id = (int)dtm.getValueAt(row, 10);
 	    }
 		sorted_response[row][3] = sample_id;
 	  
@@ -143,6 +149,23 @@ public class ResponseWrangler {
 	    }
 
 	    break;
+	case 3: //p_enhance
+	    desired_response_list.add(p_enhance);
+	sorted_response[row][0] = p_enhance;
+	    if(well_type_id==4){  //if it is a blank
+		blank_list.add(Double.valueOf((float)dtm.getValueAt(row, 6)));
+	    }
+	    if(well_type_id==3){  //if it is a negative control
+		neg_list.add(Double.valueOf((float)dtm.getValueAt(row, 6)));
+	    }
+	    if(well_type_id==2){  //if it is a positive control
+		pos_list.add(Double.valueOf((float)dtm.getValueAt(row, 6)));
+	    }
+	    if(well_type_id==1){  //if it is an unknown
+		unknowns_list.add(Double.valueOf((float)dtm.getValueAt(row, 6)));
+	    }
+
+	    break;
 	}
 
        
@@ -165,6 +188,10 @@ public class ResponseWrangler {
     mean_neg_3_sd = mean_neg + 3*(stdev_neg);
     mean_neg_2_sd = mean_neg + 2*(stdev_neg);
     threshold = mean_neg_3_sd;
+
+
+    mean_pos_3_sd = mean_pos + 3*(stdev_pos);
+    mean_pos_2_sd = mean_pos + 2*(stdev_pos);
 
     Arrays.sort(sorted_response, new Comparator<double[]>() {
         @Override

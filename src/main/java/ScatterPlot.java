@@ -102,6 +102,7 @@ public class ScatterPlot extends JFrame {
 	raw_response = new ResponseWrangler(table, ResponseWrangler.RAW);
 	norm_response = new ResponseWrangler(table, ResponseWrangler.NORM);
 	norm_pos_response = new ResponseWrangler(table, ResponseWrangler.NORM_POS);
+	p_enhanced_response = new ResponseWrangler(table, ResponseWrangler.P_ENHANCE);
 
 	selected_response = norm_response;
 	threshold = selected_response.getThreshold();
@@ -209,7 +210,7 @@ public class ScatterPlot extends JFrame {
     c.anchor = GridBagConstraints.LINE_END;
     panel2.add(label, c);
 
-    ComboItem[] responseTypes = new ComboItem[]{ new ComboItem(1,"raw"), new ComboItem(2,"norm"), new ComboItem(3,"norm_pos"), new ComboItem(3,"% enhancement")};
+    ComboItem[] responseTypes = new ComboItem[]{ new ComboItem(1,"raw"), new ComboItem(2,"norm"), new ComboItem(3,"norm_pos"), new ComboItem(4,"% enhancement")};
     
     responseList = new JComboBox<ComboItem>(responseTypes);
     responseList.setSelectedIndex(1);
@@ -347,10 +348,20 @@ public class ScatterPlot extends JFrame {
 	  hgt = getHeight();
 	  
            originX = margin;
+
+	   if(	selected_response == p_enhanced_response ){
+	       //origin in the middle of the Y axis
+	       originY = (getHeight() - margin)/2;
+	       scaleY = (hgt-margin)/300; //125% on either side of the origin  
+	       
+
+	   }else{  //origin lower left corner
 	   originY = getHeight() - margin;
+	  scaleY = (hgt-margin)/max_response;  
+	       
+	   }
 	
 	  scaleX = (wth-margin)/Double.valueOf(format);
-	  scaleY = (hgt-margin)/max_response;  
 	  //    double[][]  sortedResponse [response] [well] [type_id] [sample_id]
 	  
 	  for (int i = 0; i < sortedResponse.length; i++) {
@@ -409,6 +420,7 @@ public class ScatterPlot extends JFrame {
 		  break;	    
 	      }
 
+	      //Yaxis  6 evenly spaced ticks
 		  for(int k = 1; k <6; k++){ //Y axis
 		      g.drawLine( (int)Math.round(originX-10), (int)Math.round(originY-k*((hgt-margin)/6)),
 				  (int)Math.round(originX), (int)Math.round(originY-k*((hgt-margin)/6)));

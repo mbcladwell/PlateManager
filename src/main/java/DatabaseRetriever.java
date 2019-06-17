@@ -959,7 +959,7 @@ int plate_layout_name_id = _plate_layout_name_id;
 
 	String assay_run_id[] = _assay_run_id;
 	CustomTable ct;
-	String sqlstring_pre = "SELECT plate_set.plate_set_sys_name as \"Plate SET\", plate.plate_sys_name as \"Plate\", assay_result.well, assay_result.response, assay_result.bkgrnd_sub,   assay_result.norm,  assay_result.norm_pos  FROM assay_result, assay_run, plate_plate_set, plate_set, plate WHERE assay_run.plate_set_id=plate_plate_set.plate_set_id and assay_result.assay_run_id=assay_run.id AND plate_plate_set.plate_order=assay_result.plate_order AND plate_plate_set.plate_set_id=plate_set.id AND plate_plate_set.plate_id=plate.ID and assay_run.id IN (";
+	String sqlstring_pre = "SELECT plate_set.plate_set_sys_name as \"Plate SET\", plate.plate_sys_name as \"Plate\", assay_result.well, assay_result.response, assay_result.bkgrnd_sub,   assay_result.norm,  assay_result.norm_pos, assay_result.p_enhance  FROM assay_result, assay_run, plate_plate_set, plate_set, plate WHERE assay_run.plate_set_id=plate_plate_set.plate_set_id and assay_result.assay_run_id=assay_run.id AND plate_plate_set.plate_order=assay_result.plate_order AND plate_plate_set.plate_set_id=plate_set.id AND plate_plate_set.plate_id=plate.ID and assay_run.id IN (";
 
 	String sqlstring_mid  = new String();
 
