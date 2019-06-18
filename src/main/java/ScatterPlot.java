@@ -6,7 +6,7 @@
  */
 package pm;
 
-    import java.awt.BasicStroke;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -95,7 +95,7 @@ public class ScatterPlot extends JFrame {
 	this.dmf = _dmf;
 	session = dmf.getSession();
 	assay_run_id = _assay_run_id;
-    //need the assay run id
+	//need the assay run id
 	table = session.getDatabaseManager().getDatabaseRetriever().getDataForScatterPlot(assay_run_id);
 	//LOGGER.info("row count: " + table.getRowCount());	    
 
@@ -113,27 +113,27 @@ public class ScatterPlot extends JFrame {
 	panel2 = new JPanel(new GridBagLayout());
 	GridBagConstraints c = new GridBagConstraints();
 
-    JLabel label = new JLabel("Algorithm:", SwingConstants.RIGHT);
-    c.gridx = 0;
-    c.gridy = 0;
-    c.gridheight = 1;
-    c.gridwidth = 1;
-    c.insets = new Insets(5, 5, 2, 2);
-    c.anchor = GridBagConstraints.LINE_END;
-    panel2.add(label, c);
+	JLabel label = new JLabel("Algorithm:", SwingConstants.RIGHT);
+	c.gridx = 0;
+	c.gridy = 1;
+	c.gridheight = 1;
+	c.gridwidth = 1;
+	c.insets = new Insets(5, 5, 2, 2);
+	c.anchor = GridBagConstraints.LINE_END;
+	panel2.add(label, c);
 
-    ComboItem[] algorithmTypes = new ComboItem[]{ new ComboItem(3,"mean(neg) + 3SD"), new ComboItem(2,"mean(neg) + 2SD"), new ComboItem(1,"> mean(pos)")};
+	ComboItem[] algorithmTypes = new ComboItem[]{ new ComboItem(3,"mean(neg) + 3SD"), new ComboItem(2,"mean(neg) + 2SD"), new ComboItem(1,"> mean(pos)")};
     
-    algorithmList = new JComboBox<ComboItem>(algorithmTypes);
-    algorithmList.setSelectedIndex(0);
-    c.gridx = 1;
-    c.gridy = 0;
-    c.gridheight = 1;
-    c.gridwidth = 1;
-    c.anchor = GridBagConstraints.LINE_START;
-    panel2.add(algorithmList, c);
-    algorithmList.addActionListener(new ActionListener() { 
-        public void actionPerformed(ActionEvent evt) {
+	algorithmList = new JComboBox<ComboItem>(algorithmTypes);
+	algorithmList.setSelectedIndex(0);
+	c.gridx = 1;
+	c.gridy = 1;
+	c.gridheight = 1;
+	c.gridwidth = 1;
+	c.anchor = GridBagConstraints.LINE_START;
+	panel2.add(algorithmList, c);
+	algorithmList.addActionListener(new ActionListener() { 
+		public void actionPerformed(ActionEvent evt) {
 	    switch(((ComboItem)algorithmList.getSelectedItem()).getKey()){
 	    case 3:
 		setThreshold( mean_neg_3_sd);		
@@ -204,7 +204,7 @@ public class ScatterPlot extends JFrame {
 
  label = new JLabel("Response:", SwingConstants.RIGHT);
     c.gridx = 0;
-    c.gridy = 1;
+    c.gridy = 0;
     c.gridheight = 1;
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_END;
@@ -215,7 +215,7 @@ public class ScatterPlot extends JFrame {
     responseList = new JComboBox<ComboItem>(responseTypes);
     responseList.setSelectedIndex(1);
     c.gridx = 1;
-    c.gridy = 1;
+    c.gridy = 0;
     c.gridheight = 1;
     c.gridwidth = 1;
     c.anchor = GridBagConstraints.LINE_START;
@@ -225,18 +225,26 @@ public class ScatterPlot extends JFrame {
 	    switch(((ComboItem)responseList.getSelectedItem()).getKey()){
 	    case 1:
 		selected_response = raw_response;
+		algorithmList.setEnabled(true);
+		algorithmList.setSelectedIndex(0); 
 		updateAllVariables();
 		break;
 	    case 2:
 		selected_response = norm_response;
+		algorithmList.setEnabled(true);
+		algorithmList.setSelectedIndex(0); 
 		updateAllVariables();
 		break;
 	    case 3:
 		selected_response = norm_pos_response;
+		algorithmList.setEnabled(true);
+		algorithmList.setSelectedIndex(0); 
 		updateAllVariables();
 		break;
 	    case 4:
 		selected_response = p_enhanced_response;
+		algorithmList.setSelectedIndex(2); //sets to > mean(pos)
+		algorithmList.setEnabled(false);
 		updateAllVariables();
 		break;
 	    }
@@ -277,20 +285,11 @@ public class ScatterPlot extends JFrame {
         }
     });
 
-    /*
-    numHitsLabel = new JLabel(String.valueOf(num_hits));
-    c.gridx = 3;
-    c.gridy = 1;
-    c.gridheight = 1;
-    c.gridwidth = 1;
-    c.anchor = GridBagConstraints.LINE_START;
-    panel2.add(numHitsLabel, c);
-    */
     getContentPane().add(panel2, BorderLayout.SOUTH);
 
-	panel3 = new JPanel(new GridBagLayout());
-
-     label = new JLabel("Legend:", SwingConstants.RIGHT);
+    panel3 = new JPanel(new GridBagLayout());
+ 
+    label = new JLabel("Legend:", SwingConstants.RIGHT);
     c.gridx = 0;
     c.gridy = 0;
     c.gridheight = 1;
@@ -298,8 +297,8 @@ public class ScatterPlot extends JFrame {
     c.anchor = GridBagConstraints.LINE_END;
     panel3.add(label, c);
 
-         label = new JLabel("positive", SwingConstants.RIGHT);
-	 label.setForeground(Color.green);
+    label = new JLabel("positive", SwingConstants.RIGHT);
+    label.setForeground(Color.green);
     c.gridx = 1;
     c.gridy = 0;
     c.gridheight = 1;
@@ -307,8 +306,8 @@ public class ScatterPlot extends JFrame {
     c.anchor = GridBagConstraints.LINE_END;
     panel3.add(label, c);
 
-         label = new JLabel("negative", SwingConstants.RIGHT);
-	 label.setForeground(Color.red);
+    label = new JLabel("negative", SwingConstants.RIGHT);
+    label.setForeground(Color.red);
     c.gridx = 2;
     c.gridy = 0;
     c.gridheight = 1;
@@ -316,7 +315,7 @@ public class ScatterPlot extends JFrame {
     c.anchor = GridBagConstraints.LINE_END;
     panel3.add(label, c);
 
-         label = new JLabel("unknown", SwingConstants.RIGHT);
+    label = new JLabel("unknown", SwingConstants.RIGHT);
     c.gridx = 3;
     c.gridy = 0;
     c.gridheight = 1;
@@ -324,8 +323,8 @@ public class ScatterPlot extends JFrame {
     c.anchor = GridBagConstraints.LINE_END;
     panel3.add(label, c);
 
-         label = new JLabel("blank", SwingConstants.RIGHT);
-	 label.setForeground(Color.gray);
+    label = new JLabel("blank", SwingConstants.RIGHT);
+    label.setForeground(Color.gray);
     c.gridx = 4;
     c.gridy = 0;
     c.gridheight = 1;
@@ -333,58 +332,52 @@ public class ScatterPlot extends JFrame {
     c.anchor = GridBagConstraints.LINE_END;
     panel3.add(label, c);
 
-  getContentPane().add(panel3, BorderLayout.NORTH);
+    getContentPane().add(panel3, BorderLayout.NORTH);
     
     panel = new JPanel() {
 	    
 	    
-      public void paintComponent(Graphics g) {
-	  // Plot points below.
-	Font font = new Font(null, Font.PLAIN, 12);    
-	g.setFont(font);
+	    public void paintComponent(Graphics g) {
+		// Plot points below.
+		Font font = new Font(null, Font.PLAIN, 12);    
+		g.setFont(font);
+		wth = getWidth();
+		hgt = getHeight();
+		originX = margin;
 
-
-	  wth = getWidth();
-	  hgt = getHeight();
-	  
-           originX = margin;
-
-	   if(	selected_response == p_enhanced_response ){
+		if(	selected_response == p_enhanced_response ){
 	       //origin in the middle of the Y axis
-	       originY = (getHeight() - margin)/2;
-	       scaleY = (hgt-margin)/300; //125% on either side of the origin  
-	       
-
-	   }else{  //origin lower left corner
-	   originY = getHeight() - margin;
-	  scaleY = (hgt-margin)/max_response;  
-	       
-	   }
+		    originY = (getHeight() - margin)/2;
+		    scaleY = (hgt-margin)/280; //140% on either side of the origin  
+		}else{  //origin lower left corner
+		    originY = getHeight() - margin;
+		    scaleY = (hgt-margin)/max_response;  
+		}
 	
-	  scaleX = (wth-margin)/Double.valueOf(format);
-	  //    double[][]  sortedResponse [response] [well] [type_id] [sample_id]
-	  
-	  for (int i = 0; i < sortedResponse.length; i++) {
+		scaleX = (wth-margin)/Double.valueOf(format);
+		//    double[][]  sortedResponse [response] [well] [type_id] [sample_id]
+		
+		for (int i = 0; i < sortedResponse.length; i++) {
 	     
 
-	      //set color based on well type
-	      switch((int)Math.round(sortedResponse[i][2])){
-	      case 1: g.setColor(Color.black);
-		  break;
-	      case 2: g.setColor(Color.green);
-		  break;
-	      case 3: g.setColor(Color.red);
-		  //LOGGER.info("color set to red");
-		  break;
-	      case 4: g.setColor(Color.gray);
-		  break;
-	      case 5: g.setColor(Color.blue);
-		  break;
-	      }
+		    //set // commentlor based on well type
+		    switch((int)Math.round(sortedResponse[i][2])){
+		    case 1: g.setColor(Color.black);
+			break;
+		    case 2: g.setColor(Color.green);
+			break;
+		    case 3: g.setColor(Color.red);
+			//LOGGER.info("color set to red");
+			break;
+		    case 4: g.setColor(Color.gray);
+			break;
+		    case 5: g.setColor(Color.blue);
+			break;
+		    }
 
 	      
-	      int xpt = (int)Math.round(originX + scaleX*sortedResponse[i][1]);
-	      int ypt = (int)Math.round(originY - scaleY*sortedResponse[i][0]);
+		    int xpt = (int)Math.round(originX + scaleX*sortedResponse[i][1]);
+		    int ypt = (int)Math.round(originY - scaleY*sortedResponse[i][0]);
 	      // LOGGER.info("scaleX: " + scaleX + " response: " + sortedResponse[i][0] + " xpt: " + xpt);
 
 	      g.drawString("X", xpt, ypt);
@@ -392,7 +385,13 @@ public class ScatterPlot extends JFrame {
 	      g.setColor(Color.black);
 	      g.drawLine(margin, 0,  margin, hgt-margin); // y-axis
 	      g.drawLine(margin, hgt-margin, wth-10, hgt-margin); // x-axis
-	      g.drawString("Well", (int)Math.round(originX + (wth-margin)/2)  , (int)Math.round(originY + margin/2 + 10) );
+
+	      if(selected_response == p_enhanced_response ){
+		  g.drawString("Well", (int)Math.round(originX + (wth-margin)/2)  , (int)Math.round(originY*2 + margin/2 + 10) );
+	      }else{
+		  g.drawString("Well", (int)Math.round(originX + (wth-margin)/2)  , (int)Math.round(originY + margin/2 + 10) );
+	      }
+	     
 	      
 	      //draw the axes ticks and labels
 	      
@@ -420,15 +419,30 @@ public class ScatterPlot extends JFrame {
 		  break;	    
 	      }
 
-	      //Yaxis  6 evenly spaced ticks
+	      //scale Y is 280 i.e. Y axis broke into 280 units, 140 on each side of 0
+	      //so height - margin is 280
+	      // consider originY-140 is the origin and add to that 40, 90 140, 190, 240
+	      // or originY - 150 is where you want to start
+	      if(selected_response == p_enhanced_response ){
+		  //Y axis at -100, -50, 0, 50, 100
+		  String[] labels = {"150","100","50","0","-50","-100","-150"};
+		  for(int k = 0; k <7; k++){ //Y axis
+		      g.drawLine( (int)Math.round(originX-10), (int)Math.round(originY-150 + k*50),
+				  (int)Math.round(originX), (int)Math.round(originY-150 + k*50));
+		      g.drawString( labels[k],  (int)Math.round(originX - 50),
+				    (int)Math.round(originY-150 + k*50 ));	   	
+		  }
+		  
+		      
+	      }else{
+		  //Yaxis  6 evenly spaced ticks
 		  for(int k = 1; k <6; k++){ //Y axis
 		      g.drawLine( (int)Math.round(originX-10), (int)Math.round(originY-k*((hgt-margin)/6)),
 				  (int)Math.round(originX), (int)Math.round(originY-k*((hgt-margin)/6)));
 		      g.drawString(String.valueOf(df.format((k*((hgt-margin)/6))/scaleY)),  (int)Math.round(originX - 50),
-				   (int)Math.round(originY-k*((hgt-margin)/6)) );
-	   	
+				   (int)Math.round(originY-k*((hgt-margin)/6)) );	   	
 		  }
-
+	      }
 	      
 	      //draw "Response" on the Y axis
 	      Graphics2D g2d = (Graphics2D) g.create();
@@ -436,7 +450,12 @@ public class ScatterPlot extends JFrame {
 	      affineTransform.rotate(Math.toRadians(-90), 0, 0);
 	      Font rotatedFont = font.deriveFont(affineTransform);
 	      g2d.setFont(rotatedFont);
-	      g2d.drawString("Response", Math.round(originX -40)  , Math.round(originY - hgt/2 + 40) );
+	      if(selected_response == p_enhanced_response ){
+		  g2d.drawString("% Enhancement", Math.round(originX -25)  , Math.round(originY*2 - hgt/2 + 60) );
+	      }else{
+		  g2d.drawString("Response", Math.round(originX -25)  , Math.round(originY - hgt/2 + 40) );
+	      }
+	      
 	      g2d.setFont(font);
 	      g2d.dispose();
 
@@ -483,7 +502,8 @@ public class ScatterPlot extends JFrame {
 	slider.setDoubleValue(threshold);
 	num_hits = selected_response.getHitsAboveThreshold(threshold);
 	numHitsField.setText(String.valueOf(num_hits));
-	this.repaint();
+	updateAllVariables();
+	//this.repaint();
 	
     }
 

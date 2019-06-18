@@ -11,7 +11,7 @@ public class Main {
     // new DialogMainFrame();
 
     Session s = new Session();
-    //ScatterPlot sp = new ScatterPlot(dmf, 10);
+    ScatterPlot sp = new ScatterPlot(s.getDialogMainFrame(), 1);
     //DialogAddPlateSetData dapsd = new DialogAddPlateSetData(dmf, "name", 10, 1536, 20);
     //AssayRunViewer lv = new AssayRunViewer(dmf);
     //LayoutViewer lv = new LayoutViewer(dmf);

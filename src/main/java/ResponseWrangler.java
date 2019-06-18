@@ -151,7 +151,7 @@ public class ResponseWrangler {
 	    break;
 	case 3: //p_enhance
 	    desired_response_list.add(p_enhance);
-	sorted_response[row][0] = p_enhance;
+	    sorted_response[row][0] = p_enhance;
 	    if(well_type_id==4){  //if it is a blank
 		blank_list.add(Double.valueOf((float)dtm.getValueAt(row, 6)));
 	    }
@@ -187,7 +187,12 @@ public class ResponseWrangler {
     
     mean_neg_3_sd = mean_neg + 3*(stdev_neg);
     mean_neg_2_sd = mean_neg + 2*(stdev_neg);
-    threshold = mean_neg_3_sd;
+
+    if(_desired_response==3){
+	threshold = 0;
+    }else{
+	threshold = mean_neg_3_sd;
+    }
 
 
     mean_pos_3_sd = mean_pos + 3*(stdev_pos);
