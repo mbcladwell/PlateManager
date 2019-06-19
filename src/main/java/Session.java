@@ -30,7 +30,7 @@ public class Session {
     private String plate_set_sys_name;
     private int plate_set_id;
     private int plate_id;
-    private Long session_id;
+    private int session_id;
     private String working_dir;
     private String temp_dir;
     //DialogProperties not found has a help button that needs a help_url_prefix
@@ -246,12 +246,12 @@ public class Session {
   }
 
     
-  public Long getSessionID() {
+  public int getSessionID() {
     return session_id;
   }
 
-  public void setSessionID(Long _l) {
-    session_id = _l;
+  public void setSessionID(int _i) {
+    session_id = _i;
   }
 
   public void setTempDir(String _s) {

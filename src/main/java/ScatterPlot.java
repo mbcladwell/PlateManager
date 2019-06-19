@@ -106,7 +106,10 @@ public class ScatterPlot extends JFrame {
 
 	selected_response = norm_response;
 	threshold = selected_response.getThreshold();
-	updateAllVariables();
+	//updateAllVariables();
+	min_response = selected_response.getMin_response();
+	max_response = selected_response.getMax_response();
+	
 	slider = new ScatterPlotSlider(min_response, max_response, threshold, 100, this);
 
     
@@ -134,18 +137,19 @@ public class ScatterPlot extends JFrame {
 	panel2.add(algorithmList, c);
 	algorithmList.addActionListener(new ActionListener() { 
 		public void actionPerformed(ActionEvent evt) {
+		    LOGGER.info("Algorithm event fired");
 	    switch(((ComboItem)algorithmList.getSelectedItem()).getKey()){
 	    case 3:
 		setThreshold( mean_neg_3_sd);		
-		updateAllVariables();
+		//updateAllVariables();
 		break;
 	    case 2:
 		setThreshold( mean_neg_2_sd);		
-		updateAllVariables();
+		//updateAllVariables();
 		break;
 	    case 1:
 		setThreshold( mean_pos);		
-		updateAllVariables();
+		//updateAllVariables();
 		break;
 	    }
         }
@@ -224,28 +228,28 @@ public class ScatterPlot extends JFrame {
         public void actionPerformed(ActionEvent evt) {
 	    switch(((ComboItem)responseList.getSelectedItem()).getKey()){
 	    case 1:
-		selected_response = raw_response;
 		algorithmList.setEnabled(true);
 		algorithmList.setSelectedIndex(0); 
-		updateAllVariables();
+		selected_response = raw_response;
+		setThreshold(raw_response.getThreshold());
 		break;
 	    case 2:
-		selected_response = norm_response;
 		algorithmList.setEnabled(true);
 		algorithmList.setSelectedIndex(0); 
-		updateAllVariables();
+		selected_response = norm_response;
+		setThreshold(norm_response.getThreshold());
 		break;
 	    case 3:
-		selected_response = norm_pos_response;
 		algorithmList.setEnabled(true);
 		algorithmList.setSelectedIndex(0); 
-		updateAllVariables();
+		selected_response = norm_pos_response;
+		setThreshold(norm_pos_response.getThreshold());
 		break;
 	    case 4:
 		selected_response = p_enhanced_response;
+		setThreshold(p_enhanced_response.getThreshold());
 		algorithmList.setSelectedIndex(2); //sets to > mean(pos)
 		algorithmList.setEnabled(false);
-		updateAllVariables();
 		break;
 	    }
         }
@@ -335,9 +339,22 @@ public class ScatterPlot extends JFrame {
     getContentPane().add(panel3, BorderLayout.NORTH);
     
     panel = new JPanel() {
-	    
-	    
+	    	    
 	    public void paintComponent(Graphics g) {
+
+		format = selected_response.getFormat();
+		num_plates = selected_response.getNum_plates();
+		max_response = selected_response.getMax_response();
+		min_response = selected_response.getMin_response();
+		mean_bkgrnd = selected_response.getMean_bkgrnd();
+		stdev_bkgrnd = selected_response.getStdev_bkgrnd();
+		mean_neg_3_sd = selected_response.getMean_neg_3_sd();
+		mean_neg_2_sd = selected_response.getMean_neg_2_sd();
+		mean_pos = selected_response.getMean_pos();
+		sortedResponse = selected_response.getSortedResponse();
+		sorted_response_unknowns_only = selected_response.getSortedResponseUnknownsOnly();
+		num_hits = selected_response.getHitsAboveThreshold(threshold);
+
 		// Plot points below.
 		Font font = new Font(null, Font.PLAIN, 12);    
 		g.setFont(font);
@@ -502,11 +519,11 @@ public class ScatterPlot extends JFrame {
 	slider.setDoubleValue(threshold);
 	num_hits = selected_response.getHitsAboveThreshold(threshold);
 	numHitsField.setText(String.valueOf(num_hits));
-	updateAllVariables();
-	//this.repaint();
+	repaint();
 	
     }
 
+    /*
     public void updateAllVariables(){
 	
 	format = selected_response.getFormat();
@@ -535,5 +552,5 @@ public class ScatterPlot extends JFrame {
 	//numHitsLabel.setText(Integer.toString(num_hits));
 	repaint();
     }
-    
+    */
 }

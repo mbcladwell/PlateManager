@@ -886,9 +886,9 @@ if(num_of_plate_ids*format_id!=table.size()-1){
       int plate_format_id = _plate_format_id;
       int plate_type_id = _plate_type_id;
       int plate_layout_id = _plate_layout_id;
-         
+      // new_plate_set(_descr VARCHAR(30),_plate_set_name VARCHAR(30), _num_plates INTEGER, _plate_format_id INTEGER, _plate_type_id INTEGER, _project_id INTEGER, _plate_layout_name_id INTEGER, _lnsession_id INTEGER, _with_samples boolean)         
 
-      String insertSql1 = "SELECT new_plate_set ( ?, ?, ?, ?, ?, ?, ?, ?);";
+      String insertSql1 = "SELECT new_plate_set ( ?, ?, ?, ?, ?, ?, ?, ?, ?);";
       PreparedStatement insertPs =
           conn.prepareStatement(insertSql1, Statement.RETURN_GENERATED_KEYS);
       insertPs.setString(1, _description);
@@ -897,8 +897,9 @@ if(num_of_plate_ids*format_id!=table.size()-1){
       insertPs.setInt(4, plate_format_id);
       insertPs.setInt(5, plate_type_id);
       insertPs.setInt(6, project_id);
-      insertPs.setInt(7, plate_layout_id);    
-      insertPs.setBoolean(8, false);      
+      insertPs.setInt(7, plate_layout_id);
+      insertPs.setInt(8, session.getSessionID());
+      insertPs.setBoolean(9, false);      
       // LOGGER.info(insertPs.toString());
       insertPs.execute();  //executeUpdate() expects no returns
       ResultSet resultSet = insertPs.getResultSet();

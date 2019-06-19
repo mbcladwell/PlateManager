@@ -84,7 +84,7 @@ public class DatabaseManager {
 
         if (rsKey.next()) {
           insertKey = rsKey.getLong(1);
-	  session.setSessionID(insertKey);
+	  session.setSessionID(insertKey.intValue());
 
           // LOGGER.info("rsKey: " + insertKey);
         }
