@@ -201,12 +201,16 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 		    if(results.length>1){
 			String[] assay_run_ids = new String[results.length];
 			try{
-			    
+			    //this plans ahead to accept an array, but all must be same format
+			    //stick to one for now
 			    for(int i=0; i < results.length-1; i++){
 			    assay_run_ids[i] =  assay_runs_table.getModel().getValueAt(i, 0).toString().substring(3);
+			 
 			    }
+			    //just work with the first one
+			    int assay_run_id = Integer.parseInt(assay_run_ids[0]);
 
-			    Object[][] assay_run_data = session.getDatabaseRetriever().getAssayRunData(assay_run_ids);
+			    Object[][] assay_run_data = session.getDatabaseRetriever().getAssayRunData(assay_run_id);
 			    POIUtilities poi = new POIUtilities(dmf);
 			    
 			    poi.writeJTableToSpreadsheet("Assay Run Data", assay_run_data);

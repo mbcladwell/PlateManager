@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -955,37 +957,29 @@ int plate_layout_name_id = _plate_layout_name_id;
     /**
      * Called from 
      */
-   public String[][] getAssayRunData(String[] _assay_run_id){
+   public String[][] getAssayRunData(int  _assay_run_id){
 
-	String assay_run_id[] = _assay_run_id;
+	int assay_run_id = _assay_run_id;
 	CustomTable ct;
-	String sqlstring_pre = "SELECT plate_set.plate_set_sys_name as \"Plate SET\", plate.plate_sys_name as \"Plate\", assay_result.well, assay_result.response, assay_result.bkgrnd_sub,   assay_result.norm,  assay_result.norm_pos, assay_result.p_enhance  FROM assay_result, assay_run, plate_plate_set, plate_set, plate WHERE assay_run.plate_set_id=plate_plate_set.plate_set_id and assay_result.assay_run_id=assay_run.id AND plate_plate_set.plate_order=assay_result.plate_order AND plate_plate_set.plate_set_id=plate_set.id AND plate_plate_set.plate_id=plate.ID and assay_run.id IN (";
+	String sqlstring = "Select * from get_all_data_for_assay_run(?)";
 
-	String sqlstring_mid  = new String();
-
-	for (int i =0; i < assay_run_id.length; i++){
-	    sqlstring_mid = sqlstring_mid +  assay_run_id[i] + ",";	    
-	}
-       
-	sqlstring_mid = sqlstring_mid.substring(0,sqlstring_mid.length()-1);
-	String sqlstring_post = ");";
-	String sqlstring = sqlstring_pre + sqlstring_mid + sqlstring_post;
 	//LOGGER.info("SQL : " + sqlstring);
 
 	try {
 	    PreparedStatement preparedStatement =
 		conn.prepareStatement(sqlstring, Statement.RETURN_GENERATED_KEYS);
-	    //preparedStatement.setInt(1, assay_run_id);
+	    preparedStatement.setInt(1, assay_run_id);
 	    preparedStatement.executeQuery(); // executeUpdate expects no returns!!!
 	    ResultSet rs = preparedStatement.getResultSet();
 	     ResultSetMetaData metaData = rs.getMetaData();
 
     // names of columns
-    Vector<String> columnNames = new Vector<String>();
+	     String[] columnNamespre = {"AssayRun","PlateSet","Plate","PlateOrder","Well","WellNum","Response","Bk_Sub","Norm","NormPos","pEnhanced","Sample"};
+	     Vector<String> columnNames = new Vector<String>(Arrays.asList(columnNamespre));
     int columnCount = metaData.getColumnCount();
-    for (int column = 1; column <= columnCount; column++) {
+    /*    for (int column = 1; column <= columnCount; column++) {
         columnNames.add(metaData.getColumnName(column));
-    }
+	}*/
 
     //set up a row counter which will generate a vector of selected row indices
     //used to select all rows for export to a spreadsheet
