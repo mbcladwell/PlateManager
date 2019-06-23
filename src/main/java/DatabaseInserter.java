@@ -562,7 +562,11 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 	    break;
 	case 3:  // mean(background) + 3SD
 	    number_of_hits =  rw.getHitsAboveThreshold(rw.getMean_neg_3_sd() );
-	    break;	    	    
+	    break;
+	case 4:  // >0% enhanced
+	    number_of_hits =  rw.getHitsAboveThreshold(rw.getMean_pos() );
+	    break;
+	    
 	}
 	DialogNewHitList dnhl = new DialogNewHitList(session, assay_run_id, sorted_response, number_of_hits);
 	
@@ -588,7 +592,7 @@ if(num_of_plate_ids*format_id!=table.size()-1){
 
     int new_assay_run_id = 0;
 
-    String sqlstring = "SELECT new_assay_run(?, ?, ?, ?, ?);";
+    String sqlstring = "SELECT new_assay_run(?, ?, ?, ?, ?, ?);";
     // LOGGER.info("sql: " + sqlstring);
 
     try {
@@ -599,6 +603,8 @@ if(num_of_plate_ids*format_id!=table.size()-1){
       preparedStatement.setInt(3, assay_type_id);
       preparedStatement.setInt(4, plate_set_id);
       preparedStatement.setInt(5, plate_layout_name_id);
+      preparedStatement.setInt(6, session.getSessionID());
+      
 
       preparedStatement.execute(); // executeUpdate expects no returns!!!
 

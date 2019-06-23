@@ -279,7 +279,7 @@ public class DialogAddPlateSetData extends JDialog
     }
 	});
 
-    ComboItem[] algorithmTypes = new ComboItem[]{ new ComboItem(3,"mean(background) + 3SD"), new ComboItem(2,"mean(background) + 2SD"), new ComboItem(1,"Top N")};
+    ComboItem[] algorithmTypes = new ComboItem[]{ new ComboItem(4,">0% enhanced"), new ComboItem(3,"mean(background) + 3SD"), new ComboItem(2,"mean(background) + 2SD"), new ComboItem(1,"Top N")};
     algorithmList = new JComboBox<ComboItem>(algorithmTypes);
    
     c.gridx = 2;
