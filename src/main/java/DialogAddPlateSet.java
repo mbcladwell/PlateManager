@@ -215,10 +215,13 @@ public class DialogAddPlateSet extends JDialog {
 		    .getDatabaseInserter().insertPlateSet(
                     nameField.getText(),
                     descriptionField.getText(),
-                    numberField.getText(),
-                    formatList.getSelectedItem().toString(),
+                    Integer.valueOf(numberField.getText()),
+                    Integer.valueOf(formatList.getSelectedItem().toString()),
                     ((ComboItem)typeList.getSelectedItem()).getKey(),
-			((ComboItem)layoutList.getSelectedItem()).getKey());
+		    session.getProjectID(),
+		    ((ComboItem)layoutList.getSelectedItem()).getKey(),
+							  true);
+		session.getDialogMainFrame().showPlateSetTable(session.getProjectSysName());
             dispose();
           }
         }));

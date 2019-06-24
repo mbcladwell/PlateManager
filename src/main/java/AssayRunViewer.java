@@ -197,6 +197,11 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
     menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 		if(!assay_runs_table.getSelectionModel().isSelectionEmpty()){
+		    try{
+			int row = assay_runs_table.getSelectedRow();
+			int assay_run_id = Integer.parseInt(( (String)assay_runs_table.getModel().getValueAt(row,0)).substring(3));
+
+			/*
 		    Object[][] results = dmf.getUtilities().getSelectedRowsAndHeaderAsStringArray(assay_runs_table);
 		    if(results.length>1){
 			String[] assay_run_ids = new String[results.length];
@@ -204,12 +209,17 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 			    //this plans ahead to accept an array, but all must be same format
 			    //stick to one for now
 			    for(int i=0; i < results.length-1; i++){
-			    assay_run_ids[i] =  assay_runs_table.getModel().getValueAt(i, 0).toString().substring(3);
+				int modelRow =  assay_runs_table.convertRowIndexToModel(i);
+			    assay_run_ids[i] =  assay_runs_table.getModel().getValueAt(modelRow, 0).toString().substring(3);
+			 LOGGER.info("modelRow: " + modelRow);
+			   LOGGER.info("full string: " + assay_runs_table.getModel().getValueAt(modelRow, 0).toString());
+			  
+			    LOGGER.info("assay_run_ids[i]; i: " + i + ": " + assay_run_ids[i]);
 			 
 			    }
 			    //just work with the first one
 			    int assay_run_id = Integer.parseInt(assay_run_ids[0]);
-
+			*/
 			    Object[][] assay_run_data = session.getDatabaseRetriever().getAssayRunData(assay_run_id);
 			    POIUtilities poi = new POIUtilities(dmf);
 			    
@@ -226,7 +236,7 @@ public class AssayRunViewer extends JDialog implements java.awt.event.ActionList
 		    }
 		}
 	    }
-        });
+        );
     popup.add(menuItem);
     popup.show(exportAssayRun, 0, 0);
     popup.setVisible(true);
