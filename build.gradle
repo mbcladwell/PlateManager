@@ -112,10 +112,13 @@ jar {
 	   
         )
     }
+    
     from {
-	configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+    	configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
+      }
+    
 }
+
 
 
 task myJavadocs(type: Javadoc) {
@@ -218,7 +221,24 @@ task customFatJar(type: Jar) {
 
 /////////////////////////////////////////////////////////////
 //Run makeUberJar to create the Uber jar
-task makeUberJar(type: Copy, dependsOn: [jar]) {
+
+
+task jarForWebStart() {
+    manifest {
+        attributes(
+                'Main-Class': mainClassName,
+                'Implementation-Title': 'LIMS*Nucleus',
+                'Implementation-Version': version,
+            'provider': 'gradle'
+	   
+        )
+    }
+    
+    
+}
+
+
+task copyWebStartJar(type: Copy, dependsOn: [jarForWebStart]) {
     
 //    from configurations.runtime
     from("build/libs")
@@ -229,8 +249,7 @@ task makeUberJar(type: Copy, dependsOn: [jar]) {
 
 
 
-    
-task signAll(dependsOn: []) {
+task signAll(dependsOn: [copyWebStartJar]) {
     doLast{
     new File('webstart/signed').mkdirs()
     def libFiles = files { file('webstart/libs').listFiles() }
@@ -245,5 +264,16 @@ task signAll(dependsOn: []) {
                 preservelastmodified: 'false')
     }
     }	
+}
+
+
+task prepWebStart(type: Copy, dependsOn: [signAll]) {
+   // from configurations.runtime
+// new File('/home/mbc/syncd/labsolns/public/schema').mkdirs()
+    from("webstart/signed")
+   // include('*.html', '*.js', '*.css','*.png','*.txt','*.xml')
+    into("/home/mbc/syncd/labsolns/source/_posts/webstart")
+    
+    
 }
 
