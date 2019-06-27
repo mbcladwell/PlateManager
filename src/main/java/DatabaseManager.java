@@ -39,7 +39,7 @@ public class DatabaseManager {
    * access (no delete etc.). Connect as ln_admin to get administrative privileges.
    */
   public DatabaseManager(Session _s) {
-      LOGGER.info("insession: " + _s);
+      //LOGGER.info("in session: " + _s);
       session=_s;
       Long insertKey = 0L;
       try {
@@ -52,13 +52,13 @@ public class DatabaseManager {
 	  props.setProperty("password", "welcome");
 
 	  conn = DriverManager.getConnection(url, props);
-	  LOGGER.info("conn: " + conn);
+	  //LOGGER.info("conn: " + conn);
 	  PreparedStatement pstmt = conn.prepareStatement(
               //  "SELECT password = crypt( ?,password) FROM pmuser WHERE pmuser_name = ?;");
               "SELECT password = ?, password FROM lnuser WHERE lnuser_name = ?;");
 	  pstmt.setString(1, session.getPassword());
 	  pstmt.setString(2, session.getUserName());
-	  LOGGER.info("pstmnt: " + pstmt);
+	  //LOGGER.info("pstmnt: " + pstmt);
 	  ResultSet rs = pstmt.executeQuery();
 	  rs.next();
 	  boolean pass = rs.getBoolean(1);

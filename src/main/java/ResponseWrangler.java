@@ -179,11 +179,12 @@ public class ResponseWrangler {
     num_data_points = desired_response_list.size();
     
     mean_bkgrnd = Stats.meanOf(blank_list);
-    stdev_bkgrnd = Stats.of(blank_list).populationStandardDeviation();
+    stdev_bkgrnd = Stats.of(blank_list).sampleStandardDeviation();
     mean_neg = Stats.meanOf(neg_list);
-    stdev_neg = Stats.of(neg_list).populationStandardDeviation();
+    
+    stdev_neg = Stats.of(neg_list).sampleStandardDeviation();
     mean_pos = Stats.meanOf(pos_list);
-    stdev_pos = Stats.of(pos_list).populationStandardDeviation();
+    stdev_pos = Stats.of(pos_list).sampleStandardDeviation();
     
     mean_neg_3_sd = mean_neg + 3*(stdev_neg);
     mean_neg_2_sd = mean_neg + 2*(stdev_neg);
@@ -220,17 +221,19 @@ public class ResponseWrangler {
 
 
     
-    /*
+    
     if(_desired_response == 0){
-	System.out.println("max: " + max_response);
-	System.out.println("min: " + min_response);
-	System.out.println("bkrnd: " + mean_bkgrnd);
-	System.out.println("stdev: " + stdev_bkgrnd);
-	System.out.println("mean_3_sd: " + mean_3_sd);
-	System.out.println("mean_2_sd: " + mean_2_sd);
-	System.out.println("threshold: " + threshold);
-	System.out.println("" );
+	System.out.println("neg: " + mean_neg);
+	System.out.println("stdev_neg: " + stdev_neg);
+	System.out.println("mean_2_sd: " + mean_neg_2_sd);
+	System.out.println("mean_2_sd_hits: " + getHitsAboveThreshold(mean_neg_2_sd));
+	System.out.println("mean_3_sd: " + mean_neg_3_sd);
+	System.out.println("mean_3_sd_hits: " + getHitsAboveThreshold(mean_neg_3_sd));
+	System.out.println("mean_pos" + mean_pos );
+	System.out.println("pos_hits: " + getHitsAboveThreshold(mean_pos));
+    }
 
+    /*
     for(int i=0; i < sorted_response.length; i++){
 	System.out.println("[" + i + "][0] " + sorted_response[i][0] );
 	System.out.println("[" + i + "][1] " + sorted_response[i][1]);

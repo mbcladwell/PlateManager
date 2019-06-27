@@ -137,7 +137,7 @@ public class ScatterPlot extends JFrame {
 	panel2.add(algorithmList, c);
 	algorithmList.addActionListener(new ActionListener() { 
 		public void actionPerformed(ActionEvent evt) {
-		    LOGGER.info("Algorithm event fired");
+		    //   LOGGER.info("Algorithm event fired");
 	    switch(((ComboItem)algorithmList.getSelectedItem()).getKey()){
 	    case 3:
 		setThreshold( mean_neg_3_sd);		
